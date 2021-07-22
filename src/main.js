@@ -7,6 +7,8 @@ import { VuelidatePlugin } from "@vuelidate/core";
 
 import components from "@/components/UI/";
 
+import "@/assets/styles/main.scss";
+
 const app = createApp(App);
 
 components.forEach((component) => {

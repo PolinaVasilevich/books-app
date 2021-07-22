@@ -1,13 +1,13 @@
 <template>
   <my-header>
-    <my-button class="btn"><router-link to="/">Home</router-link></my-button>
-    <my-button v-if="isAdmin"
+    <my-button class="link"><router-link to="/">Home</router-link></my-button>
+    <my-button v-if="isAdmin" class="link"
       ><router-link to="/admin">Admin</router-link></my-button
     >
-    <my-button v-if="!isLoggedIn" class="btn"
+    <my-button v-if="!isLoggedIn" class="link"
       ><router-link to="/login">Login</router-link></my-button
     >
-    <my-button v-else @click="logout">Logout</my-button>
+    <my-button v-else @click="logout" class="link">Logout</my-button>
   </my-header>
   <router-view />
 </template>
@@ -35,17 +35,12 @@ export default {
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Roboto", sans-serif;
-  color: #000;
-  text-decoration: none;
+.link {
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
-.btn:hover {
-  cursor: pointer;
-  background-color: rgba(230, 225, 225, 0.938);
+.router-link-active {
+  color: #3498db;
 }
 </style>

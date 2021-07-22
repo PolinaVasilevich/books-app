@@ -37,6 +37,8 @@ import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { mapState } from "vuex";
 
+import "@/assets/styles/loginForm.scss";
+
 export default {
   name: "login-form",
   setup() {
@@ -59,12 +61,7 @@ export default {
       if (this.v$.$invalid) {
         return;
       }
-      const user = this.user;
-
-      this.$store
-        .dispatch("login/login", user)
-        .then(() => this.$router.push("/"))
-        .catch((err) => console.log(err));
+      this.$emit("login", this.user);
     },
   },
 
@@ -88,32 +85,3 @@ export default {
   },
 };
 </script>
-
-<style scoped lang="scss">
-.form {
-  .form__input {
-    margin: 10px 0 5px 0;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    outline: none;
-    border: 1px solid #ddd;
-    font-size: 1em;
-  }
-  .error-msg {
-    margin-top: 10px;
-    color: red;
-  }
-  .input-error {
-    border-color: red;
-  }
-
-  .btn {
-    background-color: #3498db;
-    padding: 10px 20px;
-    margin-top: 10px;
-    border: none;
-    color: white;
-  }
-}
-</style>
