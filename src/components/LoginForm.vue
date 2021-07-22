@@ -28,7 +28,7 @@
       <div class="error-msg">{{ error.$message }}</div>
     </div>
 
-    <my-button @click="submitForm" class="form__btn">Login</my-button>
+    <my-button @click="checkForm" class="form__btn">Login</my-button>
   </form>
 </template>
 
@@ -55,13 +55,11 @@ export default {
   },
 
   methods: {
-    submitForm() {
-      this.v$.$touch();
-
-      if (this.v$.$invalid) {
-        return;
+    checkForm() {
+      this.v$.user.$touch();
+      if (!this.v$.user.$error) {
+        this.$emit("login", this.user);
       }
-      this.$emit("login", this.user);
     },
   },
 
