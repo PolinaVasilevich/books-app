@@ -1,6 +1,9 @@
 <template>
   <my-header>
     <my-button class="btn"><router-link to="/">Home</router-link></my-button>
+    <my-button v-if="isAdmin"
+      ><router-link to="/admin">Admin</router-link></my-button
+    >
     <my-button v-if="!isLoggedIn" class="btn"
       ><router-link to="/login">Login</router-link></my-button
     >
@@ -17,13 +20,17 @@ export default {
   methods: {
     logout() {
       this.$store.dispatch("logout").then(() => {
-        this.$router.push("/login");
+        this.$router.push("/");
       });
     },
   },
   computed: {
     isLoggedIn() {
       return this.$store.getters.isLoggedIn;
+    },
+
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
   },
 };
@@ -43,24 +50,4 @@ export default {
   cursor: pointer;
   background-color: rgba(230, 225, 225, 0.938);
 }
-/* #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-} */
 </style>

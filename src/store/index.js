@@ -5,16 +5,17 @@ export default createStore({
   state: {
     status: "",
     token: localStorage.getItem("token") || "",
-    user: {},
+    user: JSON.parse(localStorage.getItem("user")) || {},
   },
 
   mutations: {
     auth_request(state) {
       state.status = "loading";
     },
-    auth_success(state, token, user) {
+
+    auth_success(state, user) {
       state.status = "success";
-      state.token = token;
+      state.token = user.token;
       state.user = user;
     },
 
@@ -25,6 +26,7 @@ export default createStore({
     logout(state) {
       state.status = "";
       state.token = "";
+      state.user = "";
     },
   },
   actions: {
@@ -38,11 +40,14 @@ export default createStore({
 
         if (userInfo) {
           localStorage.setItem("token", userInfo.token);
-          commit("auth_success", userInfo.token, userInfo);
+          localStorage.setItem("user", JSON.stringify(userInfo));
+
+          commit("auth_success", userInfo);
           resolve();
         } else {
           commit("auth_error", "User not found");
           localStorage.removeItem("token");
+          localStorage.removeItem("user");
           reject("User not found");
         }
       });
@@ -52,6 +57,7 @@ export default createStore({
       return new Promise((resolve) => {
         commit("logout");
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         resolve();
       });
     },
@@ -59,6 +65,7 @@ export default createStore({
   getters: {
     isLoggedIn: (state) => !!state.token,
     authStatus: (state) => state.status,
+    isAdmin: (state) => !!state.user.isAdmin,
   },
   modules: {},
 });

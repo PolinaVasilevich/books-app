@@ -1,6 +1,9 @@
 <template>
   <form @submit.prevent class="form">
     <h1>Login</h1>
+    <div v-if="$store.state.status" class="input-errors">
+      <div class="error-msg">{{ $store.state.status }}</div>
+    </div>
     <input
       class="form__input"
       :class="{ 'input-error': v$.user.username.$errors.length }"
@@ -9,11 +12,7 @@
       placeholder="Enter your username"
     />
 
-    <div
-      class="input-errors"
-      v-for="error of v$.user.username.$errors"
-      :key="error.$uid"
-    >
+    <div v-for="error of v$.user.username.$errors" :key="error.$uid">
       <div class="error-msg">{{ error.$message }}</div>
     </div>
 
@@ -25,17 +24,11 @@
       placeholder="Enter your password"
     />
 
-    <div
-      class="input-errors"
-      v-for="error of v$.user.password.$errors"
-      :key="error.$uid"
-    >
+    <div v-for="error of v$.user.password.$errors" :key="error.$uid">
       <div class="error-msg">{{ error.$message }}</div>
     </div>
 
     <my-button @click="submitForm" class="form__btn">Login</my-button>
-
-    <span v-if="$store.state.status"></span>
   </form>
 </template>
 
@@ -101,6 +94,7 @@ export default {
     font-size: 1em;
   }
   .error-msg {
+    margin-top: 10px;
     color: red;
   }
   .input-error {

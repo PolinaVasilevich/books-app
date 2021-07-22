@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
+import Admin from "@/views/Admin.vue";
+import UserPage from "@/views/UserPage.vue";
+import Secure from "@/views/Secure.vue";
 
 const routes = [
   {
@@ -12,6 +15,27 @@ const routes = [
     path: "/login",
     name: "Login",
     component: Login,
+  },
+
+  {
+    path: "/admin",
+    name: "Admin",
+    component: Admin,
+  },
+
+  {
+    path: "/user",
+    name: "User",
+    component: UserPage,
+  },
+
+  {
+    path: "/secure",
+    name: "Secure",
+    component: Secure,
+    meta: {
+      requiresAuth: true,
+    },
   },
 ];
 

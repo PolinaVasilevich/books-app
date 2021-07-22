@@ -12,5 +12,6 @@ export default [
     username: "vasilevich_p",
     password: "vasilevich",
     isAdmin: false,
+    token: "vasilevich",
   },
 ];

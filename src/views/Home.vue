@@ -1,7 +1,5 @@
 <template>
-  <div class="home">
-    {{ $store.state.token }}
-  </div>
+  <div class="home"></div>
 </template>
 
 <script>
