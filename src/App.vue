@@ -13,25 +13,23 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import MyHeader from "@/components/MyHeader.vue";
 
 export default {
   components: { MyHeader },
   methods: {
     logout() {
-      this.$store.dispatch("logout").then(() => {
+      this.$store.dispatch("login/logout").then(() => {
         this.$router.push("/");
       });
     },
   },
   computed: {
-    isLoggedIn() {
-      return this.$store.getters.isLoggedIn;
-    },
-
-    isAdmin() {
-      return this.$store.getters.isAdmin;
-    },
+    ...mapGetters("login", {
+      isLoggedIn: "isLoggedIn",
+      isAdmin: "isAdmin",
+    }),
   },
 };
 </script>

@@ -1,8 +1,8 @@
 <template>
   <form @submit.prevent class="form">
     <h1>Login</h1>
-    <div v-if="$store.state.status" class="input-errors">
-      <div class="error-msg">{{ $store.state.status }}</div>
+    <div v-if="status" class="input-errors">
+      <div class="error-msg">{{ status }}</div>
     </div>
     <input
       class="form__input"
@@ -35,6 +35,7 @@
 <script>
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import { mapState } from "vuex";
 
 export default {
   name: "login-form",
@@ -61,10 +62,16 @@ export default {
       const user = this.user;
 
       this.$store
-        .dispatch("login", user)
+        .dispatch("login/login", user)
         .then(() => this.$router.push("/"))
         .catch((err) => console.log(err));
     },
+  },
+
+  computed: {
+    ...mapState("login", {
+      status: (state) => state.status,
+    }),
   },
 
   validations() {

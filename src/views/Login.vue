@@ -14,7 +14,7 @@ export default {
 
 <style scoped>
 .form {
-  width: 50%;
+  width: 500px;
   margin: auto;
   padding: 20px;
   text-align: center;
