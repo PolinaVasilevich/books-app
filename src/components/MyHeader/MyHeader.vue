@@ -12,6 +12,6 @@
 </template>
 
 <script>
-import "@/assets/styles/header.scss";
+import "./styles.scss";
 export default {};
 </script>

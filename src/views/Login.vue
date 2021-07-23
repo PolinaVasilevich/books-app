@@ -1,9 +1,9 @@
 <template>
-  <login-form class="form" @login="onLogin" />
+  <login-form class="form" @login="onLogin" :inputs="inputs" />
 </template>
 
 <script>
-import LoginForm from "@/components/LoginForm.vue";
+import LoginForm from "@/components/LoginForm/LoginForm";
 
 export default {
   components: {

@@ -14,7 +14,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import MyHeader from "@/components/MyHeader.vue";
+import MyHeader from "@/components/MyHeader/MyHeader";
 
 export default {
   components: { MyHeader },
