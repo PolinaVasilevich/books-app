@@ -13,7 +13,7 @@ export default {
     onLogin(user) {
       this.$store
         .dispatch("login/login", user)
-        .then(() => this.$router.push("/"))
+        .then(() => this.$router.push("/books"))
         .catch((err) => console.log(err));
     },
   },

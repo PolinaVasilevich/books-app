@@ -4,7 +4,8 @@ import store from "@/store";
 import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Admin from "@/views/Admin.vue";
-import UserPage from "@/views/UserPage.vue";
+import AllBooksPage from "@/views/AllBooksPage.vue";
+import BookPage from "@/views/BookPage.vue";
 
 const routes = [
   {
@@ -14,23 +15,36 @@ const routes = [
   },
   {
     path: "/login",
-    name: "Login",
+    name: "login",
     component: Login,
   },
 
   {
     path: "/admin",
-    name: "Admin",
+    name: "admin",
     component: Admin,
+    meta: {
+      requiresAuth: true,
+      isAdmin: true,
+    },
+  },
+
+  {
+    path: "/books",
+    name: "books",
+    component: AllBooksPage,
     meta: {
       requiresAuth: true,
     },
   },
 
   {
-    path: "/user",
-    name: "User",
-    component: UserPage,
+    path: "/books/:id",
+    name: "book",
+    component: BookPage,
+    meta: {
+      requiresAuth: true,
+    },
   },
 ];
 
@@ -41,7 +55,8 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some((route) => route.meta.requiresAuth)) {
-    if (store.getters["login/isLoggedIn"] && store.getters["login/isAdmin"]) {
+    // if (store.getters["login/isLoggedIn"] && store.getters["login/isAdmin"]) {
+    if (store.getters["login/isLoggedIn"]) {
       next();
       return;
     }
