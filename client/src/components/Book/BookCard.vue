@@ -15,8 +15,8 @@ export default {
   name: "book-card",
   props: {
     book: {
-      type: Array,
-      default: () => [],
+      type: Object,
+      default: () => {},
       required: true,
     },
   },
