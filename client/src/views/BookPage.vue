@@ -27,6 +27,7 @@ export default {
       book: null,
     };
   },
+
   created() {
     const book = this.books.find((book) => book._id === this.$route.params.id);
     if (book) {

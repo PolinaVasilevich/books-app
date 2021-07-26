@@ -1,4 +1,4 @@
-import users from "@/data/users";
+import API from "../utils/api";
 
 export const loginModule = {
   state: () => ({
@@ -42,40 +42,32 @@ export const loginModule = {
   },
 
   actions: {
-    login({ commit }, user) {
-      return new Promise((resolve, reject) => {
+    async login({ commit }, user) {
+      try {
         commit("setStatus", "loading");
+        const users = await API.post("auth/login", { ...user });
+        const token = users.data.token;
+        const userInfo = users.data.user;
 
-        const userInfo = users.find((u) => {
-          return u.username === user.username && u.password === user.password;
-        });
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(userInfo));
 
-        if (userInfo) {
-          localStorage.setItem("token", userInfo.token);
-          localStorage.setItem("user", JSON.stringify(userInfo));
-
-          commit("setUser", userInfo);
-          commit("setToken", userInfo.token);
-
-          resolve();
-        } else {
-          commit("setStatus", "User not found");
-
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-
-          reject();
-        }
-      });
+        commit("setUser", userInfo);
+        commit("setToken", token);
+      } catch (e) {
+        commit("auth_error");
+        localStorage.removeItem("token");
+      }
     },
 
-    logout({ commit }) {
-      return new Promise((resolve) => {
+    async logout({ commit }) {
+      try {
         commit("logout");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        resolve();
-      });
+      } catch (e) {
+        console.log(e);
+      }
     },
   },
   namespaced: true,
