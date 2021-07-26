@@ -33,18 +33,18 @@ const routes = [
     path: "/books",
     name: "books",
     component: AllBooksPage,
-    meta: {
-      requiresAuth: true,
-    },
+    // meta: {
+    //   requiresAuth: true,
+    // },
   },
 
   {
     path: "/books/:id",
     name: "book",
     component: BookPage,
-    meta: {
-      requiresAuth: true,
-    },
+    // meta: {
+    //   requiresAuth: true,
+    // },
   },
 ];
 

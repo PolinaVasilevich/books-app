@@ -85,7 +85,7 @@ class bookController {
 
   async getBooks(req, res) {
     try {
-      const books = await Book.find();
+      const books = await Book.find().populate("author").populate("genre");
       res.json(books);
     } catch (e) {
       console.log(e);

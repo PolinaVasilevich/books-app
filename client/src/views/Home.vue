@@ -1,9 +1,14 @@
 <template>
-  <div></div>
+  <div>
+    <all-books-page />
+  </div>
 </template>
 
 <script>
-export default {};
+import AllBooksPage from "./AllBooksPage.vue";
+export default {
+  components: { AllBooksPage },
+};
 </script>
 
 <style></style>
