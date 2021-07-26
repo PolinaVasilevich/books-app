@@ -1,0 +1,24 @@
+<template>
+  <div class="book-card">
+    <router-link :to="{ name: 'book', params: { id: book._id } }"
+      ><img :src="book.img" :alt="book.title" />
+    </router-link>
+    <p>{{ book.title }}</p>
+    <p>{{ book.author }}</p>
+  </div>
+</template>
+
+<script>
+import "./styles.scss";
+
+export default {
+  name: "book-card",
+  props: {
+    book: {
+      type: Array,
+      default: () => [],
+      required: true,
+    },
+  },
+};
+</script>
