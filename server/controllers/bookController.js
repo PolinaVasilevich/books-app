@@ -119,7 +119,9 @@ class bookController {
       console.log(bookReserved);
 
       if (userReserved && bookReserved) {
-        return res.status(400).json({ message: "You reserved this book " });
+        return res
+          .status(400)
+          .json({ message: "You have already booked this book" });
       }
 
       const bookInstance = new BookInstance({

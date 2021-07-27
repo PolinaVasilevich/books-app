@@ -44,16 +44,10 @@ export default {
   },
 
   computed: {
-    ...mapState(
-      "books",
-      {
-        books: (state) => state.books,
-      },
-      "login",
-      {
-        user: (state) => state.user,
-      }
-    ),
+    ...mapState({
+      books: (state) => state.books.books,
+      username: (state) => state.login.user.username,
+    }),
     ...mapGetters("login", {
       isLoggedIn: "isLoggedIn",
       isAdmin: "isAdmin",
@@ -66,7 +60,7 @@ export default {
         const copyBook = { ...this.book, count: this.book.count - 1 };
         try {
           await API.post(`books/bookinstance`, {
-            username: this.$store.state.login.user.username,
+            username: this.username,
             bookId: this.$route.params.id,
           });
 
@@ -77,7 +71,8 @@ export default {
           this.$router.push("/books");
         } catch (error) {
           console.log(error);
-          this.status = error.response.data.message;
+          alert(error.response.data.message);
+          // this.status = error.response.data.message;
         }
       }
     },

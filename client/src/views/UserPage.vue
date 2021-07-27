@@ -14,12 +14,19 @@
 
 <script>
 import API from "../utils/api";
+import { mapState } from "vuex";
 
 export default {
   data() {
     return {
       books: null,
     };
+  },
+
+  computed: {
+    ...mapState("login", {
+      user: (state) => state.user,
+    }),
   },
 
   created() {
@@ -30,7 +37,10 @@ export default {
     async getReservedBooks() {
       try {
         const reservedBooks = await API.get("books/info");
-        this.books = reservedBooks.data;
+
+        this.books = reservedBooks.data.filter(
+          (item) => item.user._id === this.user._id
+        );
       } catch (error) {
         console.log(error);
       }
