@@ -95,9 +95,10 @@ class bookController {
 
   async getReservedBooks(req, res) {
     try {
-      const reservedBooks = await BookInstance.find();
+      const reservedBooks = await BookInstance.find()
+        .populate("user")
+        .populate("book");
 
-      console.log(reservedBooks);
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);

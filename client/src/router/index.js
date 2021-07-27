@@ -51,8 +51,8 @@ const routes = [
   },
 
   {
-    path: "/books/user",
-    name: "book",
+    path: "/info",
+    name: "userPage",
     component: UserPage,
 
     // meta: {

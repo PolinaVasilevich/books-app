@@ -2,9 +2,11 @@
   <div class="user-page">
     <h1>Welcome to users page</h1>
     <div>
-      <div v-for="item in reservedBooks" :key="item._id">
-        <p class="user-page__book-title">{{ item.title }}</p>
-        <span class="user-page__book-reserve"></span>
+      <div v-for="item in books" :key="item._id">
+        <p class="user-page__book-title">Book: {{ item.book.title }}</p>
+        <span class="user-page__book-reserve"
+          >Date: {{ new Date(item.data_reserve).toLocaleDateString() }}</span
+        >
       </div>
     </div>
   </div>
@@ -16,7 +18,7 @@ import API from "../utils/api";
 export default {
   data() {
     return {
-      reservedBooks: null,
+      books: null,
     };
   },
 
@@ -28,8 +30,7 @@ export default {
     async getReservedBooks() {
       try {
         const reservedBooks = await API.get("books/info");
-        this.reservedBooks = reservedBooks;
-        console.log(this.reservedBooks);
+        this.books = reservedBooks.data;
       } catch (error) {
         console.log(error);
       }
