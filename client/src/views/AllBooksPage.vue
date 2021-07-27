@@ -1,6 +1,6 @@
 <template>
   <div class="books">
-    <books-list :books="books" />
+    <books-list :books="books || localStorage.getItem('books')" />
   </div>
 </template>
 

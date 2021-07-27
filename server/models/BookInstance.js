@@ -2,14 +2,13 @@ const { Schema, model } = require("mongoose");
 
 const BookInstanceSchema = new Schema({
   book: { type: Schema.ObjectId, ref: "Book", required: true },
-  imprint: { type: String, required: true },
+  user: { type: Schema.ObjectId, ref: "User", require: true },
   status: {
     type: String,
     required: true,
-    enum: ["Available", "Maintenance", "Loaned", "Reserved"],
-    default: "Maintenance",
+    enum: ["Available", "Reserved"],
   },
-  due_back: { type: Date, default: Date.now },
+  data_reserve: { type: Date, default: Date.now },
 });
 
 BookInstanceSchema.virtual("url").get(function () {

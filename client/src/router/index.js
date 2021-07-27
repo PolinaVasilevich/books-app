@@ -7,6 +7,8 @@ import Admin from "@/views/Admin.vue";
 import AllBooksPage from "@/views/AllBooksPage.vue";
 import BookPage from "@/views/BookPage.vue";
 
+import UserPage from "@/views/UserPage.vue";
+
 const routes = [
   {
     path: "/",
@@ -42,6 +44,17 @@ const routes = [
     path: "/books/:id",
     name: "book",
     component: BookPage,
+
+    // meta: {
+    //   requiresAuth: true,
+    // },
+  },
+
+  {
+    path: "/books/user",
+    name: "book",
+    component: UserPage,
+
     // meta: {
     //   requiresAuth: true,
     // },

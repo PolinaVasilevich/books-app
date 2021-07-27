@@ -1,7 +1,8 @@
 const Book = require("../models/Book");
 const Author = require("../models/Author");
 const Genre = require("../models/Genre");
-// const BookInstance = require("./models/bookinstance");
+const User = require("../models/User/User");
+const BookInstance = require("../models/bookinstance");
 
 class bookController {
   async createAuthor(req, res) {
@@ -89,6 +90,65 @@ class bookController {
       res.json(books);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async getReservedBooks(req, res) {
+    try {
+      const reservedBooks = await BookInstance.find();
+
+      console.log(reservedBooks);
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async reserveBook(req, res) {
+    try {
+      const { username, bookId } = req.body;
+
+      const book = await Book.findById({ _id: bookId });
+      const user = await User.findOne({ username });
+
+      const userReserved = await BookInstance.findOne({ user: user._id });
+      const bookReserved = await BookInstance.findOne({ book: book._id });
+
+      console.log(userReserved);
+      console.log(bookReserved);
+
+      if (userReserved && bookReserved) {
+        return res.status(400).json({ message: "You reserved this book " });
+      }
+
+      const bookInstance = new BookInstance({
+        book: book._id,
+        user: user._id,
+        status: "Reserved",
+      });
+
+      await bookInstance.save();
+      return res.json({ message: "BookInstance has created" });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: "Create bookInstance error" });
+    }
+  }
+
+  async updateBook(req, res) {
+    try {
+      Book.findOneAndUpdate(
+        { _id: req.params.id },
+        req.body,
+        { new: true },
+        (err, book) => {
+          if (err) res.send(err);
+          res.json(book);
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: "Update book error" });
     }
   }
 }

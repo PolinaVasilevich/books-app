@@ -3,7 +3,12 @@
     <div class="book">
       <div>
         <img :src="book.img" :alt="book.title" class="book_img" />
-        <my-button v-if="isLoggedIn" class="book__btn"
+        <my-button
+          v-if="isLoggedIn"
+          class="book__btn"
+          @click="onReserveBook(book, user)"
+          :disabled="!book.count"
+          :class="{ disabled: !book.count }"
           >Book this book</my-button
         >
       </div>
@@ -15,16 +20,19 @@
         <p class="info__text">Count books: {{ book.count }}</p>
       </div>
     </div>
+    <span>{{ status }}</span>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import API from "../utils/api";
 
 export default {
   data() {
     return {
       book: null,
+      status: null,
     };
   },
 
@@ -34,14 +42,45 @@ export default {
       this.book = book;
     }
   },
+
   computed: {
-    ...mapState("books", {
-      books: (state) => state.books,
-    }),
+    ...mapState(
+      "books",
+      {
+        books: (state) => state.books,
+      },
+      "login",
+      {
+        user: (state) => state.user,
+      }
+    ),
     ...mapGetters("login", {
       isLoggedIn: "isLoggedIn",
       isAdmin: "isAdmin",
     }),
+  },
+
+  methods: {
+    async onReserveBook() {
+      if (this.book.count) {
+        const copyBook = { ...this.book, count: this.book.count - 1 };
+        try {
+          await API.post(`books/bookinstance`, {
+            username: this.$store.state.login.user.username,
+            bookId: this.$route.params.id,
+          });
+
+          await API.put(`books/book/${this.$route.params.id}`, copyBook);
+
+          // this.status = `Book "${this.book.title}" has reserved`;
+          alert(`Book "${this.book.title}" has reserved`);
+          this.$router.push("/books");
+        } catch (error) {
+          console.log(error);
+          this.status = error.response.data.message;
+        }
+      }
+    },
   },
 };
 </script>
@@ -67,11 +106,17 @@ export default {
 }
 
 .book__btn {
+  cursor: pointer;
   margin-top: 30px;
   border: 1px solid #000 !important;
 }
 
 .info__text {
   margin-top: 7px;
+}
+
+.disabled {
+  opacity: 0.25;
+  cursor: initial;
 }
 </style>

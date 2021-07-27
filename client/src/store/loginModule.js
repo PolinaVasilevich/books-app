@@ -42,22 +42,42 @@ export const loginModule = {
   },
 
   actions: {
-    async login({ commit }, user) {
-      try {
-        commit("setStatus", "loading");
-        const users = await API.post("auth/login", { ...user });
-        const token = users.data.token;
-        const userInfo = users.data.user;
+    // async login({ commit }, user) {
+    //   try {
+    //     commit("setStatus", "loading");
+    //     const users = await API.post("auth/login", { ...user });
+    //     const { token, user: userInfo } = users.data;
 
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(userInfo));
+    //     localStorage.setItem("token", token);
+    //     localStorage.setItem("user", JSON.stringify(userInfo));
 
-        commit("setUser", userInfo);
-        commit("setToken", token);
-      } catch (e) {
-        commit("auth_error");
-        localStorage.removeItem("token");
-      }
+    //     commit("setUser", userInfo);
+    //     commit("setToken", token);
+    //   } catch (e) {
+    //     commit("setStatus", e.data);
+    //     console.log(e);
+    //     localStorage.removeItem("token");
+    //   }
+    // },
+    login({ commit }, user) {
+      return new Promise((resolve, reject) => {
+        API.post("auth/login", { ...user })
+          .then((response) => {
+            commit("setStatus", "loading");
+            const { token, user: userInfo } = response.data;
+
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(userInfo));
+
+            commit("setUser", userInfo);
+            commit("setToken", token);
+            resolve(user);
+          })
+          .catch((error) => {
+            commit("setStatus", error.response.data.message);
+            reject(error.response.data);
+          });
+      });
     },
 
     async logout({ commit }) {
