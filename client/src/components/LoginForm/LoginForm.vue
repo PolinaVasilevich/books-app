@@ -29,7 +29,7 @@
       >
     </div>
 
-    <my-button @click="checkForm" class="form__btn">Login</my-button>
+    <my-button @click="checkForm" class="btn btn-primary">Login</my-button>
   </form>
 </template>
 

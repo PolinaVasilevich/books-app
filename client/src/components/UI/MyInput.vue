@@ -1,6 +1,6 @@
 <template>
   <input
-    class="input"
+    class="form-control input"
     :value="modelValue"
     @input="$emit('update:modelValue', $event.target.value)"
   />
@@ -22,9 +22,6 @@ export default {
 
 <style scoped>
 .input {
-  width: 100%;
-  border: 1px solid #000;
-  padding: 10px 15px;
   margin-top: 15px;
 }
 </style>

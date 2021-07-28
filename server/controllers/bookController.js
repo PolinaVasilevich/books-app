@@ -66,7 +66,20 @@ class bookController {
         last_name: author.split(" ")[1],
       });
 
-      const genreBook = await Genre.findOne({ name: genre });
+      if (!authorBook) {
+        const authorB = new Author({
+          first_name: author.split(" ")[0],
+          last_name: author.split(" ")[1],
+        });
+        await authorB.save();
+      }
+
+      const genreBook = await Genre.findOne({ name: genre[0].name });
+
+      if (!genreBook) {
+        const genreB = new Genre({ name });
+        await genreB.save();
+      }
 
       const book = new Book({
         title,

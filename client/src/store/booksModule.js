@@ -2,7 +2,7 @@ import API from "../utils/api";
 
 export const booksModule = {
   state: () => ({
-    books: JSON.parse(localStorage.getItem("books")) || "[]",
+    books: JSON.parse(localStorage.getItem("books")) || [],
   }),
 
   mutations: {

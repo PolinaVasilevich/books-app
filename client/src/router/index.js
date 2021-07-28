@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 
-import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Admin from "@/views/Admin.vue";
 import AllBooksPage from "@/views/AllBooksPage.vue";
@@ -12,8 +11,8 @@ import UserPage from "@/views/UserPage.vue";
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "books",
+    component: AllBooksPage,
   },
   {
     path: "/login",
@@ -29,15 +28,6 @@ const routes = [
       requiresAuth: true,
       isAdmin: true,
     },
-  },
-
-  {
-    path: "/books",
-    name: "books",
-    component: AllBooksPage,
-    // meta: {
-    //   requiresAuth: true,
-    // },
   },
 
   {

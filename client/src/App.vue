@@ -1,11 +1,13 @@
 <template>
   <my-header>
-    <my-button class="link"><router-link to="/">Home</router-link></my-button>
+    <my-button class="link"
+      ><router-link class="link" to="/">Home</router-link></my-button
+    >
     <my-button v-if="isAdmin" class="link"
-      ><router-link to="/admin">Admin</router-link></my-button
+      ><router-link class="link" to="/admin">Admin</router-link></my-button
     >
     <my-button v-if="!isLoggedIn" class="link"
-      ><router-link to="/login">Login</router-link></my-button
+      ><router-link class="link" to="/login">Login</router-link></my-button
     >
     <my-button v-else @click="logout" class="link">Logout</my-button>
   </my-header>
@@ -36,6 +38,8 @@ export default {
 
 <style>
 .link {
+  color: #000;
+  text-decoration: none;
   font-size: 1.2em;
   cursor: pointer;
 }
