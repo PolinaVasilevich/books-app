@@ -43,6 +43,9 @@ export default {
   font-size: 1.2em;
   cursor: pointer;
 }
+.link:hover {
+  color: #fff;
+}
 
 .router-link-active {
   color: #3498db;

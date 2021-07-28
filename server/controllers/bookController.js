@@ -12,7 +12,8 @@ class bookController {
         first_name,
         last_name,
       });
-      if (authorBook) {
+
+      if (authorBook.length) {
         return res
           .status(400)
           .json({ message: "This author has already been created" });
@@ -33,7 +34,7 @@ class bookController {
       const genreBook = await Author.findOne({
         name,
       });
-      if (genreBook) {
+      if (!genreBook.length) {
         return res
           .status(400)
           .json({ message: "This genre has already been created" });
@@ -101,6 +102,15 @@ class bookController {
     try {
       const books = await Book.find().populate("author").populate("genre");
       res.json(books);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getAuthors(req, res) {
+    try {
+      const authors = await Author.find();
+      res.json(authors);
     } catch (e) {
       console.log(e);
     }

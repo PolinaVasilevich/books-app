@@ -5,13 +5,6 @@
         <h1>{{ titleTable }}</h1>
         <hr />
         <br /><br />
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          @click="showModal = true"
-        >
-          Create new record
-        </button>
         <slot name="modal"></slot>
         <br /><br />
         <table class="table table-hover">
@@ -24,17 +17,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in items" :key="index">
-              <slot name="data"></slot>
-              <td>
-                <button type="button" class="btn btn-warning btn-sm">
-                  Update
-                </button>
-                <button type="button" class="btn btn-danger btn-sm">
-                  Delete
-                </button>
-              </td>
-            </tr>
+            <slot name="data"></slot>
           </tbody>
         </table>
       </div>
@@ -44,10 +27,19 @@
 
 <script>
 export default {
+  data() {
+    return {
+      showModal: false,
+    };
+  },
+
   props: {
     titleTable: {
       type: String,
       default: "Books",
+    },
+    headers: {
+      type: Array,
     },
   },
 };

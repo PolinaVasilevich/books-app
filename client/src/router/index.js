@@ -2,11 +2,14 @@ import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 
 import Login from "@/views/Login.vue";
-import Admin from "@/views/Admin.vue";
 import AllBooksPage from "@/views/AllBooksPage.vue";
 import BookPage from "@/views/BookPage.vue";
 
 import UserPage from "@/views/UserPage.vue";
+
+import Admin from "@/views/Admin/Admin.vue";
+import AdminBooks from "@/views/Admin/AdminBooks.vue";
+import AdminAuthors from "@/views/Admin/AdminAuthors.vue";
 
 const routes = [
   {
@@ -24,6 +27,26 @@ const routes = [
     path: "/admin",
     name: "admin",
     component: Admin,
+    meta: {
+      requiresAuth: true,
+      isAdmin: true,
+    },
+  },
+
+  {
+    path: "/admin/adminbooks",
+    name: "adminBooks",
+    component: AdminBooks,
+    meta: {
+      requiresAuth: true,
+      isAdmin: true,
+    },
+  },
+
+  {
+    path: "/admin/adminauthors",
+    name: "adminAuthors",
+    component: AdminAuthors,
     meta: {
       requiresAuth: true,
       isAdmin: true,
