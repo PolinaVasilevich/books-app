@@ -45,7 +45,7 @@ export default {
   border-radius: 12px;
   min-height: 50px;
   min-width: 500px;
-  padding: 50px;
+  padding: 40px;
 }
 .modal__cross {
   position: absolute;

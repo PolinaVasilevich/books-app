@@ -19,20 +19,19 @@
               placeholder="Enter title"
               required
             />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="book.author"
-              placeholder="Enter author"
-              required
+
+            <my-select
+              :options="
+                authors.map((author) => ({
+                  name: author.first_name + ' ' + author.last_name,
+                }))
+              "
+              class="select"
+              v-model="book.author"
             />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="book.genre"
-              placeholder="Enter genre"
-              required
-            />
+
+            <my-select :options="genres" class="select" v-model="book.genre" />
+
             <input
               class="form-control input"
               type="text"
@@ -40,12 +39,16 @@
               placeholder="Enter url image"
               required
             />
+            <!-- <file-input class="select" /> -->
+
             <input
               class="form-control input"
               type="number"
               v-model.trim="book.count"
               placeholder="Enter count"
               required
+              min="0"
+              max="100"
             />
 
             <div class="btns">
@@ -75,6 +78,8 @@
               type="number"
               v-model.trim="editForm.count"
               placeholder="Enter count"
+              min="0"
+              max="100"
               required
             />
 
@@ -119,18 +124,24 @@
 import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
+import MySelect from "@/components/UI/MySelect";
+
 import API from "@/utils/api";
+import "@/assets/styles/main.scss";
 
 export default {
   name: "admin-books",
-  components: { AdminTable, MyAlert },
+  components: { AdminTable, MyAlert, MySelect },
   data() {
     return {
       book: {
         title: "",
+        author: "",
+        genre: "",
         img: "",
         count: "0",
       },
+
       editForm: {
         _id: "",
         title: "",
@@ -149,6 +160,8 @@ export default {
   methods: {
     ...mapActions({
       getBooks: "books/getBooks",
+      getAuthors: "books/getAuthors",
+      getGenres: "books/getGenres",
     }),
 
     resetForm() {
@@ -229,6 +242,8 @@ export default {
   computed: {
     ...mapState("books", {
       books: (state) => state.books,
+      authors: (state) => state.authors,
+      genres: (state) => state.genres,
     }),
   },
 
