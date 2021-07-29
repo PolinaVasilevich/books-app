@@ -6,7 +6,7 @@ router.post("/book", bookController.createBook);
 router.post("/author", bookController.createAuthor);
 router.post("/genre", bookController.createGenre);
 
-router.post("/bookinstance", bookController.reserveBook);
+router.post("/reservebook", bookController.reserveBook);
 
 router.get("/allbooks", bookController.getBooks);
 router.get("/allauthors", bookController.getAuthors);

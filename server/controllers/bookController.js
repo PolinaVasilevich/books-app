@@ -32,7 +32,7 @@ class bookController {
   async createGenre(req, res) {
     try {
       const { name } = req.body;
-      const genreBook = await Author.findOne({
+      const genreBook = await Genre.findOne({
         name,
       });
       if (genreBook) {
@@ -67,6 +67,10 @@ class bookController {
       const authorBook = await Author.findOne({
         first_name: author.split(" ")[0],
         last_name: author.split(" ")[1],
+      });
+
+      const genreBook = await Genre.findOne({
+        name: genre,
       });
 
       const book = new Book({
@@ -129,44 +133,26 @@ class bookController {
 
   ///END GET///
 
-  async reserveBook(req, res) {
-    try {
-      const { username, bookId } = req.body;
-
-      const book = await Book.findById({ _id: bookId });
-      const user = await User.findOne({ username });
-
-      const userReserved = await BookInstance.findOne({ user: user._id });
-      const bookReserved = await BookInstance.findOne({ book: book._id });
-
-      console.log(userReserved);
-      console.log(bookReserved);
-
-      if (userReserved && bookReserved) {
-        return res
-          .status(400)
-          .json({ message: "You have already booked this book" });
-      }
-
-      const bookInstance = new BookInstance({
-        book: book._id,
-        user: user._id,
-        status: "Reserved",
-      });
-
-      await bookInstance.save();
-      return res.json({ message: "BookInstance has created" });
-    } catch (e) {
-      console.log(e);
-      res.status(400).json({ message: "Create bookInstance error" });
-    }
-  }
-
   ///BGN UPDATE///
   async updateBook(req, res) {
     const { id } = req.params;
     try {
-      await Book.findOneAndUpdate({ _id: id }, req.body, { new: true });
+      const { author, genre } = req.body;
+
+      const authorBook = await Author.findOne({
+        first_name: author.split(" ")[0],
+        last_name: author.split(" ")[1],
+      });
+
+      const genreBook = await Genre.findOne({
+        name: genre,
+      });
+
+      await Book.findOneAndUpdate(
+        { _id: id },
+        { ...req.body, author: authorBook._id, genre: [genreBook._id] },
+        { new: true }
+      );
       res.json({
         message: "Book was updated successfully",
       });
@@ -245,6 +231,38 @@ class bookController {
   }
 
   ///END DELETE///
+
+  async reserveBook(req, res) {
+    try {
+      const { username, bookId } = req.body;
+
+      const book = await Book.findById({ _id: bookId });
+      const user = await User.findOne({ username });
+
+      const userReserved = await BookInstance.findOne({ user: user._id });
+      const bookReserved = await BookInstance.findOne({ book: book._id });
+
+      if (userReserved && bookReserved) {
+        return res
+          .status(400)
+          .json({ message: "You have already reserved this book" });
+      }
+
+      const bookInstance = new BookInstance({
+        book: book._id,
+        user: user._id,
+        status: "Reserved",
+      });
+
+      await bookInstance.save();
+      return res.json({
+        message: `${bookInstance.book.title} has reserved successfully!`,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: `Cannot reserved book` });
+    }
+  }
 }
 
 module.exports = new bookController();

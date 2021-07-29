@@ -1,4 +1,5 @@
 <template>
+  <my-alert class="alert alert-danger" :message="message" v-if="showMessage" />
   <div class="container">
     <div class="book">
       <div>
@@ -9,7 +10,7 @@
           @click="onReserveBook(book, user)"
           :disabled="!book.count"
           :class="{ disabled: !book.count }"
-          >Book this book</my-button
+          >Reserve book</my-button
         >
       </div>
       <div class="book__info info">
@@ -20,27 +21,24 @@
         <p class="info__text">Count books: {{ book.count }}</p>
       </div>
     </div>
-    <span>{{ status }}</span>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import MyAlert from "@/components/UI/MyAlert";
 import API from "../utils/api";
 
 export default {
+  components: {
+    MyAlert,
+  },
   data() {
     return {
       book: null,
-      status: null,
+      message: "",
+      showMessage: false,
     };
-  },
-
-  created() {
-    const book = this.books.find((book) => book._id === this.$route.params.id);
-    if (book) {
-      this.book = book;
-    }
   },
 
   computed: {
@@ -48,6 +46,7 @@ export default {
       books: (state) => state.books.books,
       username: (state) => state.login.user.username,
     }),
+
     ...mapGetters("login", {
       isLoggedIn: "isLoggedIn",
       isAdmin: "isAdmin",
@@ -55,34 +54,66 @@ export default {
   },
 
   methods: {
-    async onReserveBook() {
-      if (this.book.count) {
-        const copyBook = { ...this.book, count: this.book.count - 1 };
-        try {
-          await API.post(`books/bookinstance`, {
-            username: this.username,
-            bookId: this.$route.params.id,
-          });
-
-          await API.put(`books/book/${this.$route.params.id}`, copyBook);
-
-          // this.status = `Book "${this.book.title}" has reserved`;
-          alert(`Book "${this.book.title}" has reserved`);
-          this.$router.push("/books");
-        } catch (error) {
-          console.log(error);
-          alert(error.response.data.message);
-          // this.status = error.response.data.message;
-        }
+    getBook() {
+      const book = this.books.find(
+        (book) => book._id === this.$route.params.id
+      );
+      if (book) {
+        this.book = book;
       }
     },
+
+    async updateCountBook() {
+      try {
+        await API.put(`books/updatebook/${this.book._id}`, {
+          ...this.book,
+          count: 2,
+          author: `${this.book.author.first_name} ${this.book.author.last_name}`,
+          genre: this.book.genre[0].name,
+        });
+        // this.getBook();
+      } catch (error) {
+        console.log(error);
+        // this.getBook();
+      }
+    },
+
+    onReserveBook() {
+      if (this.book.count) {
+        this.updateCountBook();
+
+        // try {
+        //   await API.put(`books/book/${this.book._id}`, {
+        //     count: this.book.count - 1,
+        //   });
+
+        //   await API.post(`books/reservebook`, {
+        //     username: this.username,
+        //     bookId: this.book._id,
+        //   });
+
+        //   this.message = `Book "${this.book.title}" has reserved`;
+        //   this.showMessage = true;
+
+        //   // this.$router.push("/books");
+        // } catch (error) {
+        //   console.log(error);
+        //   alert(error.response.data.message);
+        //   // this.status = error.response.data.message;
+        // }
+      }
+    },
+  },
+
+  created() {
+    this.getBook();
   },
 };
 </script>
 
 <style>
 .container {
-  margin: 50px auto;
+  margin: 30px auto;
   width: 100%;
 }
 

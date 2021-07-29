@@ -41,7 +41,7 @@ export default {
 .router-link {
   color: #000;
   text-decoration: none;
-  font-size: 1.2em;
+
   cursor: pointer;
 }
 

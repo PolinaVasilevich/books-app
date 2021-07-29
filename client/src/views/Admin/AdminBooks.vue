@@ -47,7 +47,7 @@
               v-model.trim="book.count"
               placeholder="Enter count"
               required
-              min="0"
+              min="1"
               max="100"
             />
 
@@ -66,6 +66,22 @@
               placeholder="Enter title"
               required
             />
+
+            <my-select
+              :options="
+                authors.map((author) => ({
+                  name: author.first_name + ' ' + author.last_name,
+                }))
+              "
+              class="select"
+              v-model="editForm.author"
+            />
+
+            <my-select
+              :options="genres"
+              class="select"
+              v-model="editForm.genre"
+            />
             <input
               class="form-control input"
               type="text"
@@ -78,7 +94,7 @@
               type="number"
               v-model.trim="editForm.count"
               placeholder="Enter count"
-              min="0"
+              min="1"
               max="100"
               required
             />
@@ -139,7 +155,7 @@ export default {
         author: "",
         genre: "",
         img: "",
-        count: "0",
+        count: "",
       },
 
       editForm: {
@@ -148,8 +164,9 @@ export default {
         author: "",
         genre: "",
         img: "",
-        count: "0",
+        count: "",
       },
+
       headers: ["Title", "Author", "Genre", "Count"],
       showModal: false,
       showMessage: false,
@@ -172,7 +189,8 @@ export default {
       this.book.count = 0;
 
       this.editForm.title = "";
-
+      this.editForm.author = "";
+      this.editForm.genre = "";
       this.editForm.img = "";
       this.editForm.count = 0;
     },
@@ -212,7 +230,11 @@ export default {
     },
 
     editBook(book) {
-      this.editForm = book;
+      this.editForm = {
+        ...book,
+        genre: book.genre[0].name,
+        author: book.author.first_name + " " + book.author.last_name,
+      };
       this.showEditModal = true;
     },
 
