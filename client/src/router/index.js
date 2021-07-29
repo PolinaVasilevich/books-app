@@ -10,6 +10,7 @@ import UserPage from "@/views/UserPage.vue";
 import Admin from "@/views/Admin/Admin.vue";
 import AdminBooks from "@/views/Admin/AdminBooks.vue";
 import AdminAuthors from "@/views/Admin/AdminAuthors.vue";
+import AdminGenres from "@/views/Admin/AdminGenres.vue";
 
 const routes = [
   {
@@ -47,6 +48,16 @@ const routes = [
     path: "/admin/adminauthors",
     name: "adminAuthors",
     component: AdminAuthors,
+    meta: {
+      requiresAuth: true,
+      isAdmin: true,
+    },
+  },
+
+  {
+    path: "/admin/admingenres",
+    name: "adminGenres",
+    component: AdminGenres,
     meta: {
       requiresAuth: true,
       isAdmin: true,

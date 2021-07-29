@@ -37,13 +37,15 @@ export default {
 </script>
 
 <style>
-.link {
+.link,
+.router-link {
   color: #000;
   text-decoration: none;
   font-size: 1.2em;
   cursor: pointer;
 }
-.link:hover {
+
+.router-link:hover {
   color: #fff;
 }
 

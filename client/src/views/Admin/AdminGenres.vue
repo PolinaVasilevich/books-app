@@ -1,7 +1,7 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-    <admin-table titleTable="Authors" :headers="headers" :data="authors">
+    <admin-table titleTable="Genres" :headers="headers" :data="genres">
       <template v-slot:modal>
         <button
           type="button"
@@ -15,18 +15,10 @@
             <input
               class="form-control input"
               type="text"
-              v-model.trim="author.first_name"
-              placeholder="Enter first name"
+              v-model.trim="genre.name"
+              placeholder="Enter name genre"
               required
             />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="author.last_name"
-              placeholder="Enter last name"
-              required
-            />
-
             <div class="btns">
               <button type="submit" class="btn btn-primary">Submit</button>
               <button type="reset" class="btn btn-danger">Reset</button>
@@ -39,18 +31,10 @@
             <input
               class="form-control input"
               type="text"
-              v-model.trim="editForm.first_name"
-              placeholder="Enter first name"
+              v-model.trim="editForm.name"
+              placeholder="Enter name genre"
               required
             />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="editForm.last_name"
-              placeholder="Enter last name"
-              required
-            />
-
             <div class="btns">
               <button type="submit" class="btn btn-primary">Update</button>
               <button type="reset" class="btn btn-danger">Cancel</button>
@@ -59,21 +43,20 @@
         </my-modal>
       </template>
       <template v-slot:data>
-        <tr v-for="author in authors" :key="author._id">
-          <td>{{ author.first_name }}</td>
-          <td>{{ author.last_name }}</td>
+        <tr v-for="genre in genres" :key="genre._id">
+          <td>{{ genre.name }}</td>
           <td>
             <button
               type="button"
               class="btn btn-warning btn-sm"
-              @click="editAuthor(author)"
+              @click="editGenre(genre)"
             >
               Update
             </button>
             <button
               type="button"
               class="btn btn-danger btn-sm"
-              @click="onDeleteAuthor(author)"
+              @click="onDeleteGenre(genre)"
             >
               Delete
             </button>
@@ -91,20 +74,19 @@ import MyAlert from "@/components/UI/MyAlert";
 import API from "@/utils/api";
 
 export default {
-  name: "admin-authors",
+  name: "admin-genres",
   components: { AdminTable, MyAlert },
   data() {
     return {
-      author: {
-        first_name: "",
-        last_name: "",
+      genre: {
+        name: "",
       },
+
       editForm: {
         _id: "",
-        first_name: "",
-        last_name: "",
+        fname: "",
       },
-      headers: ["First name", "Last Name"],
+      headers: ["Name"],
       message: "",
 
       showModal: false,
@@ -115,88 +97,86 @@ export default {
 
   methods: {
     ...mapActions({
-      getAuthors: "books/getAuthors",
+      getGenres: "books/getGenres",
     }),
 
     resetForm() {
-      this.author.first_name = "";
-      this.author.last_name = "";
+      this.genre.name = "";
 
       this.editForm._id = "";
-      this.editForm.first_name = "";
-      this.editForm.last_name = "";
+      this.editForm.name = "";
     },
 
-    async addAuthor(payload) {
+    async addGenre(payload) {
       try {
-        await API.post("books/author", payload);
-        this.getAuthors();
-        this.message = "Author added!";
+        await API.post("books/genre", payload);
+        this.getGenres();
+        this.message = "Genre added!";
         this.showMessage = true;
       } catch (error) {
         console.log(error);
-        this.getAuthors();
+        this.getGenres();
       }
     },
 
     onSubmit() {
       this.showModal = false;
-      this.addAuthor(this.author);
+      this.addGenre(this.genre);
       this.resetForm();
     },
 
-    async removeAuthor(authorID) {
+    async removeGenre(genreID) {
       try {
-        await API.delete(`/books/deleteauthor/${authorID}`);
-        this.getAuthors();
-        this.message = "Author removed!";
+        await API.delete(`/books/deletegenre/${genreID}`);
+        this.getGenres();
+        this.message = "Genre removed!";
         this.showMessage = true;
       } catch (error) {
         console.log(error);
-        this.getAuthors();
+        this.getGenres();
       }
     },
 
-    onDeleteAuthor(author) {
-      this.removeAuthor(author._id);
+    onDeleteGenre(genre) {
+      this.removeGenre(genre._id);
     },
 
-    editAuthor(author) {
-      this.editForm = author;
+    editGenre(genre) {
+      this.editForm = genre;
       this.showEditModal = true;
     },
 
-    async updateAuthor(payload, authorID) {
+    async updateGenre(payload, genreID) {
       try {
-        await API.put(`/books/updateauthor/${authorID}`, payload);
-        this.getAuthors();
+        await API.put(`/books/updategenre/${genreID}`, payload);
+        this.getGenres();
         this.message = "Book updated!";
         this.showMessage = true;
       } catch (error) {
         console.log(error);
-        this.getAuthors();
+        this.getGenres();
       }
     },
 
     onSubmitUpdate() {
       this.showEditModal = false;
-      this.updateAuthor(this.editForm, this.editForm._id);
+      this.updateGenre(this.editForm, this.editForm._id);
     },
 
     onResetUpdate() {
       this.resetForm();
-      this.getAuthors();
+      this.getGenres();
     },
   },
 
   computed: {
     ...mapState("books", {
-      authors: (state) => state.authors,
+      genres: (state) => state.genres,
     }),
   },
 
   created() {
-    this.getAuthors();
+    this.getGenres();
   },
 };
 </script>

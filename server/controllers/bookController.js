@@ -5,6 +5,7 @@ const User = require("../models/User/User");
 const BookInstance = require("../models/bookinstance");
 
 class bookController {
+  ///BGN CREATE///
   async createAuthor(req, res) {
     try {
       const { first_name, last_name } = req.body;
@@ -13,7 +14,7 @@ class bookController {
         last_name,
       });
 
-      if (authorBook.length) {
+      if (authorBook) {
         return res
           .status(400)
           .json({ message: "This author has already been created" });
@@ -34,7 +35,7 @@ class bookController {
       const genreBook = await Author.findOne({
         name,
       });
-      if (!genreBook.length) {
+      if (genreBook) {
         return res
           .status(400)
           .json({ message: "This genre has already been created" });
@@ -52,6 +53,7 @@ class bookController {
   async createBook(req, res) {
     try {
       const { title, img, author, genre, count } = req.body;
+
       const bookOne = await Book.findOne({
         title,
       });
@@ -66,21 +68,6 @@ class bookController {
         first_name: author.split(" ")[0],
         last_name: author.split(" ")[1],
       });
-
-      if (!authorBook) {
-        const authorB = new Author({
-          first_name: author.split(" ")[0],
-          last_name: author.split(" ")[1],
-        });
-        await authorB.save();
-      }
-
-      const genreBook = await Genre.findOne({ name: genre[0].name });
-
-      if (!genreBook) {
-        const genreB = new Genre({ name });
-        await genreB.save();
-      }
 
       const book = new Book({
         title,
@@ -98,6 +85,9 @@ class bookController {
     }
   }
 
+  ///END CREATE///
+
+  ///BGN GET///
   async getBooks(req, res) {
     try {
       const books = await Book.find().populate("author").populate("genre");
@@ -116,6 +106,15 @@ class bookController {
     }
   }
 
+  async getGenres(req, res) {
+    try {
+      const genres = await Genre.find();
+      res.json(genres);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async getReservedBooks(req, res) {
     try {
       const reservedBooks = await BookInstance.find()
@@ -127,6 +126,8 @@ class bookController {
       console.log(e);
     }
   }
+
+  ///END GET///
 
   async reserveBook(req, res) {
     try {
@@ -161,22 +162,89 @@ class bookController {
     }
   }
 
+  ///BGN UPDATE///
   async updateBook(req, res) {
+    const { id } = req.params;
     try {
-      Book.findOneAndUpdate(
-        { _id: req.params.id },
-        req.body,
-        { new: true },
-        (err, book) => {
-          if (err) res.send(err);
-          res.json(book);
-        }
-      );
+      await Book.findOneAndUpdate({ _id: id }, req.body, { new: true });
+      res.json({
+        message: "Book was updated successfully",
+      });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ message: "Update book error" });
+      res.status(400).json({ message: `Cannot update book with id: ${id}` });
     }
   }
+
+  async updateAuthor(req, res) {
+    const { id } = req.params;
+    try {
+      await Author.findOneAndUpdate({ _id: id }, req.body, { new: true });
+      res.json({
+        message: "Author was updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: `Cannot update author with id: ${id}` });
+    }
+  }
+
+  async updateGenre(req, res) {
+    const { id } = req.params;
+    try {
+      await Genre.findOneAndUpdate({ _id: id }, req.body, { new: true });
+      res.json({
+        message: "Genre was updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: `Cannot update genre with id: ${id}` });
+    }
+  }
+
+  ///END UPDATE///
+
+  ///BGN DELETE///
+  async deleteBook(req, res) {
+    const { id } = req.params;
+    try {
+      const book = await Book.findByIdAndDelete({ _id: id });
+      return res.json({
+        message: `${book.title}- Author were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete book with id ${id}` });
+    }
+  }
+
+  async deleteAuthor(req, res) {
+    const { id } = req.params;
+    try {
+      const author = await Author.findByIdAndDelete({ _id: id });
+      return res.json({
+        message: `${author.first_name} ${author.last_name} - Author were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete author with id ${id}` });
+    }
+  }
+
+  async deleteGenre(req, res) {
+    const { id } = req.params;
+    try {
+      const genre = await Genre.findByIdAndDelete({ _id: id });
+      return res.json({
+        message: `${genre.name} - Genre were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete genre with id ${id}` });
+    }
+  }
+
+  ///END DELETE///
 }
 
 module.exports = new bookController();
