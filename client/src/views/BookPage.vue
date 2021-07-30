@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
 import MyAlert from "@/components/UI/MyAlert";
 import API from "../utils/api";
 
@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      book: null,
+      book: {},
       message: "",
       showMessage: false,
     };
@@ -54,53 +54,52 @@ export default {
   },
 
   methods: {
-    getBook() {
-      const book = this.books.find(
-        (book) => book._id === this.$route.params.id
-      );
-      if (book) {
-        this.book = book;
-      }
-    },
+    ...mapActions({
+      getBooks: "books/getBooks",
+    }),
 
-    async updateCountBook() {
+    async getBook() {
       try {
-        await API.put(`books/updatebook/${this.book._id}`, {
-          ...this.book,
-          count: 2,
-          author: `${this.book.author.first_name} ${this.book.author.last_name}`,
-          genre: this.book.genre[0].name,
-        });
-        // this.getBook();
+        const book = this.books.find(
+          (book) => book._id === this.$route.params.id
+        );
+
+        if (book) {
+          this.book = book;
+        }
       } catch (error) {
         console.log(error);
-        // this.getBook();
       }
     },
 
-    onReserveBook() {
+    async onReserveBook() {
       if (this.book.count) {
-        this.updateCountBook();
+        try {
+          const payload = {
+            ...this.book,
+            count: this.book.count - 1,
+            genre: this.book.genre[0].name,
+            author:
+              this.book.author.first_name + " " + this.book.author.last_name,
+          };
 
-        // try {
-        //   await API.put(`books/book/${this.book._id}`, {
-        //     count: this.book.count - 1,
-        //   });
+          await API.put(`books/updatebook/${this.book._id}`, payload);
 
-        //   await API.post(`books/reservebook`, {
-        //     username: this.username,
-        //     bookId: this.book._id,
-        //   });
+          await API.post(`books/reservebook`, {
+            username: this.username,
+            bookId: this.book._id,
+          });
 
-        //   this.message = `Book "${this.book.title}" has reserved`;
-        //   this.showMessage = true;
+          this.getBook();
 
-        //   // this.$router.push("/books");
-        // } catch (error) {
-        //   console.log(error);
-        //   alert(error.response.data.message);
-        //   // this.status = error.response.data.message;
-        // }
+          // this.message = `Book "${this.book.title}" has reserved`;
+          // this.showMessage = true;
+          this.$router.push("/");
+        } catch (error) {
+          console.log(error);
+          this.message = error.response.data.message;
+          this.showMessage = true;
+        }
       }
     },
   },

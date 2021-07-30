@@ -151,11 +151,19 @@ class bookController {
       await Book.findOneAndUpdate(
         { _id: id },
         { ...req.body, author: authorBook._id, genre: [genreBook._id] },
-        { new: true }
+        { new: true, useFindAndModify: false }
       );
       res.json({
         message: "Book was updated successfully",
       });
+
+      // await Book.findOneAndUpdate({ _id: id }, req.body, { new: true })
+      //   .populate("author")
+      //   .populate("genre");
+
+      // res.json({
+      //   message: "Book was updated successfully",
+      // });
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: `Cannot update book with id: ${id}` });
@@ -239,13 +247,18 @@ class bookController {
       const book = await Book.findById({ _id: bookId });
       const user = await User.findOne({ username });
 
-      const userReserved = await BookInstance.findOne({ user: user._id });
-      const bookReserved = await BookInstance.findOne({ book: book._id });
+      // const userReserved = await BookInstance.findOne({ user: user._id });
+      // const bookReserved = await BookInstance.findOne({ book: book._id });
 
-      if (userReserved && bookReserved) {
+      const reservedBook = await BookInstance.findOne({
+        user: user._id,
+        book: book._id,
+      });
+
+      if (reservedBook) {
         return res
           .status(400)
-          .json({ message: "You have already reserved this book" });
+          .send({ message: "You have already reserved this book" });
       }
 
       const bookInstance = new BookInstance({
