@@ -1,24 +1,50 @@
 <template>
-  <my-alert class="alert alert-danger" :message="message" v-if="showMessage" />
-  <div class="container">
-    <div class="book">
+  <my-alert class="alert" :message="message" v-if="showMessage" />
+  <my-alert
+    class="alert alert-warning"
+    message="Sorry, but now books out of stock."
+    v-if="!book.count"
+  />
+
+  <my-alert
+    class="alert alert-warning"
+    message="You have already reserved this book"
+    v-if="isReserved"
+  />
+
+  <div class="book-page">
+    <div class="book-page__content">
       <div>
-        <img :src="book.img" :alt="book.title" class="book_img" />
-        <my-button
+        <img
+          :src="book.img"
+          :alt="book.title"
+          class="book-page__content__img"
+        />
+        <button
           v-if="isLoggedIn"
-          class="book__btn"
+          class="book-page__content__btn btn btn-outline-primary"
           @click="onReserveBook(book, user)"
           :disabled="!book.count"
           :class="{ disabled: !book.count || isReserved }"
-          >Reserve book</my-button
         >
+          <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
+            Reserve book</i
+          >
+          <i v-else class="bi bi-book-fill book-page__content__icon">
+            Reserved</i
+          >
+        </button>
       </div>
-      <div class="book__info info">
-        <h2 class="info__title">{{ book.title }}</h2>
-        <p class="info__text">
-          Author: {{ book.author.first_name + " " + book.author.last_name }}
+      <div class="book-page__content__info">
+        <h2 class="book-page__content__info__title">{{ book.title }}</h2>
+        <p class="book-page__content__info__text">
+          <strong>Author: </strong>
+          {{ book.author.first_name + " " + book.author.last_name }}
         </p>
-        <p class="info__text">Count books: {{ book.count }}</p>
+        <p class="book-page__content__info__text">
+          <strong>Count books: </strong>
+          {{ book.count }}
+        </p>
       </div>
     </div>
   </div>
@@ -28,6 +54,8 @@
 import { mapState, mapGetters, mapActions } from "vuex";
 import MyAlert from "@/components/UI/MyAlert";
 import API from "../utils/api";
+
+import "@/assets/styles/bookPage.scss";
 
 export default {
   components: {
@@ -42,24 +70,12 @@ export default {
     };
   },
 
-  computed: {
-    ...mapState({
-      books: (state) => state.books.books,
-      username: (state) => state.login.user.username,
-    }),
-
-    ...mapGetters("login", {
-      isLoggedIn: "isLoggedIn",
-      isAdmin: "isAdmin",
-    }),
-  },
-
   methods: {
     ...mapActions({
       getBooks: "books/getBooks",
     }),
 
-    async getBook(books) {
+    getBook(books) {
       try {
         const book = books.find((book) => book._id === this.$route.params.id);
 
@@ -103,11 +119,10 @@ export default {
             bookId: this.book._id,
           });
 
-          this.getBook();
+          this.book = { ...this.book, count: this.book.count - 1 };
 
-          // this.message = `Book "${this.book.title}" has reserved`;
-          // this.showMessage = true;
-          this.$router.push("/");
+          this.message = `Book "${this.book.title}" has reserved`;
+          this.showMessage = true;
         } catch (error) {
           console.log(error);
           this.message = error.response.data.message;
@@ -117,45 +132,22 @@ export default {
     },
   },
 
+  computed: {
+    ...mapState({
+      books: (state) => state.books.books,
+      username: (state) => state.login.user.username,
+    }),
+
+    ...mapGetters("login", {
+      isLoggedIn: "isLoggedIn",
+      isAdmin: "isAdmin",
+    }),
+  },
+
   created() {
     this.getBook(this.books);
+
     this.checkReserveBook(this.book._id, this.username);
   },
 };
 </script>
-
-<style>
-.container {
-  margin: 30px auto;
-  width: 100%;
-}
-
-.book {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.book_img {
-  margin-right: 30px;
-  display: block;
-  object-fit: cover;
-  width: 300px;
-  height: 400px;
-}
-
-.book__btn {
-  cursor: pointer;
-  margin-top: 30px;
-  border: 1px solid #000 !important;
-}
-
-.info__text {
-  margin-top: 7px;
-}
-
-.disabled {
-  opacity: 0.25;
-  cursor: initial;
-}
-</style>

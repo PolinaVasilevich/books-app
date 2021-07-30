@@ -9,7 +9,7 @@ class bookController {
   async createAuthor(req, res) {
     try {
       const { first_name, last_name } = req.body;
-      const authorBook = await Author.find({
+      const authorBook = await Author.findOne({
         first_name,
         last_name,
       });
@@ -123,8 +123,7 @@ class bookController {
     try {
       const reservedBooks = await BookInstance.find()
         .populate("user")
-        .populate("book");
-
+        .populate({ path: "book", populate: ["author", "genre"] });
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);
