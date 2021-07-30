@@ -9,7 +9,7 @@
           class="book__btn"
           @click="onReserveBook(book, user)"
           :disabled="!book.count"
-          :class="{ disabled: !book.count }"
+          :class="{ disabled: !book.count || isReserved }"
           >Reserve book</my-button
         >
       </div>
@@ -38,6 +38,7 @@ export default {
       book: {},
       message: "",
       showMessage: false,
+      isReserved: false,
     };
   },
 
@@ -58,15 +59,27 @@ export default {
       getBooks: "books/getBooks",
     }),
 
-    async getBook() {
+    async getBook(books) {
       try {
-        const book = this.books.find(
-          (book) => book._id === this.$route.params.id
-        );
+        const book = books.find((book) => book._id === this.$route.params.id);
 
         if (book) {
           this.book = book;
         }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async checkReserveBook(bookId, username) {
+      try {
+        const reservedBooks = await API.get("books/info");
+
+        const books = reservedBooks.data.filter(
+          (item) => item.user.username === username && item.book._id === bookId
+        );
+
+        this.isReserved = !!books.length;
       } catch (error) {
         console.log(error);
       }
@@ -105,7 +118,8 @@ export default {
   },
 
   created() {
-    this.getBook();
+    this.getBook(this.books);
+    this.checkReserveBook(this.book._id, this.username);
   },
 };
 </script>

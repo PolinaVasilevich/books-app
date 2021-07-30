@@ -4,6 +4,7 @@ export const loginModule = {
   state: () => ({
     status: "",
     token: localStorage.getItem("token") || "",
+    users: JSON.parse(localStorage.getItem("users")) || [],
     user: JSON.parse(localStorage.getItem("user")) || {},
   }),
 
@@ -34,6 +35,10 @@ export const loginModule = {
       state.user = user;
     },
 
+    setUsers(state, users) {
+      state.users = users;
+    },
+
     logout(state) {
       state.status = "";
       state.token = "";
@@ -42,6 +47,15 @@ export const loginModule = {
   },
 
   actions: {
+    async getUsers({ commit }) {
+      try {
+        const users = await API.get("auth/users");
+        localStorage.setItem("users", JSON.stringify(users.data));
+        commit("setUsers", users.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     // async login({ commit }, user) {
     //   try {
     //     commit("setStatus", "loading");

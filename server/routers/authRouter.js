@@ -4,13 +4,16 @@ const controller = require("../controllers/authController");
 
 const router = new Router();
 
+router.post("/login", controller.login);
+
+router.get("/users", controller.getUsers);
 router.post(
-  "/registration",
+  "/user",
   [check("username", "Имя пользователя не может быть пустым").notEmpty()],
   controller.registration
 );
 
-router.post("/login", controller.login);
-router.get("/users", controller.getUsers);
+router.put("/updateuser/:id", controller.updateUser);
+router.delete("/deleteuser/:id", controller.deleteUser);
 
 module.exports = router;

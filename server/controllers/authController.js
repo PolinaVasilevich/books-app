@@ -71,6 +71,44 @@ class authController {
       console.log(e);
     }
   }
+
+  async deleteUser(req, res) {
+    const { id } = req.params;
+    try {
+      const user = await User.findByIdAndDelete({ _id: id });
+      return res.json({
+        message: `${user.username} - were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete user with id ${id}` });
+    }
+  }
+
+  async updateUser(req, res) {
+    const { id } = req.params;
+    try {
+      let { password } = req.body;
+
+      const user = await User.findById({ _id: id });
+
+      if (!(user.password === password)) {
+        password = bcrypt.hashSync(password, 7);
+      }
+
+      await User.findOneAndUpdate(
+        { _id: id },
+        { ...req.body, password },
+        { new: true }
+      );
+      res.json({
+        message: "User was updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: `Cannot update user with id: ${id}` });
+    }
+  }
 }
 
 module.exports = new authController();
