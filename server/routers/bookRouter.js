@@ -11,14 +11,19 @@ router.post("/reservebook", bookController.reserveBook);
 router.get("/allbooks", bookController.getBooks);
 router.get("/allauthors", bookController.getAuthors);
 router.get("/allgenres", bookController.getGenres);
-router.get("/info", bookController.getReservedBooks);
+
+router.get("/allreservedbooks", bookController.getReservedBooks);
 
 router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);
 router.put("/updategenre/:id", bookController.updateGenre);
 
+router.put("/updatereservedbook/:id", bookController.updateReservedBook);
+
 router.delete("/deletebook/:id", bookController.deleteBook);
 router.delete("/deleteauthor/:id", bookController.deleteAuthor);
 router.delete("/deletegenre/:id", bookController.deleteGenre);
+
+router.delete("/deletereservedbook/:id", bookController.deleteReservedBook);
 
 module.exports = router;

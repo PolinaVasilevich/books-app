@@ -5,6 +5,7 @@ export const booksModule = {
     books: JSON.parse(localStorage.getItem("books")) || [],
     authors: JSON.parse(localStorage.getItem("authors")) || [],
     genres: JSON.parse(localStorage.getItem("genres")) || [],
+    reservedBooks: JSON.parse(localStorage.getItem("reservedBooks")) || [],
   }),
 
   mutations: {
@@ -18,6 +19,10 @@ export const booksModule = {
 
     setGenres(state, genres) {
       state.genres = genres;
+    },
+
+    setReservedBooks(state, reservedBooks) {
+      state.reservedBooks = reservedBooks;
     },
   },
 
@@ -48,6 +53,19 @@ export const booksModule = {
         const genres = await API.get("books/allgenres");
         localStorage.setItem("genres", JSON.stringify(genres.data));
         commit("setGenres", genres.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getReservedBooks({ commit }) {
+      try {
+        const reservedBooks = await API.get("books/allreservedbooks");
+        localStorage.setItem(
+          "reservedBooks",
+          JSON.stringify(reservedBooks.data)
+        );
+        commit("setReservedBooks", reservedBooks.data);
       } catch (error) {
         console.log(error);
       }

@@ -10,8 +10,8 @@
 .book-card {
   &__img {
     object-fit: cover;
-    width: 300px;
     height: 400px;
+    max-width: 294px;
   }
   &__title {
     margin: 0;

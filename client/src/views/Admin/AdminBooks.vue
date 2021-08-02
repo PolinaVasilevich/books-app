@@ -271,6 +271,8 @@ export default {
 
   created() {
     this.getBooks();
+    this.getAuthors();
+    this.getGenres();
   },
 };
 </script>

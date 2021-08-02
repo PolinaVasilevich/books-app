@@ -155,14 +155,6 @@ class bookController {
       res.json({
         message: "Book was updated successfully",
       });
-
-      // await Book.findOneAndUpdate({ _id: id }, req.body, { new: true })
-      //   .populate("author")
-      //   .populate("genre");
-
-      // res.json({
-      //   message: "Book was updated successfully",
-      // });
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: `Cannot update book with id: ${id}` });
@@ -192,6 +184,41 @@ class bookController {
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: `Cannot update genre with id: ${id}` });
+    }
+  }
+
+  async updateReservedBook(req, res) {
+    const { id } = req.params;
+    try {
+      const { user, book, date_reserved } = req.body;
+
+      const reservedBook = await BookInstance.findOne({
+        user: user._id,
+        book: book._id,
+      });
+
+      console.log(new Date(reservedBook.date_reserved).toISOString());
+
+      if (reservedBook && !(reservedBook.date_reserved === date_reserved)) {
+        return res
+          .status(400)
+          .send({ message: "You have already reserved this book" });
+      }
+
+      await BookInstance.findOneAndUpdate(
+        { _id: id },
+        { ...req.body, user: user._id, book: [book._id] },
+        { new: true, useFindAndModify: false }
+      );
+
+      res.json({
+        message: "Reserved book was updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json({ message: `Cannot update reserved book with id: ${id}` });
     }
   }
 
@@ -241,13 +268,7 @@ class bookController {
 
   async reserveBook(req, res) {
     try {
-      const { username, bookId } = req.body;
-
-      const book = await Book.findById({ _id: bookId });
-      const user = await User.findOne({ username });
-
-      // const userReserved = await BookInstance.findOne({ user: user._id });
-      // const bookReserved = await BookInstance.findOne({ book: book._id });
+      const { user, book } = req.body;
 
       const reservedBook = await BookInstance.findOne({
         user: user._id,
@@ -266,13 +287,43 @@ class bookController {
         status: "Reserved",
       });
 
+      await Book.findOneAndUpdate(
+        { _id: book._id },
+        { ...book, count: book.count - 1 },
+        { new: true, useFindAndModify: false }
+      );
+
       await bookInstance.save();
+
       return res.json({
         message: `${bookInstance.book.title} has reserved successfully!`,
       });
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: `Cannot reserved book` });
+    }
+  }
+
+  async deleteReservedBook(req, res) {
+    const { id } = req.params;
+    try {
+      const { book } = req.body;
+      const reservedBook = await BookInstance.findByIdAndDelete({ _id: id });
+
+      await Book.findOneAndUpdate(
+        { _id: book._id },
+        { ...book, count: book.count + 1 },
+        { new: true, useFindAndModify: false }
+      );
+
+      return res.json({
+        message: `${reservedBook.book.title} - Reserved book were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res
+        .status(400)
+        .json({ message: `Cannot delete reserved book with id ${id}` });
     }
   }
 }

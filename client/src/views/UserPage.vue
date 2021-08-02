@@ -18,14 +18,7 @@
             >
           </p>
           <span class="user-page__content__date"
-            ><em
-              >Reservation date:
-              {{
-                new Date(item.data_reserve).toLocaleDateString() +
-                " " +
-                new Date(item.data_reserve).toLocaleTimeString()
-              }}</em
-            ></span
+            ><em>Reservation date: {{ item.date_reserved }}</em></span
           >
         </div>
       </div>
@@ -34,8 +27,9 @@
 </template>
 
 <script>
-import API from "../utils/api";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
+import { getDateAndTime } from "@/utils/getDateAndTime.js";
+
 import "@/assets/styles/userPage.scss";
 export default {
   data() {
@@ -45,21 +39,30 @@ export default {
   },
 
   computed: {
-    ...mapState("login", {
-      user: (state) => state.user,
+    ...mapState({
+      user: (state) => state.login.user,
+      reservedBooks: (state) => state.books.reservedBooks,
     }),
+
+    date(date) {
+      return getDateAndTime(date);
+    },
   },
 
   created() {
-    this.getReservedBooks();
+    this.getReservedBook();
   },
 
   methods: {
-    async getReservedBooks() {
+    ...mapActions({
+      getReservedBooks: "books/getReservedBooks",
+    }),
+
+    async getReservedBook() {
       try {
-        const reservedBooks = await API.get("books/info");
-        this.books = reservedBooks.data.filter(
-          (item) => item.user._id === this.user._id
+        this.getReservedBooks();
+        this.books = JSON.parse(JSON.stringify(this.reservedBooks)).filter(
+          (book) => book.user._id === this.user._id
         );
       } catch (error) {
         console.log(error);

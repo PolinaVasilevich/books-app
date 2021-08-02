@@ -24,6 +24,12 @@
           >Users</router-link
         >
       </button>
+
+      <button type="button" class="btn btn btn-outline-success">
+        <router-link class="router-link" to="/admin/adminreservedbooks"
+          >Reserved books</router-link
+        >
+      </button>
     </div>
   </div>
 </template>

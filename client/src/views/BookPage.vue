@@ -71,10 +71,6 @@ export default {
   },
 
   methods: {
-    ...mapActions({
-      getBooks: "books/getBooks",
-    }),
-
     getBook(books) {
       try {
         const book = books.find((book) => book._id === this.$route.params.id);
@@ -87,14 +83,11 @@ export default {
       }
     },
 
-    async checkReserveBook(bookId, username) {
+    async checkReserveBook(bookID, userID) {
       try {
-        const reservedBooks = await API.get("books/info");
-
-        const books = reservedBooks.data.filter(
-          (item) => item.user.username === username && item.book._id === bookId
+        const books = JSON.parse(JSON.stringify(this.reservedBooks)).filter(
+          (book) => book.book._id === bookID && book.user._id === userID
         );
-
         this.isReserved = !!books.length;
       } catch (error) {
         console.log(error);
@@ -104,38 +97,35 @@ export default {
     async onReserveBook() {
       if (this.book.count) {
         try {
-          const payload = {
-            ...this.book,
-            count: this.book.count - 1,
-            genre: this.book.genre[0].name,
-            author:
-              this.book.author.first_name + " " + this.book.author.last_name,
-          };
-
-          await API.put(`books/updatebook/${this.book._id}`, payload);
-
           await API.post(`books/reservebook`, {
-            username: this.username,
-            bookId: this.book._id,
+            user: this.user,
+            book: this.book,
           });
-
-          this.book = { ...this.book, count: this.book.count - 1 };
 
           this.message = `Book "${this.book.title}" has reserved`;
           this.showMessage = true;
+          this.getBooks();
+          this.getBook();
         } catch (error) {
           console.log(error);
           this.message = error.response.data.message;
           this.showMessage = true;
+
+          this.getBooks();
         }
       }
     },
+    ...mapActions({
+      getBooks: "books/getBooks",
+      getReservedBooks: "books/getReservedBooks",
+    }),
   },
 
   computed: {
     ...mapState({
       books: (state) => state.books.books,
-      username: (state) => state.login.user.username,
+      reservedBooks: (state) => state.books.reservedBooks,
+      user: (state) => state.login.user,
     }),
 
     ...mapGetters("login", {
@@ -145,9 +135,10 @@ export default {
   },
 
   created() {
+    this.getBooks();
     this.getBook(this.books);
-
-    this.checkReserveBook(this.book._id, this.username);
+    this.getReservedBooks();
+    this.checkReserveBook(this.book._id, this.user._id);
   },
 };
 </script>
