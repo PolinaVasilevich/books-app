@@ -190,16 +190,14 @@ class bookController {
   async updateReservedBook(req, res) {
     const { id } = req.params;
     try {
-      const { user, book, date_reserved } = req.body;
+      const { user, book } = req.body;
 
       const reservedBook = await BookInstance.findOne({
         user: user._id,
         book: book._id,
       });
 
-      console.log(new Date(reservedBook.date_reserved).toISOString());
-
-      if (reservedBook && !(reservedBook.date_reserved === date_reserved)) {
+      if (reservedBook) {
         return res
           .status(400)
           .send({ message: "You have already reserved this book" });
@@ -268,7 +266,7 @@ class bookController {
 
   async reserveBook(req, res) {
     try {
-      const { user, book } = req.body;
+      const { user, book, date_reserved } = req.body;
 
       const reservedBook = await BookInstance.findOne({
         user: user._id,
@@ -285,6 +283,7 @@ class bookController {
         book: book._id,
         user: user._id,
         status: "Reserved",
+        date_reserved,
       });
 
       await Book.findOneAndUpdate(

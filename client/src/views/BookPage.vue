@@ -104,14 +104,15 @@ export default {
 
           this.message = `Book "${this.book.title}" has reserved`;
           this.showMessage = true;
+          this.isReserved = true;
           this.getBooks();
           this.getBook();
         } catch (error) {
           console.log(error);
           this.message = error.response.data.message;
           this.showMessage = true;
-
           this.getBooks();
+          this.getBook();
         }
       }
     },

@@ -28,6 +28,12 @@
               </option>
             </select>
 
+            <input
+              class="form-control select"
+              type="datetime-local"
+              v-model="data.date_reserved"
+            />
+
             <div class="btns">
               <button type="submit" class="btn btn-primary">Submit</button>
               <button type="reset" class="btn btn-danger">Reset</button>
@@ -65,7 +71,9 @@
         <tr v-for="book in reservedBooks" :key="book._id">
           <td>{{ book.user.username }}</td>
           <td>{{ book.book.title }}</td>
-          <td>{{ book.date_reserved }}</td>
+          <td>
+            {{ moment(book.date_reserved).format("YYYY-MM-DD hh:mm") }}
+          </td>
           <td>
             <button
               type="button"
@@ -92,7 +100,6 @@
 import { mapActions, mapState } from "vuex";
 import moment from "moment";
 
-import { getDateAndTime } from "@/utils/getDateAndTime.js";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
 
@@ -104,9 +111,11 @@ export default {
   components: { AdminTable, MyAlert },
   data() {
     return {
+      moment: moment,
       data: {
         user: null,
         book: null,
+        date_reserved: moment(new Date()).format("YYYY-MM-DDThh:mm"),
       },
 
       editForm: {
@@ -127,6 +136,7 @@ export default {
     resetForm() {
       this.data.user = "";
       this.data.book = "";
+      this.data.date_reserved = "";
 
       this.editForm.user = "";
       this.editForm.book = "";
@@ -137,6 +147,8 @@ export default {
       try {
         await API.post("books/reservebook", payload);
         this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
         this.message = "Reserve book added!";
         this.showMessage = true;
       } catch (error) {
@@ -144,13 +156,19 @@ export default {
         this.showMessage = true;
         this.message = error.response.data.message;
         this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
       }
     },
 
     onSubmit() {
       this.showModal = false;
 
-      this.addNewRecord(this.data);
+      this.addNewRecord({
+        ...this.data,
+        date_reserved: new Date(this.data.date_reserved).toISOString(),
+      });
+
       this.resetForm();
     },
 
@@ -160,11 +178,15 @@ export default {
           data: { book: payload },
         });
         this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
         this.message = "Reserve book removed!";
         this.showMessage = true;
       } catch (error) {
         console.log(error);
         this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
       }
     },
 
@@ -184,6 +206,8 @@ export default {
         date_reserved: moment(record.date_reserved).format("YYYY-MM-DDThh:mm"),
       };
 
+      console.log(record.date_reserved);
+
       this.showEditModal = true;
     },
 
@@ -191,22 +215,34 @@ export default {
       try {
         await API.put(`/books/updatereservedbook/${recordID}`, payload);
         this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
         this.message = "Reserve book updated!";
         this.showMessage = true;
       } catch (error) {
         console.log(error);
         this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
       }
     },
 
     onSubmitUpdate() {
       this.showEditModal = false;
-      this.updateRecord(this.editForm, this.editForm._id);
+      this.updateRecord(
+        {
+          ...this.editForm,
+          date_reserved: new Date(this.editForm.date_reserved).toISOString(),
+        },
+        this.editForm._id
+      );
     },
 
     onResetUpdate() {
       this.resetForm();
       this.getReservedBooks();
+      this.getBooks();
+      this.getUsers();
       this.showEditModal = false;
     },
 
@@ -234,10 +270,6 @@ export default {
       books: (state) => state.books.books,
       users: (state) => state.login.users,
     }),
-
-    date(date) {
-      return getDateAndTime(date);
-    },
   },
 
   created() {
