@@ -13,8 +13,6 @@
 </template>
 
 <script>
-import "./styles.scss";
-
 export default {
   name: "book-card",
   props: {

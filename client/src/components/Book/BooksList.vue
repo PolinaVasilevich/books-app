@@ -7,8 +7,6 @@
 <script>
 import BookCard from "./BookCard.vue";
 
-import "./styles.scss";
-
 export default {
   components: {
     BookCard,

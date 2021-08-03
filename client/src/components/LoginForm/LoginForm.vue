@@ -38,8 +38,6 @@ import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { mapState } from "vuex";
 
-import "./styles.scss";
-
 export default {
   name: "login-form",
   setup() {
