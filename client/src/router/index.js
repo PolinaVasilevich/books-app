@@ -101,9 +101,9 @@ const routes = [
     name: "userPage",
     component: UserPage,
 
-    // meta: {
-    //   requiresAuth: true,
-    // },
+    meta: {
+      requiresAuth: true,
+    },
   },
 ];
 

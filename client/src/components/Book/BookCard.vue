@@ -4,10 +4,10 @@
       ><img :src="book.img" :alt="book.title" class="book-card__img" />
     </router-link>
     <p class="book-card__title">
-      <strong>{{ book.title }}</strong>
+      {{ book.title }}
     </p>
     <p class="book-card__text">
-      <em>{{ book.author.first_name + " " + book.author.last_name }}</em>
+      {{ book.author.first_name + " " + book.author.last_name }}
     </p>
   </div>
 </template>

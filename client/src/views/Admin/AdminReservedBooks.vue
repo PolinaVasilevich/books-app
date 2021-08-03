@@ -1,98 +1,100 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-    <admin-table
-      titleTable="Reserved books"
-      :headers="headers"
-      :data="reservedBooks"
+    <admin-header>
+      <admin-table
+        titleTable="Reserved books"
+        :headers="headers"
+        :data="reservedBooks"
+      >
+        <template v-slot:modal>
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            @click="showModal = true"
+          >
+            Create new record
+          </button>
+          <my-modal :showModal="showModal" @close="showModal = false">
+            <form @submit.prevent="onSubmit" @reset="resetForm">
+              <select class="form-control select" v-model="data.user">
+                <option v-for="user in users" :key="user._id" :value="user">
+                  {{ user.username }}
+                </option>
+              </select>
+
+              <select class="form-control select" v-model="data.book">
+                <option v-for="book in books" :key="book._id" :value="book">
+                  {{ book.title }}
+                </option>
+              </select>
+
+              <input
+                class="form-control select"
+                type="datetime-local"
+                v-model="data.date_reserved"
+              />
+
+              <div class="btns">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-danger">Reset</button>
+              </div>
+            </form>
+          </my-modal>
+          <my-modal :showModal="showEditModal" @close="showEditModal = false">
+            <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
+              <select class="form-control select" v-model="editForm.user">
+                <option v-for="user in users" :key="user._id" :value="user">
+                  {{ user.username }}
+                </option>
+              </select>
+
+              <select class="form-control select" v-model="editForm.book">
+                <option v-for="book in books" :key="book._id" :value="book">
+                  {{ book.title }}
+                </option>
+              </select>
+
+              <input
+                class="form-control select"
+                type="datetime-local"
+                v-model="editForm.date_reserved"
+              />
+
+              <div class="btns">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="reset" class="btn btn-danger">Cancel</button>
+              </div>
+            </form>
+          </my-modal>
+        </template>
+        <template v-slot:data>
+          <tr v-for="book in reservedBooks" :key="book._id">
+            <td>{{ book.user.username }}</td>
+            <td>{{ book.book.title }}</td>
+            <td>
+              {{ moment(book.date_reserved).format("YYYY-MM-DD hh:mm") }}
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-warning btn-sm"
+                @click="editRecord(book)"
+              >
+                Update
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                @click="onDeleteRecord(book)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </template>
+      </admin-table></admin-header
     >
-      <template v-slot:modal>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          @click="showModal = true"
-        >
-          Create new record
-        </button>
-        <my-modal :showModal="showModal" @close="showModal = false">
-          <form @submit.prevent="onSubmit" @reset="resetForm">
-            <select class="form-control select" v-model="data.user">
-              <option v-for="user in users" :key="user._id" :value="user">
-                {{ user.username }}
-              </option>
-            </select>
-
-            <select class="form-control select" v-model="data.book">
-              <option v-for="book in books" :key="book._id" :value="book">
-                {{ book.title }}
-              </option>
-            </select>
-
-            <input
-              class="form-control select"
-              type="datetime-local"
-              v-model="data.date_reserved"
-            />
-
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-danger">Reset</button>
-            </div>
-          </form>
-        </my-modal>
-        <my-modal :showModal="showEditModal" @close="showEditModal = false">
-          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-            <select class="form-control select" v-model="editForm.user">
-              <option v-for="user in users" :key="user._id" :value="user">
-                {{ user.username }}
-              </option>
-            </select>
-
-            <select class="form-control select" v-model="editForm.book">
-              <option v-for="book in books" :key="book._id" :value="book">
-                {{ book.title }}
-              </option>
-            </select>
-
-            <input
-              class="form-control select"
-              type="datetime-local"
-              v-model="editForm.date_reserved"
-            />
-
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Update</button>
-              <button type="reset" class="btn btn-danger">Cancel</button>
-            </div>
-          </form>
-        </my-modal>
-      </template>
-      <template v-slot:data>
-        <tr v-for="book in reservedBooks" :key="book._id">
-          <td>{{ book.user.username }}</td>
-          <td>{{ book.book.title }}</td>
-          <td>
-            {{ moment(book.date_reserved).format("YYYY-MM-DD hh:mm") }}
-          </td>
-          <td>
-            <button
-              type="button"
-              class="btn btn-warning btn-sm"
-              @click="editRecord(book)"
-            >
-              Update
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger btn-sm"
-              @click="onDeleteRecord(book)"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      </template>
-    </admin-table>
   </div>
 </template>
 
@@ -102,13 +104,16 @@ import moment from "moment";
 
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
+import AdminHeader from "./AdminHeader.vue";
 
 import API from "@/utils/api";
+
+import "@/assets/styles/main.scss";
 import "@/assets/styles/main.scss";
 
 export default {
   name: "admin-reservedBooks",
-  components: { AdminTable, MyAlert },
+  components: { AdminTable, MyAlert, AdminHeader },
   data() {
     return {
       moment: moment,

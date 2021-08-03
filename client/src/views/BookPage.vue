@@ -20,20 +20,6 @@
           :alt="book.title"
           class="book-page__content__img"
         />
-        <button
-          v-if="isLoggedIn"
-          class="book-page__content__btn btn btn-outline-primary"
-          @click="onReserveBook(book, user)"
-          :disabled="!book.count"
-          :class="{ disabled: !book.count || isReserved }"
-        >
-          <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
-            Reserve book</i
-          >
-          <i v-else class="bi bi-book-fill book-page__content__icon">
-            Reserved</i
-          >
-        </button>
       </div>
       <div class="book-page__content__info">
         <h2 class="book-page__content__info__title">{{ book.title }}</h2>
@@ -45,6 +31,21 @@
           <strong>Count books: </strong>
           {{ book.count }}
         </p>
+
+        <button
+          v-if="isLoggedIn"
+          class="book-page__content__btn btn"
+          @click="onReserveBook(book, user)"
+          :disabled="!book.count"
+          :class="{ disabled: !book.count || isReserved }"
+        >
+          <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
+            Reserve book</i
+          >
+          <i v-else class="bi bi-book-fill book-page__content__icon">
+            Reserved</i
+          >
+        </button>
       </div>
     </div>
   </div>

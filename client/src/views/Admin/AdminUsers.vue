@@ -1,111 +1,113 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-    <admin-table titleTable="Users" :headers="headers" :data="users">
-      <template v-slot:modal>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          @click="showModal = true"
-        >
-          Create new record
-        </button>
-        <my-modal :showModal="showModal" @close="showModal = false">
-          <form @submit.prevent="onSubmit" @reset="resetForm">
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="user.username"
-              placeholder="Enter username"
-              required
-            />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="user.password"
-              placeholder="Enter password"
-              required
-            />
-
-            <div class="form-check form-check-inline">
-              <label class="form-check-label" for="inlineCheckbox1"
-                >Admin</label
-              >
+    <admin-header>
+      <admin-table titleTable="Users" :headers="headers" :data="users">
+        <template v-slot:modal>
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            @click="showModal = true"
+          >
+            Create new record
+          </button>
+          <my-modal :showModal="showModal" @close="showModal = false">
+            <form @submit.prevent="onSubmit" @reset="resetForm">
               <input
-                class="form-check-input"
-                type="checkbox"
-                id="inlineCheckbox1"
-                v-model="user.isAdmin"
+                class="form-control input"
+                type="text"
+                v-model.trim="user.username"
+                placeholder="Enter username"
+                required
               />
-            </div>
-
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-danger">Reset</button>
-            </div>
-          </form>
-        </my-modal>
-
-        <my-modal :showModal="showEditModal" @close="showEditModal = false">
-          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="editForm.username"
-              placeholder="Enter username"
-              required
-            />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="editForm.password"
-              placeholder="Enter password"
-              required
-            />
-
-            <div class="form-check form-check-inline">
-              <label class="form-check-label" for="inlineCheckbox1"
-                >Admin</label
-              >
               <input
-                class="form-check-input"
-                type="checkbox"
-                id="inlineCheckbox1"
-                v-model="editForm.isAdmin"
+                class="form-control input"
+                type="text"
+                v-model.trim="user.password"
+                placeholder="Enter password"
+                required
               />
-            </div>
 
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Update</button>
-              <button type="reset" class="btn btn-danger">Cancel</button>
-            </div>
-          </form>
-        </my-modal>
-      </template>
-      <template v-slot:data>
-        <tr v-for="user in users" :key="user._id">
-          <td>{{ user.username }}</td>
-          <td>{{ user.password }}</td>
-          <td>{{ user.isAdmin }}</td>
-          <td>
-            <button
-              type="button"
-              class="btn btn-warning btn-sm"
-              @click="editUser(user)"
-            >
-              Update
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger btn-sm"
-              @click="onDeleteUser(user)"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      </template>
-    </admin-table>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label" for="inlineCheckbox1"
+                  >Admin</label
+                >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="inlineCheckbox1"
+                  v-model="user.isAdmin"
+                />
+              </div>
+
+              <div class="btns">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-danger">Reset</button>
+              </div>
+            </form>
+          </my-modal>
+
+          <my-modal :showModal="showEditModal" @close="showEditModal = false">
+            <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
+              <input
+                class="form-control input"
+                type="text"
+                v-model.trim="editForm.username"
+                placeholder="Enter username"
+                required
+              />
+              <input
+                class="form-control input"
+                type="text"
+                v-model.trim="editForm.password"
+                placeholder="Enter password"
+                required
+              />
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label" for="inlineCheckbox1"
+                  >Admin</label
+                >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="inlineCheckbox1"
+                  v-model="editForm.isAdmin"
+                />
+              </div>
+
+              <div class="btns">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="reset" class="btn btn-danger">Cancel</button>
+              </div>
+            </form>
+          </my-modal>
+        </template>
+        <template v-slot:data>
+          <tr v-for="user in users" :key="user._id">
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+            <td>{{ user.isAdmin }}</td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-warning btn-sm"
+                @click="editUser(user)"
+              >
+                Update
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                @click="onDeleteUser(user)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        </template>
+      </admin-table></admin-header
+    >
   </div>
 </template>
 
@@ -113,11 +115,14 @@
 import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
+import AdminHeader from "./AdminHeader.vue";
 import API from "@/utils/api";
+
+import "@/assets/styles/main.scss";
 
 export default {
   name: "admin-users",
-  components: { AdminTable, MyAlert },
+  components: { AdminTable, MyAlert, AdminHeader },
   data() {
     return {
       user: {

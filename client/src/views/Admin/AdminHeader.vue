@@ -1,7 +1,6 @@
 <template>
-  <div class="admin-page">
-    <h1 class="admin-page__title">Welcome to administrator page</h1>
-    <div>
+  <div class="admin-header">
+    <div class="admin-header__links">
       <my-button type="button">
         <router-link class="router-link" to="/admin/adminbooks"
           >Books</router-link
@@ -31,11 +30,14 @@
         >
       </my-button>
     </div>
+    <slot></slot>
   </div>
 </template>
 
 <script>
 import "./styles/admin.scss";
 
-export default {};
+export default {
+  name: "admin-header",
+};
 </script>

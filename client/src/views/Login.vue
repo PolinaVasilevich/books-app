@@ -23,8 +23,7 @@ export default {
 <style scoped>
 .form {
   width: 500px;
-  margin: auto;
-  padding: 20px;
+  margin: 150px auto;
   text-align: center;
 }
 </style>

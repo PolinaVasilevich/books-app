@@ -1,23 +1,35 @@
 <template>
-  <my-header>
-    <my-button><router-link class="link" to="/">Home</router-link></my-button>
-    <my-button v-if="isAdmin"
-      ><router-link class="link" to="/admin">Admin</router-link></my-button
-    >
-    <my-button v-if="isLoggedIn"
-      ><router-link
-        class="link"
-        :to="{ name: 'userPage', params: { id: user._id } }"
-        >My books</router-link
-      ></my-button
-    >
-    <my-button v-if="!isLoggedIn"
-      ><router-link class="link" to="/login">Login</router-link></my-button
-    >
+  <div class="app">
+    <my-header>
+      <my-button
+        ><router-link class="header__link" to="/">Home</router-link></my-button
+      >
+      <my-button v-if="isAdmin"
+        ><router-link class="header__link" to="/admin"
+          >Admin</router-link
+        ></my-button
+      >
+      <my-button v-if="isLoggedIn"
+        ><router-link
+          class="header__link"
+          :to="{ name: 'userPage', params: { id: user._id } }"
+          >My books</router-link
+        ></my-button
+      >
+      <my-button v-if="!isLoggedIn"
+        ><router-link class="header__link" to="/login"
+          >Login</router-link
+        ></my-button
+      >
 
-    <my-button v-else @click="logout" class="link">Logout</my-button>
-  </my-header>
-  <router-view />
+      <my-button v-else @click="logout" class="header__link">Logout</my-button>
+    </my-header>
+    <my-button @click="getBack" v-if="$route.path !== '/'">
+      <i class="bi bi-arrow-left arrow">Get back</i>
+    </my-button>
+
+    <router-view class="app__content" />
+  </div>
 </template>
 
 <script>
@@ -31,6 +43,10 @@ export default {
       this.$store.dispatch("login/logout").then(() => {
         this.$router.push("/");
       });
+    },
+
+    getBack() {
+      this.$router.go(-1);
     },
   },
   computed: {
@@ -47,19 +63,41 @@ export default {
 </script>
 
 <style>
-.link,
-.router-link {
-  color: #000;
+.arrow {
+  font-size: 1.4em;
+}
+
+.header__link {
+  display: inline-block;
+  position: relative;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #484848;
+  vertical-align: baseline;
+  padding: 8px 0;
+
   text-decoration: none;
-  font-size: 1.2em;
-  cursor: pointer;
 }
 
-.router-link:hover {
-  color: #fff;
-}
-
+.header__link:hover,
 .router-link-active {
-  color: #3498db;
+  color: #f66e5e;
+}
+
+.router-link-active::after {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  left: 15%;
+  transform: scale(1);
+  background-color: #f66e5e;
+  height: 2px;
+  width: 60%;
+  transition: 0.2s;
+}
+
+.app__content {
+  margin-top: 100px;
 }
 </style>
