@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
+  <div class="container admin-table">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-sm-20">
         <h1>{{ titleTable }}</h1>
         <hr />
         <br /><br />
@@ -44,3 +44,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.admin-table {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+</style>

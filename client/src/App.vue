@@ -24,9 +24,6 @@
 
       <my-button v-else @click="logout" class="header__link">Logout</my-button>
     </my-header>
-    <my-button @click="getBack" v-if="$route.path !== '/'">
-      <i class="bi bi-arrow-left arrow">Get back</i>
-    </my-button>
 
     <router-view class="app__content" />
   </div>
@@ -95,9 +92,5 @@ export default {
   height: 2px;
   width: 60%;
   transition: 0.2s;
-}
-
-.app__content {
-  margin-top: 100px;
 }
 </style>

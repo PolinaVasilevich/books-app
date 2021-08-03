@@ -1,16 +1,18 @@
 <template>
-  <my-alert class="alert" :message="message" v-if="showMessage" />
-  <my-alert
-    class="alert alert-warning"
-    message="Sorry, but now books out of stock."
-    v-if="!book.count && !isReserved"
-  />
+  <div class="alerts">
+    <my-alert
+      class="alert alert-warning"
+      message="Sorry, but now books out of stock."
+      v-if="!book.count && !isReserved"
+    />
 
-  <my-alert
-    class="alert alert-warning"
-    message="You have already reserved this book"
-    v-if="isReserved && !showMessage"
-  />
+    <my-alert
+      class="alert alert-warning"
+      message="You have already reserved this book"
+      v-if="isReserved && !showMessage"
+    />
+    <my-alert class="alert" :message="message" v-if="showMessage" />
+  </div>
 
   <div class="book-page">
     <div class="book-page__content">

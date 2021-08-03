@@ -92,10 +92,6 @@ const routes = [
     path: "/books/:id",
     name: "book",
     component: BookPage,
-
-    meta: {
-      requiresAuth: true,
-    },
   },
 
   {

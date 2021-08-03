@@ -1,13 +1,12 @@
 .book-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 300px);
+  grid-template-columns: repeat(auto-fill, 294px);
+  justify-content: space-between;
 
   text-align: center;
-  margin: 50px 100px;
 }
 
 .book-card {
-  margin: 15px;
   &__img {
     object-fit: cover;
     height: 400px;

@@ -4,7 +4,6 @@
 @import "@/assets/styles/userPage.scss";
 @import "@/assets/styles/bookList.scss";
 @import "@/assets/styles/header.scss";
-@import "@/assets/styles/admin.scss";
 
 * {
   margin: 0;
@@ -38,10 +37,16 @@ body {
 
 .router-link {
   color: #333;
+  text-decoration: none;
   line-height: 1.8em;
   font-size: 1.3em;
 }
 
 .router-link:hover {
   color: #f66e5e;
+}
+
+.app__content {
+  margin-top: 100px;
+  padding: 10px 100px;
 }

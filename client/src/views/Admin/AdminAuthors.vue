@@ -1,17 +1,13 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
+    <my-alert :message="message" v-if="isShowMessage" />
 
     <admin-table titleTable="Authors" :headers="headers" :data="authors">
       <template v-slot:modal>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          @click="showModal = true"
-        >
+        <button type="button" class="btn btn-success btn-sm" @click="showModal">
           Create new record
         </button>
-        <my-modal :showModal="showModal" @close="showModal = false">
+        <my-modal :showModal="isShowModal" @close="showModal">
           <form @submit.prevent="onSubmit" @reset="resetForm">
             <input
               class="form-control input"
@@ -35,7 +31,7 @@
           </form>
         </my-modal>
 
-        <my-modal :showModal="showEditModal" @close="showEditModal = false">
+        <my-modal :showModal="isShowEditModal" @close="showEditModal">
           <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
             <input
               class="form-control input"
@@ -90,13 +86,14 @@ import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 
 import MyAlert from "@/components/UI/MyAlert";
-import API from "@/utils/api";
+// import API from "@/utils/api";
 
-import "@/assets/styles/main.scss";
+import mixin from "@/components/mixins/formMixin.js";
 
 export default {
   name: "admin-authors",
   components: { AdminTable, MyAlert },
+  mixins: [mixin],
   data() {
     return {
       author: {
@@ -110,10 +107,6 @@ export default {
       },
       headers: ["First name", "Last Name"],
       message: "",
-
-      showModal: false,
-      showMessage: false,
-      showEditModal: false,
     };
   },
 
@@ -131,38 +124,38 @@ export default {
       this.editForm.last_name = "";
     },
 
-    async addAuthor(payload) {
-      try {
-        await API.post("books/author", payload);
-        this.getAuthors();
-        this.message = "Author added!";
-        this.showMessage = true;
-      } catch (error) {
-        console.log(error);
-        this.getAuthors();
-      }
-    },
+    // async addAuthor(payload) {
+    //   try {
+    //     await API.post("books/author", payload);
+    //     this.getAuthors();
+    //     this.message = "Author added!";
+    //     this.showMessage = true;
+    //   } catch (error) {
+    //     console.log(error);
+    //     this.getAuthors();
+    //   }
+    // },
 
     onSubmit() {
-      this.showModal = false;
-      this.addAuthor(this.author);
+      this.isShowModal = false;
+      this.addNewRecord("books/author", this.author);
       this.resetForm();
     },
 
-    async removeAuthor(authorID) {
-      try {
-        await API.delete(`/books/deleteauthor/${authorID}`);
-        this.getAuthors();
-        this.message = "Author removed!";
-        this.showMessage = true;
-      } catch (error) {
-        console.log(error);
-        this.getAuthors();
-      }
-    },
+    // async removeAuthor(authorID) {
+    //   try {
+    //     await API.delete(`/books/deleteauthor/${authorID}`);
+    //     this.getAuthors();
+    //     this.message = "Author removed!";
+    //     this.showMessage = true;
+    //   } catch (error) {
+    //     console.log(error);
+    //     this.getAuthors();
+    //   }
+    // },
 
     onDeleteAuthor(author) {
-      this.removeAuthor(author._id);
+      this.removeRecord(`/books/deleteauthor/${author._id}`);
     },
 
     editAuthor(author) {
@@ -170,21 +163,24 @@ export default {
       this.showEditModal = true;
     },
 
-    async updateAuthor(payload, authorID) {
-      try {
-        await API.put(`/books/updateauthor/${authorID}`, payload);
-        this.getAuthors();
-        this.message = "Book updated!";
-        this.showMessage = true;
-      } catch (error) {
-        console.log(error);
-        this.getAuthors();
-      }
-    },
+    // async updateAuthor(payload, authorID) {
+    //   try {
+    //     await API.put(`/books/updateauthor/${authorID}`, payload);
+    //     this.getAuthors();
+    //     this.message = "Book updated!";
+    //     this.showMessage = true;
+    //   } catch (error) {
+    //     console.log(error);
+    //     this.getAuthors();
+    //   }
+    // },
 
     onSubmitUpdate() {
       this.showEditModal = false;
-      this.updateAuthor(this.editForm, this.editForm._id);
+      this.updateRecord(
+        `/books/updateauthor/${this.editForm._id}`,
+        this.editForm
+      );
     },
 
     onResetUpdate() {
