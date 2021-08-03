@@ -1,10 +1,12 @@
 .admin-page {
-  text-align: center;
 }
 
 .admin-header {
   &__links {
     margin: 15px 100px;
+  }
+  .router-link {
+    text-decoration: none;
   }
 
   .router-link-active {

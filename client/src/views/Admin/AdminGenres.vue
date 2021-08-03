@@ -1,71 +1,70 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-    <admin-header>
-      <admin-table titleTable="Genres" :headers="headers" :data="genres">
-        <template v-slot:modal>
-          <button
-            type="button"
-            class="btn btn-success btn-sm"
-            @click="showModal = true"
-          >
-            Create new record
-          </button>
-          <my-modal :showModal="showModal" @close="showModal = false">
-            <form @submit.prevent="onSubmit" @reset="resetForm">
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="genre.name"
-                placeholder="Enter name genre"
-                required
-              />
-              <div class="btns">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="reset" class="btn btn-danger">Reset</button>
-              </div>
-            </form>
-          </my-modal>
 
-          <my-modal :showModal="showEditModal" @close="showEditModal = false">
-            <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="editForm.name"
-                placeholder="Enter name genre"
-                required
-              />
-              <div class="btns">
-                <button type="submit" class="btn btn-primary">Update</button>
-                <button type="reset" class="btn btn-danger">Cancel</button>
-              </div>
-            </form>
-          </my-modal>
-        </template>
-        <template v-slot:data>
-          <tr v-for="genre in genres" :key="genre._id">
-            <td>{{ genre.name }}</td>
-            <td>
-              <button
-                type="button"
-                class="btn btn-warning btn-sm"
-                @click="editGenre(genre)"
-              >
-                Update
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger btn-sm"
-                @click="onDeleteGenre(genre)"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </template>
-      </admin-table></admin-header
-    >
+    <admin-table titleTable="Genres" :headers="headers" :data="genres">
+      <template v-slot:modal>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          @click="showModal = true"
+        >
+          Create new record
+        </button>
+        <my-modal :showModal="showModal" @close="showModal = false">
+          <form @submit.prevent="onSubmit" @reset="resetForm">
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="genre.name"
+              placeholder="Enter name genre"
+              required
+            />
+            <div class="btns">
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </my-modal>
+
+        <my-modal :showModal="showEditModal" @close="showEditModal = false">
+          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="editForm.name"
+              placeholder="Enter name genre"
+              required
+            />
+            <div class="btns">
+              <button type="submit" class="btn btn-primary">Update</button>
+              <button type="reset" class="btn btn-danger">Cancel</button>
+            </div>
+          </form>
+        </my-modal>
+      </template>
+      <template v-slot:data>
+        <tr v-for="genre in genres" :key="genre._id">
+          <td>{{ genre.name }}</td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-warning btn-sm"
+              @click="editGenre(genre)"
+            >
+              Update
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              @click="onDeleteGenre(genre)"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </template>
+    </admin-table>
   </div>
 </template>
 
@@ -73,14 +72,12 @@
 import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
-import AdminHeader from "./AdminHeader.vue";
-import API from "@/utils/api";
 
-import "@/assets/styles/main.scss";
+import API from "@/utils/api";
 
 export default {
   name: "admin-genres",
-  components: { AdminTable, MyAlert, AdminHeader },
+  components: { AdminTable, MyAlert },
   data() {
     return {
       genre: {

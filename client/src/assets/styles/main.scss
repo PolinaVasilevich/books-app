@@ -1,3 +1,8 @@
+@import "@/assets/styles/bookPage.scss";
+@import "@/assets/styles/buttons.scss";
+@import "@/assets/styles/loginForm.scss";
+@import "@/assets/styles/userPage.scss";
+
 * {
   margin: 0;
   padding: 0;
@@ -29,10 +34,9 @@ body {
 }
 
 .router-link {
-  text-decoration: none;
   color: #333;
   line-height: 1.8em;
-  font-size: 1.2em;
+  font-size: 1.3em;
 }
 
 .router-link:hover {

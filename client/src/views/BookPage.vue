@@ -3,13 +3,13 @@
   <my-alert
     class="alert alert-warning"
     message="Sorry, but now books out of stock."
-    v-if="!book.count"
+    v-if="!book.count && !isReserved"
   />
 
   <my-alert
     class="alert alert-warning"
     message="You have already reserved this book"
-    v-if="isReserved"
+    v-if="isReserved && !showMessage"
   />
 
   <div class="book-page">
@@ -65,6 +65,7 @@ export default {
   data() {
     return {
       book: {},
+      allbooks: [],
       message: "",
       showMessage: false,
       isReserved: false,
@@ -72,9 +73,13 @@ export default {
   },
 
   methods: {
-    getBook(books) {
+    getBook() {
       try {
-        const book = books.find((book) => book._id === this.$route.params.id);
+        const book = this.books.find(
+          (book) => book._id === this.$route.params.id
+        );
+
+        console.log(this.books);
 
         if (book) {
           this.book = book;
@@ -84,7 +89,7 @@ export default {
       }
     },
 
-    async checkReserveBook(bookID, userID) {
+    checkReserveBook(bookID, userID) {
       try {
         const books = JSON.parse(JSON.stringify(this.reservedBooks)).filter(
           (book) => book.book._id === bookID && book.user._id === userID
@@ -106,14 +111,18 @@ export default {
           this.message = `Book "${this.book.title}" has reserved`;
           this.showMessage = true;
           this.isReserved = true;
+
           this.getBooks();
           this.getBook();
+          this.getReservedBooks();
         } catch (error) {
           console.log(error);
           this.message = error.response.data.message;
           this.showMessage = true;
+
           this.getBooks();
           this.getBook();
+          this.getReservedBooks();
         }
       }
     },
@@ -138,7 +147,7 @@ export default {
 
   created() {
     this.getBooks();
-    this.getBook(this.books);
+    this.getBook();
     this.getReservedBooks();
     this.checkReserveBook(this.book._id, this.user._id);
   },

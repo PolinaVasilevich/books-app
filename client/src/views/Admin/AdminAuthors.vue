@@ -1,95 +1,94 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-    <admin-header>
-      <admin-table titleTable="Authors" :headers="headers" :data="authors">
-        <template v-slot:modal>
-          <button
-            type="button"
-            class="btn btn-success btn-sm"
-            @click="showModal = true"
-          >
-            Create new record
-          </button>
-          <my-modal :showModal="showModal" @close="showModal = false">
-            <form @submit.prevent="onSubmit" @reset="resetForm">
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="author.first_name"
-                placeholder="Enter first name"
-                required
-              />
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="author.last_name"
-                placeholder="Enter last name"
-                required
-              />
 
-              <div class="btns">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="reset" class="btn btn-danger">Reset</button>
-              </div>
-            </form>
-          </my-modal>
+    <admin-table titleTable="Authors" :headers="headers" :data="authors">
+      <template v-slot:modal>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          @click="showModal = true"
+        >
+          Create new record
+        </button>
+        <my-modal :showModal="showModal" @close="showModal = false">
+          <form @submit.prevent="onSubmit" @reset="resetForm">
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="author.first_name"
+              placeholder="Enter first name"
+              required
+            />
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="author.last_name"
+              placeholder="Enter last name"
+              required
+            />
 
-          <my-modal :showModal="showEditModal" @close="showEditModal = false">
-            <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="editForm.first_name"
-                placeholder="Enter first name"
-                required
-              />
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="editForm.last_name"
-                placeholder="Enter last name"
-                required
-              />
+            <div class="btns">
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </my-modal>
 
-              <div class="btns">
-                <button type="submit" class="btn btn-primary">Update</button>
-                <button type="reset" class="btn btn-danger">Cancel</button>
-              </div>
-            </form>
-          </my-modal>
-        </template>
-        <template v-slot:data>
-          <tr v-for="author in authors" :key="author._id">
-            <td>{{ author.first_name }}</td>
-            <td>{{ author.last_name }}</td>
-            <td>
-              <button
-                type="button"
-                class="btn btn-warning btn-sm"
-                @click="editAuthor(author)"
-              >
-                Update
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger btn-sm"
-                @click="onDeleteAuthor(author)"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </template>
-      </admin-table></admin-header
-    >
+        <my-modal :showModal="showEditModal" @close="showEditModal = false">
+          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="editForm.first_name"
+              placeholder="Enter first name"
+              required
+            />
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="editForm.last_name"
+              placeholder="Enter last name"
+              required
+            />
+
+            <div class="btns">
+              <button type="submit" class="btn btn-primary">Update</button>
+              <button type="reset" class="btn btn-danger">Cancel</button>
+            </div>
+          </form>
+        </my-modal>
+      </template>
+      <template v-slot:data>
+        <tr v-for="author in authors" :key="author._id">
+          <td>{{ author.first_name }}</td>
+          <td>{{ author.last_name }}</td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-warning btn-sm"
+              @click="editAuthor(author)"
+            >
+              Update
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              @click="onDeleteAuthor(author)"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </template>
+    </admin-table>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import AdminHeader from "./AdminHeader.vue";
+
 import MyAlert from "@/components/UI/MyAlert";
 import API from "@/utils/api";
 
@@ -97,7 +96,7 @@ import "@/assets/styles/main.scss";
 
 export default {
   name: "admin-authors",
-  components: { AdminTable, MyAlert, AdminHeader },
+  components: { AdminTable, MyAlert },
   data() {
     return {
       author: {

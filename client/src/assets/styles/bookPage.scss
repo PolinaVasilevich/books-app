@@ -17,19 +17,19 @@
     &__btn {
       cursor: pointer;
       border-radius: 15px;
-      color: #fff;
-      background: #f66e5e;
-      border: 2px solid transparent;
+
+      border: 2px solid #f66e5e;
       margin-top: 30px;
       font-size: 1.2em;
     }
 
-    &__btn:hover &__icon {
+    &__btn:hover &__icon,
+    &__btn:hover {
       color: #333;
     }
 
     &__icon {
-      color: #fff;
+      color: #f66e5e;
     }
 
     &__info {

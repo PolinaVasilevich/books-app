@@ -1,151 +1,146 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-    <admin-header>
-      <admin-table titleTable="Books" :headers="headers" :data="books">
-        <template v-slot:modal>
-          <button
-            type="button"
-            class="btn btn-success btn-sm"
-            @click="showModal = true"
-          >
-            Create new record
-          </button>
-          <my-modal :showModal="showModal" @close="showModal = false">
-            <form @submit.prevent="onSubmit" @reset="resetForm">
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="book.title"
-                placeholder="Enter title"
-                required
-              />
 
-              <my-select
-                :options="
-                  authors.map((author) => ({
-                    name: author.first_name + ' ' + author.last_name,
-                  }))
-                "
-                class="select"
-                v-model="book.author"
-              />
+    <admin-table titleTable="Books" :headers="headers" :data="books">
+      <template v-slot:modal>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          @click="showModal = true"
+        >
+          Create new record
+        </button>
+        <my-modal :showModal="showModal" @close="showModal = false">
+          <form @submit.prevent="onSubmit" @reset="resetForm">
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="book.title"
+              placeholder="Enter title"
+              required
+            />
 
-              <my-select
-                :options="genres"
-                class="select"
-                v-model="book.genre"
-              />
+            <my-select
+              :options="
+                authors.map((author) => ({
+                  name: author.first_name + ' ' + author.last_name,
+                }))
+              "
+              class="select"
+              v-model="book.author"
+            />
 
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="book.img"
-                placeholder="Enter url image"
-                required
-              />
-              <!-- <file-input class="select" /> -->
+            <my-select :options="genres" class="select" v-model="book.genre" />
 
-              <input
-                class="form-control input"
-                type="number"
-                v-model.trim="book.count"
-                placeholder="Enter count"
-                required
-                min="1"
-                max="100"
-              />
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="book.img"
+              placeholder="Enter url image"
+              required
+            />
+            <!-- <file-input class="select" /> -->
 
-              <div class="btns">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="reset" class="btn btn-danger">Reset</button>
-              </div>
-            </form>
-          </my-modal>
-          <my-modal :showModal="showEditModal" @close="showEditModal = false">
-            <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="editForm.title"
-                placeholder="Enter title"
-                required
-              />
+            <input
+              class="form-control input"
+              type="number"
+              v-model.trim="book.count"
+              placeholder="Enter count"
+              required
+              min="1"
+              max="100"
+            />
 
-              <my-select
-                :options="
-                  authors.map((author) => ({
-                    name: author.first_name + ' ' + author.last_name,
-                  }))
-                "
-                class="select"
-                v-model="editForm.author"
-              />
+            <div class="btns">
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </my-modal>
+        <my-modal :showModal="showEditModal" @close="showEditModal = false">
+          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="editForm.title"
+              placeholder="Enter title"
+              required
+            />
 
-              <my-select
-                :options="genres"
-                class="select"
-                v-model="editForm.genre"
-              />
-              <input
-                class="form-control input"
-                type="text"
-                v-model.trim="editForm.img"
-                placeholder="Enter url image"
-                required
-              />
-              <input
-                class="form-control input"
-                type="number"
-                v-model.trim="editForm.count"
-                placeholder="Enter count"
-                min="1"
-                max="100"
-                required
-              />
+            <my-select
+              :options="
+                authors.map((author) => ({
+                  name: author.first_name + ' ' + author.last_name,
+                }))
+              "
+              class="select"
+              v-model="editForm.author"
+            />
 
-              <div class="btns">
-                <button type="submit" class="btn btn-primary">Update</button>
-                <button type="reset" class="btn btn-danger">Cancel</button>
-              </div>
-            </form>
-          </my-modal>
-        </template>
-        <template v-slot:data>
-          <tr v-for="book in books" :key="book._id">
-            <td>{{ book.title }}</td>
-            <td>
-              {{ book.author.first_name + " " + book.author.last_name }}
-            </td>
-            <td>{{ book.genre[0].name }}</td>
-            <td>{{ book.count }}</td>
-            <td>
-              <button
-                type="button"
-                class="btn btn-warning btn-sm"
-                @click="editBook(book)"
-              >
-                Update
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger btn-sm"
-                @click="onDeleteBook(book)"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </template>
-      </admin-table></admin-header
-    >
+            <my-select
+              :options="genres"
+              class="select"
+              v-model="editForm.genre"
+            />
+            <input
+              class="form-control input"
+              type="text"
+              v-model.trim="editForm.img"
+              placeholder="Enter url image"
+              required
+            />
+            <input
+              class="form-control input"
+              type="number"
+              v-model.trim="editForm.count"
+              placeholder="Enter count"
+              min="1"
+              max="100"
+              required
+            />
+
+            <div class="btns">
+              <button type="submit" class="btn btn-primary">Update</button>
+              <button type="reset" class="btn btn-danger">Cancel</button>
+            </div>
+          </form>
+        </my-modal>
+      </template>
+      <template v-slot:data>
+        <tr v-for="book in books" :key="book._id">
+          <td>{{ book.title }}</td>
+          <td>
+            {{ book.author.first_name + " " + book.author.last_name }}
+          </td>
+          <td>{{ book.genre[0].name }}</td>
+          <td>{{ book.count }}</td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-warning btn-sm"
+              @click="editBook(book)"
+            >
+              Update
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              @click="onDeleteBook(book)"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </template>
+    </admin-table>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import AdminHeader from "./AdminHeader.vue";
+
 import MyAlert from "@/components/UI/MyAlert";
 import MySelect from "@/components/UI/MySelect";
 
@@ -154,7 +149,7 @@ import "@/assets/styles/main.scss";
 
 export default {
   name: "admin-books",
-  components: { AdminTable, MyAlert, MySelect, AdminHeader },
+  components: { AdminTable, MyAlert, MySelect },
   data() {
     return {
       book: {

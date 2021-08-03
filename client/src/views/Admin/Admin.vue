@@ -1,41 +1,15 @@
 <template>
   <div class="admin-page">
-    <h1 class="admin-page__title">Welcome to administrator page</h1>
-    <div>
-      <my-button type="button">
-        <router-link class="router-link" to="/admin/adminbooks"
-          >Books</router-link
-        >
-      </my-button>
-      <my-button type="button">
-        <router-link class="router-link" to="/admin/adminauthors"
-          >Authors</router-link
-        >
-      </my-button>
-
-      <my-button type="button">
-        <router-link class="router-link" to="/admin/admingenres"
-          >Genres</router-link
-        >
-      </my-button>
-
-      <my-button type="button">
-        <router-link class="router-link" to="/admin/adminusers"
-          >Users</router-link
-        >
-      </my-button>
-
-      <my-button type="button">
-        <router-link class="router-link" to="/admin/adminreservedbooks"
-          >Reserved books</router-link
-        >
-      </my-button>
-    </div>
+    <admin-header />
   </div>
 </template>
 
 <script>
-import "./styles/admin.scss";
+import AdminHeader from "../../components/Admin/AdminHeader.vue";
 
-export default {};
+export default {
+  components: {
+    AdminHeader,
+  },
+};
 </script>

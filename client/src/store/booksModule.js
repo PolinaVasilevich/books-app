@@ -32,7 +32,6 @@ export const booksModule = {
         const books = await API.get("books/allbooks");
         localStorage.setItem("books", JSON.stringify(books.data));
         commit("setBooks", books.data);
-        return books;
       } catch (error) {
         console.log(error);
       }

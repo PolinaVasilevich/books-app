@@ -16,16 +16,14 @@ class authController {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res
-          .status(400)
-          .json({ message: "Ошибка при регистрации", errors });
+        return res.status(400).json({ message: "Registration error", errors });
       }
       const { username, password, isAdmin } = req.body;
       const candidate = await User.findOne({ username });
       if (candidate) {
         return res
           .status(400)
-          .json({ message: "Пользователь с таким именем уже существует" });
+          .json({ message: "User with the same name already exists" });
       }
       const hashPassword = bcrypt.hashSync(password, 7);
 
@@ -35,7 +33,7 @@ class authController {
         isAdmin,
       });
       await user.save();
-      return res.json({ message: "Пользователь успешно зарегистрирован" });
+      return res.json({ message: "User registered successfully" });
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: "Registration error" });
@@ -49,11 +47,11 @@ class authController {
       if (!user) {
         return res
           .status(400)
-          .json({ message: `Пользователь ${username} не найден` });
+          .json({ message: `User ${username} is not found` });
       }
       const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {
-        return res.status(400).json({ message: `Введен неверный пароль` });
+        return res.status(400).json({ message: `Wrong password entered` });
       }
       const token = generateAccessToken(user._id);
       return res.json({ token, user });

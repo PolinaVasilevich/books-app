@@ -18,7 +18,10 @@
             >
           </p>
           <span class="user-page__content__date"
-            ><em>Reservation date: {{ item.date_reserved }}</em></span
+            ><em
+              >Reservation date:
+              {{ moment(item.date_reserved).format("YYYY-MM-DD hh:mm") }}</em
+            ></span
           >
         </div>
       </div>
@@ -29,11 +32,13 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import { getDateAndTime } from "@/utils/getDateAndTime.js";
+import moment from "moment";
 
 import "@/assets/styles/userPage.scss";
 export default {
   data() {
     return {
+      moment: moment,
       books: null,
     };
   },

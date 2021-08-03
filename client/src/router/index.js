@@ -30,56 +30,58 @@ const routes = [
     path: "/admin",
     name: "admin",
     component: Admin,
-    meta: {
-      requiresAuth: true,
-      isAdmin: true,
-    },
-  },
 
-  {
-    path: "/admin/adminbooks",
-    name: "adminBooks",
-    component: AdminBooks,
-    meta: {
-      requiresAuth: true,
-      isAdmin: true,
-    },
-  },
+    children: [
+      {
+        path: "adminbooks",
+        name: "adminBooks",
+        component: AdminBooks,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
+      {
+        path: "adminauthors",
+        name: "adminAuthors",
+        component: AdminAuthors,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
 
-  {
-    path: "/admin/adminauthors",
-    name: "adminAuthors",
-    component: AdminAuthors,
-    meta: {
-      requiresAuth: true,
-      isAdmin: true,
-    },
-  },
+      {
+        path: "admingenres",
+        name: "adminGenres",
+        component: AdminGenres,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
 
-  {
-    path: "/admin/admingenres",
-    name: "adminGenres",
-    component: AdminGenres,
-    meta: {
-      requiresAuth: true,
-      isAdmin: true,
-    },
-  },
+      {
+        path: "adminusers",
+        name: "adminUsers",
+        component: AdminUsers,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
 
-  {
-    path: "/admin/adminusers",
-    name: "adminUsers",
-    component: AdminUsers,
-    meta: {
-      requiresAuth: true,
-      isAdmin: true,
-    },
-  },
+      {
+        path: "adminreservedBooks",
+        name: "reservedBooks",
+        component: AdminReservedBooks,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
+    ],
 
-  {
-    path: "/admin/adminreservedBooks",
-    name: "reservedBooks",
-    component: AdminReservedBooks,
     meta: {
       requiresAuth: true,
       isAdmin: true,
@@ -91,9 +93,9 @@ const routes = [
     name: "book",
     component: BookPage,
 
-    // meta: {
-    //   requiresAuth: true,
-    // },
+    meta: {
+      requiresAuth: true,
+    },
   },
 
   {
