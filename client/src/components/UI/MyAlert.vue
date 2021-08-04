@@ -8,3 +8,9 @@ export default {
   props: ["message"],
 };
 </script>
+
+<style>
+.alert {
+  top: 0px;
+}
+</style>

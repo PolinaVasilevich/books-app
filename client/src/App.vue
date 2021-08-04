@@ -81,7 +81,7 @@ export default {
 .router-link-active {
   color: #f66e5e;
 }
-
+/* 
 .router-link-active::after {
   position: absolute;
   content: "";
@@ -92,5 +92,5 @@ export default {
   height: 2px;
   width: 60%;
   transition: 0.2s;
-}
+} */
 </style>

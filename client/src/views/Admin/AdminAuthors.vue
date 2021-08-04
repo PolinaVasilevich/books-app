@@ -1,98 +1,86 @@
 <template>
-  <div>
-    <my-alert :message="message" v-if="isShowMessage" />
-
-    <admin-table titleTable="Authors" :headers="headers" :data="authors">
-      <template v-slot:modal>
-        <button type="button" class="btn btn-success btn-sm" @click="showModal">
-          Create new record
-        </button>
-        <my-modal :showModal="isShowModal" @close="showModal">
-          <form @submit.prevent="onSubmit" @reset="resetForm">
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="author.first_name"
-              placeholder="Enter first name"
-              required
-            />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="author.last_name"
-              placeholder="Enter last name"
-              required
-            />
-
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-danger">Reset</button>
-            </div>
-          </form>
-        </my-modal>
-
-        <my-modal :showModal="isShowEditModal" @close="showEditModal">
-          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="editForm.first_name"
-              placeholder="Enter first name"
-              required
-            />
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="editForm.last_name"
-              placeholder="Enter last name"
-              required
-            />
-
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Update</button>
-              <button type="reset" class="btn btn-danger">Cancel</button>
-            </div>
-          </form>
-        </my-modal>
-      </template>
-      <template v-slot:data>
-        <tr v-for="author in authors" :key="author._id">
-          <td>{{ author.first_name }}</td>
-          <td>{{ author.last_name }}</td>
-          <td>
-            <button
-              type="button"
-              class="btn btn-warning btn-sm"
-              @click="editAuthor(author)"
-            >
-              Update
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger btn-sm"
-              @click="onDeleteAuthor(author)"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      </template>
-    </admin-table>
-  </div>
+  <admin-content
+    titleTable="Autors"
+    :headers="headers"
+    :data="authors"
+    v-model:editModalVisible="showEditForm"
+    :createData="{
+      path: 'books/author',
+      form: this.author,
+      callback: this.getAuthors,
+    }"
+    @resetForm="resetForm"
+  >
+    <template v-slot:create-form>
+      <my-input
+        type="text"
+        v-model.trim="author.first_name"
+        placeholder="Enter first name"
+        required
+      />
+      <my-input
+        type="text"
+        v-model.trim="author.last_name"
+        placeholder="Enter last name"
+        required
+      />
+    </template>
+    <template v-slot:edit-form>
+      <my-input
+        type="text"
+        v-model.trim="editForm.first_name"
+        placeholder="Enter first name"
+        required
+      />
+      <my-input
+        type="text"
+        v-model.trim="editForm.last_name"
+        placeholder="Enter last name"
+        required
+      />
+    </template>
+    <template v-slot:data>
+      <tr v-for="author in authors" :key="author._id">
+        <td>
+          {{ author.first_name }}
+        </td>
+        <td>
+          {{ author.last_name }}
+        </td>
+        <td>
+          <button
+            type="button"
+            class="btn btn-warning btn-sm"
+            @click="
+              () => {
+                editData(author);
+                showEditForm = true;
+              }
+            "
+          >
+            Update
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            @click="onDeleteRecord(author)"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </template>
+  </admin-content>
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
-import AdminTable from "@/components/Admin/AdminTable.vue";
+import AdminContent from "@/components/Admin/AdminContent";
 
-import MyAlert from "@/components/UI/MyAlert";
-// import API from "@/utils/api";
-
-import mixin from "@/components/mixins/formMixin.js";
+import mixin from "@/mixins/formMixin.js";
 
 export default {
   name: "admin-authors",
-  components: { AdminTable, MyAlert },
+  components: { AdminContent },
   mixins: [mixin],
   data() {
     return {
@@ -100,99 +88,33 @@ export default {
         first_name: "",
         last_name: "",
       },
+
       editForm: {
         _id: "",
         first_name: "",
         last_name: "",
       },
+
       headers: ["First name", "Last Name"],
-      message: "",
+      showEditForm: false,
     };
   },
 
   methods: {
-    ...mapActions({
-      getAuthors: "books/getAuthors",
-    }),
-
-    resetForm() {
-      this.author.first_name = "";
-      this.author.last_name = "";
-
-      this.editForm._id = "";
-      this.editForm.first_name = "";
-      this.editForm.last_name = "";
+    onDeleteRecord(author) {
+      this.removeRecord(`/books/deleteauthor/${author._id}`, this.getAuthors);
     },
-
-    // async addAuthor(payload) {
-    //   try {
-    //     await API.post("books/author", payload);
-    //     this.getAuthors();
-    //     this.message = "Author added!";
-    //     this.showMessage = true;
-    //   } catch (error) {
-    //     console.log(error);
-    //     this.getAuthors();
-    //   }
-    // },
-
-    onSubmit() {
-      this.isShowModal = false;
-      this.addNewRecord("books/author", this.author);
-      this.resetForm();
-    },
-
-    // async removeAuthor(authorID) {
-    //   try {
-    //     await API.delete(`/books/deleteauthor/${authorID}`);
-    //     this.getAuthors();
-    //     this.message = "Author removed!";
-    //     this.showMessage = true;
-    //   } catch (error) {
-    //     console.log(error);
-    //     this.getAuthors();
-    //   }
-    // },
-
-    onDeleteAuthor(author) {
-      this.removeRecord(`/books/deleteauthor/${author._id}`);
-    },
-
-    editAuthor(author) {
-      this.editForm = author;
-      this.showEditModal = true;
-    },
-
-    // async updateAuthor(payload, authorID) {
-    //   try {
-    //     await API.put(`/books/updateauthor/${authorID}`, payload);
-    //     this.getAuthors();
-    //     this.message = "Book updated!";
-    //     this.showMessage = true;
-    //   } catch (error) {
-    //     console.log(error);
-    //     this.getAuthors();
-    //   }
-    // },
 
     onSubmitUpdate() {
-      this.showEditModal = false;
       this.updateRecord(
         `/books/updateauthor/${this.editForm._id}`,
         this.editForm
       );
     },
 
-    onResetUpdate() {
-      this.resetForm();
-      this.getAuthors();
+    resetForm(value) {
+      this.author = value;
     },
-  },
-
-  computed: {
-    ...mapState("books", {
-      authors: (state) => state.authors,
-    }),
   },
 
   created() {

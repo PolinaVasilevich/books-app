@@ -1,5 +1,5 @@
 <template>
-  <div class="modal" v-if="showModal" @click.stop="$emit('close')">
+  <div class="modal" v-if="isShowModal" @click.stop="closeModal">
     <div @click.stop class="modal__content">
       <button
         type="button"
@@ -17,14 +17,11 @@
 </template>
 
 <script>
+import mixin from "@/mixins/formMixin.js";
+
 export default {
   name: "my-modal",
-  props: {
-    showModal: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  mixins: [mixin],
 };
 </script>
 
