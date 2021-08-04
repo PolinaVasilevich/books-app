@@ -1,17 +1,25 @@
 <template>
   <div>
     <my-alert :message="message" v-if="showMessage" />
-
     <admin-table titleTable="Genres" :headers="headers" :data="genres">
       <template v-slot:modal>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          @click="showModal = true"
+        <Button
+          label="Create new record"
+          class="p-button-outlined"
+          @click="openModal"
+        />
+
+        <modal-form
+          modal-title="Create new record"
+          :displayModal="displayModal"
+          @close="closeModal"
         >
-          Create new record
-        </button>
-        <my-modal :showModal="showModal" @close="showModal = false">
+          <template v-slot:modal-content>
+            <admin-genre-create-form />
+          </template>
+        </modal-form>
+
+        <!-- <my-modal :showModal="showModal" @close="showModal = false">
           <form @submit.prevent="onSubmit" @reset="resetForm">
             <input
               class="form-control input"
@@ -41,7 +49,7 @@
               <button type="reset" class="btn btn-danger">Cancel</button>
             </div>
           </form>
-        </my-modal>
+        </my-modal> -->
       </template>
       <template v-slot:data>
         <tr v-for="genre in genres" :key="genre._id">
@@ -73,13 +81,19 @@ import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
 
+import ModalForm from "@/components/UI/ModalForm";
+import AdminGenreCreateForm from "@/components/Admin/Forms/AdminGenreCreateForm";
 import API from "@/utils/api";
+
+import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-genres",
-  components: { AdminTable, MyAlert },
+  mixins: [toggle],
+  components: { AdminTable, MyAlert, ModalForm, AdminGenreCreateForm },
   data() {
     return {
+      display: true,
       genre: {
         name: "",
       },

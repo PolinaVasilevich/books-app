@@ -1,21 +1,17 @@
 export default {
   data() {
     return {
-      isShowModal: false,
-      isShowMessage: false,
-      isShowEditModal: false,
+      displayModal: false,
     };
   },
 
   methods: {
-    showModal() {
-      this.isShowModal = !this.isShowModal;
+    openModal() {
+      this.displayModal = true;
     },
-    showMessage() {
-      this.isShowMessage = !this.isShowMessage;
-    },
-    showEditModal() {
-      this.isShowEditModal = !this.isShowEditModal;
+
+    closeModal() {
+      this.displayModal = false;
     },
   },
 };
