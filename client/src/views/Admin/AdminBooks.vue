@@ -119,6 +119,13 @@ export default {
 
   created() {
     this.getBooks();
+    this.getAuthors();
+    this.getGenres();
+  },
+
+  mounted() {
+    this.data.author = this.authors[0];
+    this.data.genre = this.genres[0];
   },
 };
 </script>

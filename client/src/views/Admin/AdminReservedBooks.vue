@@ -23,7 +23,7 @@
               typeForm="create"
               v-model:user="data.user"
               v-model:book="data.book"
-              v-model:reserved_book="data.reserved_date"
+              v-model:reserved_date="data.reserved_date"
               :dataForm="data"
               @closeModal="closeModal"
             />
@@ -38,9 +38,9 @@
           <template v-slot:modal-content>
             <admin-reserved-books-form
               typeForm="update"
-              v-model:user="editForm.user.username"
-              v-model:book="editForm.user.title"
-              v-model:reserved_book="editForm.user.reserved_book"
+              v-model:user="editForm.user"
+              v-model:book="editForm.book"
+              v-model:reserved_date="formatDate"
               :dataForm="editForm"
               @closeModal="closeEditModal"
             />
@@ -52,7 +52,7 @@
           <td>{{ item.user.username }}</td>
           <td>{{ item.book.title }}</td>
           <td>
-            {{ moment(item.book.date_reserved).format("YYYY-MM-DD hh:mm") }}
+            {{ moment(item.date_reserved).format("YYYY-MM-DDTHH:mm") }}
           </td>
           <td>
             <admin-buttons
@@ -93,16 +93,16 @@ export default {
     return {
       moment: moment,
       data: {
-        username: "",
-        password: "",
-        isAdmin: false,
+        user: "",
+        book: "",
+        reserved_date: "",
       },
 
       editForm: {
         _id: "",
-        username: "",
-        password: "",
-        isAdmin: false,
+        user: "",
+        book: "",
+        reserved_date: "",
       },
 
       headers: ["User", "Book", "Reserved Date"],
@@ -111,17 +111,35 @@ export default {
 
   methods: {
     onDeleteData(data) {
-      this.removeData(`/auth/deleteuser/${data._id}`, this.getUsers);
+      this.removeData(
+        `/books/deletereservedbook/${data._id}`,
+        this.getReservedBooks
+      );
     },
 
     editModal(item) {
+      console.log(item);
       this.editForm = item;
       this.openEditModal();
     },
   },
 
+  computed: {
+    formatDate() {
+      return moment(this.editForm.reserved_date).format("YYYY-MM-DDTHH:mm");
+    },
+  },
+
   created() {
+    this.getReservedBooks();
+    this.getBooks();
     this.getUsers();
+  },
+
+  mounted() {
+    this.data.user = this.users[0];
+    this.data.book = this.books[0];
+    this.data.reserved_date = moment(new Date()).format("YYYY-MM-DDTHH:mm");
   },
 };
 </script>

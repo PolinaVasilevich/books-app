@@ -8,42 +8,26 @@
       placeholder="Enter title"
       required
     />
-    <Dropdown
+
+    <select
+      class="form-control select"
       :value="author"
-      @input="$emit('update:author', $event.target.value)"
-      v-model="selectedItem"
-      placeholder="Select a author"
-      :options="authors"
-      optionLabel="first_name"
-      :editable="true"
-    />
+      @change="$emit('update:author', $event.target.value)"
+    >
+      <option v-for="item in authors" :key="item._id" :value="item">
+        {{ item.first_name + " " + item.last_name }}
+      </option>
+    </select>
 
-    <Dropdown
+    <select
+      class="form-control select"
       :value="genre"
-      @input="$emit('update:genre', $event.target.value)"
-      placeholder="Select a genre"
-      :options="genres"
-      optionLabel="name"
-      :editable="true"
-    />
-
-    <input
-      :value="author"
-      @input="$emit('update:author', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter author"
-      required
-    />
-
-    <input
-      :value="genre"
-      @input="$emit('update:genre', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter genre"
-      required
-    />
+      @change="$emit('update:genre', $event.target.value)"
+    >
+      <option v-for="item in genres" :key="item._id" :value="item">
+        {{ item.name }}
+      </option>
+    </select>
 
     <input
       :value="count"
@@ -116,6 +100,11 @@ export default {
       }
       this.$emit("closeModal");
     },
+  },
+
+  created() {
+    this.getAuthors();
+    this.getGenres();
   },
 };
 </script>
