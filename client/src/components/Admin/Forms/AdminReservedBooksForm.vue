@@ -6,11 +6,7 @@
       </option>
     </select>
 
-    <select
-      class="form-control select"
-      :value="book"
-      @change="$emit('update:book', books[$event.target.selectedIndex])"
-    >
+    <select class="form-control select" v-model="selectBook">
       <option
         v-for="item in books"
         :key="item._id"
@@ -101,6 +97,15 @@ export default {
       },
       set(value) {
         this.$emit("update:user", value);
+      },
+    },
+
+    selectBook: {
+      get() {
+        return this.book;
+      },
+      set(value) {
+        this.$emit("update:book", value);
       },
     },
   },

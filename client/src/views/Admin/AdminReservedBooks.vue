@@ -75,6 +75,8 @@ import ModalForm from "@/components/UI/ModalForm";
 import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
 import AdminButtons from "@/components/Admin/AdminButtons";
 
+import API from "@/utils/api";
+
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
@@ -109,11 +111,20 @@ export default {
   },
 
   methods: {
-    onDeleteData(data) {
-      this.removeData(
-        `/books/deletereservedbook/${data._id}`,
-        this.getReservedBooks
-      );
+    async onDeleteData(record) {
+      try {
+        await API.delete(`/books/deletereservedbook/${record._id}`, {
+          data: { book: record.book },
+        });
+        this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
+      } catch (error) {
+        console.log(error);
+        this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
+      }
     },
 
     editModal(item) {

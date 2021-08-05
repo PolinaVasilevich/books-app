@@ -81,8 +81,6 @@ export default {
           (book) => book._id === this.$route.params.id
         );
 
-        console.log(this.books);
-
         if (book) {
           this.book = book;
         }

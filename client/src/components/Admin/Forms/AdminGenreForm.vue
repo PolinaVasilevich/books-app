@@ -47,7 +47,6 @@ export default {
       if (this.typeForm === "create") {
         this.addNewRecord("books/genre", this.dataForm, this.getGenres);
       } else if (this.typeForm === "update") {
-        console.log(this.dataForm);
         this.updateData(
           `/books/updategenre/${this.dataForm._id}`,
           this.dataForm,

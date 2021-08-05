@@ -3,6 +3,7 @@ export default {
     return {
       displayModal: false,
       displayEditModal: false,
+      showMessage: false,
     };
   },
 
@@ -21,6 +22,14 @@ export default {
 
     closeEditModal() {
       this.displayEditModal = false;
+    },
+
+    openMessage() {
+      this.showMessage = true;
+    },
+
+    closeMessage() {
+      this.showMessage = false;
     },
   },
 };

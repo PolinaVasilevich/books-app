@@ -3,6 +3,11 @@ import { mapActions, mapState } from "vuex";
 import API from "@/utils/api";
 
 export default {
+  data() {
+    return {
+      message: "",
+    };
+  },
   methods: {
     ...mapActions({
       getBooks: "books/getBooks",
@@ -14,7 +19,6 @@ export default {
 
     async addNewRecord(path, payload, callback) {
       try {
-        console.log(callback);
         await API.post(path, payload);
         callback();
       } catch (error) {

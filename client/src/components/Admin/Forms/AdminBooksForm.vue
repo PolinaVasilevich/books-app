@@ -9,25 +9,31 @@
       required
     />
 
-    <select
-      class="form-control select"
-      :value="author"
-      @change="$emit('update:author', $event.target.value)"
-    >
+    <select class="form-control select" v-model="selectAuthor">
       <option v-for="item in authors" :key="item._id" :value="item">
         {{ item.first_name + " " + item.last_name }}
       </option>
     </select>
 
-    <select
-      class="form-control select"
-      :value="genre"
-      @change="$emit('update:genre', $event.target.value)"
-    >
-      <option v-for="item in genres" :key="item._id" :value="item">
+    <select class="form-control select" v-model="selectGenre">
+      <option
+        v-for="item in genres"
+        :key="item._id"
+        :value="item"
+        :selected="item._id === genre._id"
+      >
         {{ item.name }}
       </option>
     </select>
+
+    <input
+      :value="img"
+      @input="$emit('update:img', $event.target.value)"
+      class="form-control input"
+      type="text"
+      placeholder="Enter image"
+      required
+    />
 
     <input
       :value="count"
@@ -35,6 +41,7 @@
       class="form-control input"
       type="number"
       placeholder="Enter count"
+      min="1"
       required
     />
 
@@ -77,6 +84,11 @@ export default {
       required: true,
     },
 
+    img: {
+      type: String,
+      required: true,
+    },
+
     count: {
       type: [String, Number],
       required: true,
@@ -99,6 +111,26 @@ export default {
         );
       }
       this.$emit("closeModal");
+    },
+  },
+
+  computed: {
+    selectAuthor: {
+      get() {
+        return this.author;
+      },
+      set(value) {
+        this.$emit("update:author", value);
+      },
+    },
+
+    selectGenre: {
+      get() {
+        return this.genre;
+      },
+      set(value) {
+        this.$emit("update:genre", value);
+      },
     },
   },
 

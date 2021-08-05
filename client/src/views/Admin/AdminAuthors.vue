@@ -99,6 +99,8 @@ export default {
   methods: {
     onDeleteData(data) {
       this.removeData(`/books/deleteauthor/${data._id}`, this.getAuthors);
+      this.message = "Record has deleted";
+      this.openMessage();
     },
 
     editModal(item) {

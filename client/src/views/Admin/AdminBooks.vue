@@ -20,6 +20,7 @@
               v-model:title="data.title"
               v-model:author="data.author"
               v-model:genre="data.genre"
+              v-model:img="data.img"
               v-model:count="data.count"
               :dataForm="data"
               @closeModal="closeModal"
@@ -38,6 +39,7 @@
               v-model:title="editForm.title"
               v-model:author="editForm.author"
               v-model:genre="editForm.genre"
+              v-model:img="editForm.img"
               v-model:count="editForm.count"
               :dataForm="editForm"
               @closeModal="closeEditModal"
@@ -49,7 +51,7 @@
         <tr v-for="book in books" :key="book._id">
           <td>{{ book.title }}</td>
           <td>{{ book.author.first_name + " " + book.author.last_name }}</td>
-          <td>{{ book.genre[0].name }}</td>
+          <td>{{ book.genre.name }}</td>
           <td>{{ book.count }}</td>
           <td>
             <admin-buttons
@@ -91,6 +93,7 @@ export default {
         title: "",
         author: "",
         genre: "",
+        img: "",
         count: 0,
       },
 
@@ -99,6 +102,7 @@ export default {
         title: "",
         author: "",
         genre: "",
+        img: "",
         count: 0,
       },
 
