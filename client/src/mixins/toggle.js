@@ -2,6 +2,7 @@ export default {
   data() {
     return {
       displayModal: false,
+      displayEditModal: false,
     };
   },
 
@@ -12,6 +13,14 @@ export default {
 
     closeModal() {
       this.displayModal = false;
+    },
+
+    openEditModal() {
+      this.displayEditModal = true;
+    },
+
+    closeEditModal() {
+      this.displayEditModal = false;
     },
   },
 };

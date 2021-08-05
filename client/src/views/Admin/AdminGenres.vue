@@ -15,60 +15,38 @@
           @close="closeModal"
         >
           <template v-slot:modal-content>
-            <admin-genre-create-form />
+            <admin-genre-create-form
+              typeForm="create"
+              v-model:name="data.name"
+              :dataForm="data"
+              @closeModal="closeModal"
+            />
           </template>
         </modal-form>
 
-        <!-- <my-modal :showModal="showModal" @close="showModal = false">
-          <form @submit.prevent="onSubmit" @reset="resetForm">
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="genre.name"
-              placeholder="Enter name genre"
-              required
+        <modal-form
+          modal-title="Update record"
+          :displayModal="displayEditModal"
+          @close="closeEditModal"
+        >
+          <template v-slot:modal-content>
+            <admin-genre-create-form
+              typeForm="update"
+              v-model:name="editForm.name"
+              :dataForm="editForm"
+              @closeModal="closeEditModal"
             />
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-danger">Reset</button>
-            </div>
-          </form>
-        </my-modal>
-
-        <my-modal :showModal="showEditModal" @close="showEditModal = false">
-          <form @submit.prevent="onSubmitUpdate" @reset="onResetUpdate">
-            <input
-              class="form-control input"
-              type="text"
-              v-model.trim="editForm.name"
-              placeholder="Enter name genre"
-              required
-            />
-            <div class="btns">
-              <button type="submit" class="btn btn-primary">Update</button>
-              <button type="reset" class="btn btn-danger">Cancel</button>
-            </div>
-          </form>
-        </my-modal> -->
+          </template>
+        </modal-form>
       </template>
       <template v-slot:data>
         <tr v-for="genre in genres" :key="genre._id">
           <td>{{ genre.name }}</td>
           <td>
-            <button
-              type="button"
-              class="btn btn-warning btn-sm"
-              @click="editGenre(genre)"
-            >
-              Update
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger btn-sm"
-              @click="onDeleteGenre(genre)"
-            >
-              Delete
-            </button>
+            <admin-buttons
+              @showEditForm="editModal(genre)"
+              @delete="onDeleteData(genre)"
+            />
           </td>
         </tr>
       </template>
@@ -77,118 +55,51 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminGenreCreateForm from "@/components/Admin/Forms/AdminGenreCreateForm";
-import API from "@/utils/api";
+import AdminButtons from "@/components/Admin/AdminButtons";
 
+import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-genres",
-  mixins: [toggle],
-  components: { AdminTable, MyAlert, ModalForm, AdminGenreCreateForm },
+  mixins: [toggle, adminFormMixin],
+  components: {
+    AdminTable,
+    MyAlert,
+    ModalForm,
+    AdminGenreCreateForm,
+    AdminButtons,
+  },
+
   data() {
     return {
-      display: true,
-      genre: {
+      data: {
         name: "",
       },
 
       editForm: {
         _id: "",
-        fname: "",
+        name: "",
       },
-      headers: ["Name"],
-      message: "",
 
-      showModal: false,
-      showMessage: false,
-      showEditModal: false,
+      headers: ["Name"],
     };
   },
 
   methods: {
-    ...mapActions({
-      getGenres: "books/getGenres",
-    }),
-
-    resetForm() {
-      this.genre.name = "";
-
-      this.editForm._id = "";
-      this.editForm.name = "";
+    onDeleteData(data) {
+      this.removeData(`/books/deletegenre/${data._id}`, this.getGenres);
     },
 
-    async addGenre(payload) {
-      try {
-        await API.post("books/genre", payload);
-        this.getGenres();
-        this.message = "Genre added!";
-        this.showMessage = true;
-      } catch (error) {
-        console.log(error);
-        this.getGenres();
-      }
-    },
-
-    onSubmit() {
-      this.showModal = false;
-      this.addGenre(this.genre);
-      this.resetForm();
-    },
-
-    async removeGenre(genreID) {
-      try {
-        await API.delete(`/books/deletegenre/${genreID}`);
-        this.getGenres();
-        this.message = "Genre removed!";
-        this.showMessage = true;
-      } catch (error) {
-        console.log(error);
-        this.getGenres();
-      }
-    },
-
-    onDeleteGenre(genre) {
-      this.removeGenre(genre._id);
-    },
-
-    editGenre(genre) {
+    editModal(genre) {
       this.editForm = genre;
-      this.showEditModal = true;
+      this.openEditModal();
     },
-
-    async updateGenre(payload, genreID) {
-      try {
-        await API.put(`/books/updategenre/${genreID}`, payload);
-        this.getGenres();
-        this.message = "Book updated!";
-        this.showMessage = true;
-      } catch (error) {
-        console.log(error);
-        this.getGenres();
-      }
-    },
-
-    onSubmitUpdate() {
-      this.showEditModal = false;
-      this.updateGenre(this.editForm, this.editForm._id);
-    },
-
-    onResetUpdate() {
-      this.resetForm();
-      this.getGenres();
-    },
-  },
-
-  computed: {
-    ...mapState("books", {
-      genres: (state) => state.genres,
-    }),
   },
 
   created() {

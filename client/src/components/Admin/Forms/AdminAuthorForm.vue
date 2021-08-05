@@ -1,11 +1,19 @@
 <template>
   <form @submit.prevent="onSubmit" @reset="onReset">
     <input
-      :value="name"
-      @input="$emit('update:name', $event.target.value)"
+      :value="first_name"
+      @input="$emit('update:first_name', $event.target.value)"
       class="form-control input"
       type="text"
-      placeholder="Enter name genre"
+      placeholder="Enter first name"
+      required
+    />
+    <input
+      :value="last_name"
+      @input="$emit('update:last_name', $event.target.value)"
+      class="form-control input"
+      type="text"
+      placeholder="Enter last name"
       required
     />
     <div class="btns">
@@ -32,7 +40,12 @@ export default {
       required: true,
     },
 
-    name: {
+    first_name: {
+      type: String,
+      required: true,
+    },
+
+    last_name: {
       type: String,
       required: true,
     },
@@ -45,13 +58,12 @@ export default {
 
     onSubmit() {
       if (this.typeForm === "create") {
-        this.addNewRecord("books/genre", this.dataForm, this.getGenres);
+        this.addNewRecord("books/author", this.dataForm, this.getAuthors);
       } else if (this.typeForm === "update") {
-        console.log(this.dataForm);
         this.updateData(
-          `/books/updategenre/${this.dataForm._id}`,
+          `/books/updateauthor/${this.dataForm._id}`,
           this.dataForm,
-          this.getGenres
+          this.getAuthors
         );
       }
       this.$emit("closeModal");

@@ -18,7 +18,6 @@ export default {
   props: ["modalTitle", "displayModal"],
   methods: {
     hideModal() {
-      console.log(1);
       this.$emit("close");
     },
   },

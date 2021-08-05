@@ -1,90 +1,87 @@
 <template>
-  <admin-content
-    titleTable="Autors"
-    :headers="headers"
-    :data="authors"
-    v-model:editModalVisible="showEditForm"
-    :createData="{
-      path: 'books/author',
-      form: this.author,
-      callback: this.getAuthors,
-    }"
-    @resetForm="resetForm"
-  >
-    <template v-slot:create-form>
-      <my-input
-        type="text"
-        v-model.trim="author.first_name"
-        placeholder="Enter first name"
-        required
-      />
-      <my-input
-        type="text"
-        v-model.trim="author.last_name"
-        placeholder="Enter last name"
-        required
-      />
-    </template>
-    <template v-slot:edit-form>
-      <my-input
-        type="text"
-        v-model.trim="editForm.first_name"
-        placeholder="Enter first name"
-        required
-      />
-      <my-input
-        type="text"
-        v-model.trim="editForm.last_name"
-        placeholder="Enter last name"
-        required
-      />
-    </template>
-    <template v-slot:data>
-      <tr v-for="author in authors" :key="author._id">
-        <td>
-          {{ author.first_name }}
-        </td>
-        <td>
-          {{ author.last_name }}
-        </td>
-        <td>
-          <button
-            type="button"
-            class="btn btn-warning btn-sm"
-            @click="
-              () => {
-                editData(author);
-                showEditForm = true;
-              }
-            "
-          >
-            Update
-          </button>
-          <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            @click="onDeleteRecord(author)"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-    </template>
-  </admin-content>
+  <div>
+    <my-alert :message="message" v-if="showMessage" />
+    <admin-table titleTable="Authors" :headers="headers" :data="authors">
+      <template v-slot:modal>
+        <Button
+          label="Create new record"
+          class="p-button-outlined"
+          @click="openModal"
+        />
+
+        <modal-form
+          modal-title="Create new record"
+          :displayModal="displayModal"
+          @close="closeModal"
+        >
+          <template v-slot:modal-content>
+            <admin-author-form
+              typeForm="create"
+              v-model:first_name="data.first_name"
+              v-model:last_name="data.last_name"
+              :dataForm="data"
+              @closeModal="closeModal"
+            />
+          </template>
+        </modal-form>
+
+        <modal-form
+          modal-title="Update record"
+          :displayModal="displayEditModal"
+          @close="closeEditModal"
+        >
+          <template v-slot:modal-content>
+            <admin-author-form
+              typeForm="update"
+              v-model:first_name="editForm.first_name"
+              v-model:last_name="editForm.last_name"
+              :dataForm="editForm"
+              @closeModal="closeEditModal"
+            />
+          </template>
+        </modal-form>
+      </template>
+      <template v-slot:data>
+        <tr v-for="author in authors" :key="author._id">
+          <td>{{ author.first_name }}</td>
+          <td>{{ author.last_name }}</td>
+          <td>
+            <admin-buttons
+              @showEditForm="editModal(author)"
+              @delete="onDeleteData(author)"
+            />
+          </td>
+        </tr>
+      </template>
+    </admin-table>
+  </div>
 </template>
 
 <script>
-import AdminContent from "@/components/Admin/AdminContent";
+import AdminTable from "@/components/Admin/AdminTable.vue";
+import MyAlert from "@/components/UI/MyAlert";
 
-import mixin from "@/mixins/formMixin.js";
+import ModalForm from "@/components/UI/ModalForm";
+import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
+import AdminButtons from "@/components/Admin/AdminButtons";
+
+import adminFormMixin from "@/mixins/adminFormMixin.js";
+import toggle from "@/mixins/toggle.js";
 
 export default {
-  name: "admin-authors",
-  components: { AdminContent },
-  mixins: [mixin],
+  name: "admin-genres",
+  mixins: [toggle, adminFormMixin],
+  components: {
+    AdminTable,
+    MyAlert,
+    ModalForm,
+    AdminAuthorForm,
+    AdminButtons,
+  },
+
   data() {
     return {
-      author: {
+      data: {
         first_name: "",
         last_name: "",
       },
@@ -95,25 +92,18 @@ export default {
         last_name: "",
       },
 
-      headers: ["First name", "Last Name"],
-      showEditForm: false,
+      headers: ["First name", "Last name"],
     };
   },
 
   methods: {
-    onDeleteRecord(author) {
-      this.removeRecord(`/books/deleteauthor/${author._id}`, this.getAuthors);
+    onDeleteData(data) {
+      this.removeData(`/books/deleteauthor/${data._id}`, this.getAuthors);
     },
 
-    onSubmitUpdate() {
-      this.updateRecord(
-        `/books/updateauthor/${this.editForm._id}`,
-        this.editForm
-      );
-    },
-
-    resetForm(value) {
-      this.author = value;
+    editModal(item) {
+      this.editForm = item;
+      this.openEditModal();
     },
   },
 
