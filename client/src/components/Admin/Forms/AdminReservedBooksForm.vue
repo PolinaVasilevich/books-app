@@ -1,30 +1,31 @@
 <template>
   <form @submit.prevent="onSubmit" @reset="onReset">
-    <input
-      :value="username"
-      @input="$emit('update:username', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter username"
-      required
+    <Dropdown
+      :value="user"
+      @input="$emit('update:user', $event.target.value)"
+      v-model="selectedItem"
+      placeholder="Select a user"
+      :options="users"
+      optionLabel="username"
+      :editable="true"
     />
-    <input
-      :value="password"
-      @input="$emit('update:last_name', $event.target.value)"
-      class="form-control input"
-      type="password"
-      placeholder="Enter password"
-      required
+
+    <Dropdown
+      :value="book"
+      @input="$emit('update:book', $event.target.value)"
+      placeholder="Select a book"
+      :options="books"
+      optionLabel="title"
+      :editable="true"
     />
-    <div class="form-check form-check-inline" :style="{ marginTop: '10px' }">
-      <label class="form-check-label" for="inlineCheckbox1">Admin</label>
-      <input
-        :checked="isAdmin"
-        @input="$emit('update:isAdmin', $event.target.checked)"
-        class="form-check-input"
-        type="checkbox"
-      />
-    </div>
+
+    <Calendar
+      :value="reserved_date"
+      @input="$emit('update:reserved_dat', $event.target.value)"
+      :showTime="true"
+      :showSeconds="true"
+    />
+
     <div class="btns">
       <button type="submit" class="btn btn-primary">Submit</button>
       <button type="reset" class="btn btn-danger">Reset</button>
@@ -38,6 +39,9 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 export default {
   name: "admin-genre-create-form",
   mixins: [adminFormMixin],
+  data() {
+    return { selectedItem: null };
+  },
   props: {
     typeForm: {
       type: String,
@@ -49,17 +53,17 @@ export default {
       required: true,
     },
 
-    username: {
+    user: {
       type: String,
       required: true,
     },
 
-    password: {
+    book: {
       type: String,
       required: true,
     },
 
-    isAdmin: {
+    reserved_date: {
       type: Boolean,
       default: false,
       required: true,
@@ -86,3 +90,16 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.p-dropdown {
+  width: 14rem;
+}
+
+.country-item {
+  img {
+    width: 17px;
+    margin-right: 0.5rem;
+  }
+}
+</style>

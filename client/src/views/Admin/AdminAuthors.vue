@@ -69,7 +69,7 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
-  name: "admin-genres",
+  name: "admin-authors",
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,

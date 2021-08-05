@@ -8,7 +8,7 @@ export default {
       getBooks: "books/getBooks",
       getAuthors: "books/getAuthors",
       getGenres: "books/getGenres",
-      getReservedBook: "books/getReservedBook",
+      getReservedBooks: "books/getReservedBooks",
       getUsers: "login/getUsers",
     }),
 
@@ -56,7 +56,7 @@ export default {
 
   computed: {
     ...mapState({
-      books: (state) => state.books.authors,
+      books: (state) => state.books.books,
       authors: (state) => state.books.authors,
       genres: (state) => state.books.genres,
       reservedBooks: (state) => state.books.reservedBooks,

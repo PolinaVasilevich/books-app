@@ -17,8 +17,9 @@
           <template v-slot:modal-content>
             <admin-user-form
               typeForm="create"
-              v-model:first_name="data.first_name"
-              v-model:last_name="data.last_name"
+              v-model:username="data.username"
+              v-model:password="data.password"
+              v-model:isAdmin="data.isAdmin"
               :dataForm="data"
               @closeModal="closeModal"
             />
@@ -33,8 +34,9 @@
           <template v-slot:modal-content>
             <admin-user-form
               typeForm="update"
-              v-model:first_name="editForm.first_name"
-              v-model:last_name="editForm.last_name"
+              v-model:username="editForm.username"
+              v-model:password="editForm.password"
+              v-model:isAdmin="editForm.isAdmin"
               :dataForm="editForm"
               @closeModal="closeEditModal"
             />
@@ -70,7 +72,7 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
-  name: "admin-genres",
+  name: "admin-users",
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
@@ -101,7 +103,7 @@ export default {
 
   methods: {
     onDeleteData(data) {
-      this.removeData(`/books/deleteauthor/${data._id}`, this.getUsers);
+      this.removeData(`/auth/deleteuser/${data._id}`, this.getUsers);
     },
 
     editModal(item) {

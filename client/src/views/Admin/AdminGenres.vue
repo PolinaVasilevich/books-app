@@ -15,7 +15,7 @@
           @close="closeModal"
         >
           <template v-slot:modal-content>
-            <admin-genre-create-form
+            <admin-genre-form
               typeForm="create"
               v-model:name="data.name"
               :dataForm="data"
@@ -30,7 +30,7 @@
           @close="closeEditModal"
         >
           <template v-slot:modal-content>
-            <admin-genre-create-form
+            <admin-genre-form
               typeForm="update"
               v-model:name="editForm.name"
               :dataForm="editForm"
@@ -59,7 +59,7 @@ import AdminTable from "@/components/Admin/AdminTable.vue";
 import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
-import AdminGenreCreateForm from "@/components/Admin/Forms/AdminGenreCreateForm";
+import AdminGenreForm from "@/components/Admin/Forms/AdminGenreForm";
 import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
@@ -72,7 +72,7 @@ export default {
     AdminTable,
     MyAlert,
     ModalForm,
-    AdminGenreCreateForm,
+    AdminGenreForm,
     AdminButtons,
   },
 

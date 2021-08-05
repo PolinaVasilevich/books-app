@@ -4,6 +4,9 @@ import PrimeVue from "primevue/config";
 
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
+import Dropdown from "primevue/dropdown";
+import Calendar from "primevue/calendar";
+
 import "primevue/resources/primevue.min.css";
 import "primevue/resources/themes/bootstrap4-light-blue/theme.css";
 import "primeicons/primeicons.css";
@@ -24,5 +27,7 @@ components.forEach((component) => {
 
 app.component("Dialog", Dialog);
 app.component("Button", Button);
+app.component("Dropdown", Dropdown);
+app.component("Calendar", Calendar);
 
 app.use(store).use(router).use(VuelidatePlugin).use(PrimeVue).mount("#app");
