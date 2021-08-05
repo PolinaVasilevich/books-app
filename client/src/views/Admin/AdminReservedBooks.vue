@@ -1,6 +1,6 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
+    <!-- <my-alert :message="message" v-if="showMessage" /> -->
     <admin-table
       titleTable="Reserved books"
       :headers="headers"
@@ -23,7 +23,7 @@
               typeForm="create"
               v-model:user="data.user"
               v-model:book="data.book"
-              v-model:reserved_date="data.reserved_date"
+              v-model:date_reserved="data.date_reserved"
               :dataForm="data"
               @closeModal="closeModal"
             />
@@ -40,7 +40,7 @@
               typeForm="update"
               v-model:user="editForm.user"
               v-model:book="editForm.book"
-              v-model:reserved_date="formatDate"
+              v-model:date_reserved="editForm.date_reserved"
               :dataForm="editForm"
               @closeModal="closeEditModal"
             />
@@ -70,7 +70,7 @@
 import moment from "moment";
 
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
+// import MyAlert from "@/components/UI/MyAlert";
 import ModalForm from "@/components/UI/ModalForm";
 import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
 import AdminButtons from "@/components/Admin/AdminButtons";
@@ -83,7 +83,6 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
     ModalForm,
     AdminReservedBooksForm,
     AdminButtons,
@@ -95,14 +94,14 @@ export default {
       data: {
         user: "",
         book: "",
-        reserved_date: "",
+        date_reserved: "",
       },
 
       editForm: {
         _id: "",
         user: "",
         book: "",
-        reserved_date: "",
+        date_reserved: "",
       },
 
       headers: ["User", "Book", "Reserved Date"],
@@ -118,15 +117,8 @@ export default {
     },
 
     editModal(item) {
-      console.log(item);
       this.editForm = item;
       this.openEditModal();
-    },
-  },
-
-  computed: {
-    formatDate() {
-      return moment(this.editForm.reserved_date).format("YYYY-MM-DDTHH:mm");
     },
   },
 
@@ -139,7 +131,7 @@ export default {
   mounted() {
     this.data.user = this.users[0];
     this.data.book = this.books[0];
-    this.data.reserved_date = moment(new Date()).format("YYYY-MM-DDTHH:mm");
+    this.data.date_reserved = moment(new Date()).format("YYYY-MM-DDTHH:mm");
   },
 };
 </script>
