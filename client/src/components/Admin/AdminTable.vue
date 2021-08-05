@@ -27,12 +27,6 @@
 
 <script>
 export default {
-  data() {
-    return {
-      showModal: false,
-    };
-  },
-
   props: {
     titleTable: {
       type: String,

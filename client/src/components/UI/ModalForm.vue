@@ -1,5 +1,4 @@
 <template>
-  {{ showModal }}
   <Dialog
     :visible="displayModal"
     :style="{ width: '50vw' }"

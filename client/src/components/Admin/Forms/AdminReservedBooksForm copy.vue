@@ -1,9 +1,21 @@
 <template>
   <form @submit.prevent="onSubmit" @reset="onReset">
-    <select class="form-control select" v-model="selectUser">
-      <option v-for="item in users" :key="item._id" :value="item">
+    <select
+      class="form-control select"
+      :value="user"
+      @change="$emit('update:user', users[$event.target.selectedIndex])"
+    >
+      <option
+        v-for="item in users"
+        :key="item._id"
+        :value="item"
+        :selected="item._id === user._id"
+      >
         {{ item.username }}
       </option>
+      {{
+        user
+      }}
     </select>
 
     <select
