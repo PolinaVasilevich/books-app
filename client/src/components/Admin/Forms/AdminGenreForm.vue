@@ -21,13 +21,14 @@
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import toggle from "@/mixins/toggle.js";
 
 import AdminForm from "@/components/Admin/Forms/AdminForm";
 
 export default {
   name: "admin-genre-form",
   components: { AdminForm },
-  mixins: [adminFormMixin],
+  mixins: [adminFormMixin, toggle],
   data() {
     return { message: "" };
   },
@@ -53,29 +54,6 @@ export default {
     name: {
       type: String,
       required: true,
-    },
-  },
-
-  methods: {
-    onReset() {
-      this.resetForm(this.dataForm);
-    },
-
-    onSubmit() {
-      if (this.typeForm === "create") {
-        this.addNewRecord("books/genre", this.dataForm, this.getGenres);
-        this.message = "New record has created";
-        this.$emit("showMessage", this.message);
-      } else if (this.typeForm === "update") {
-        this.updateData(
-          `/books/updategenre/${this.dataForm._id}`,
-          this.dataForm,
-          this.getGenres
-        );
-        this.message = "Record has updated";
-        this.$emit("showMessage", this.message);
-      }
-      this.$emit("closeModal");
     },
   },
 };

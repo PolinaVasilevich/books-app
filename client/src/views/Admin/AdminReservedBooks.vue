@@ -27,6 +27,8 @@
               v-model:book="data.book"
               v-model:date_reserved="data.date_reserved"
               :dataForm="data"
+              path="books/reservebook"
+              :callback="this.getReservedBooks"
               @closeModal="closeModal"
               @showMessage="showMessage"
             />
@@ -45,6 +47,8 @@
               v-model:book="editForm.book"
               v-model:date_reserved="editForm.date_reserved"
               :dataForm="editForm"
+              :path="`/books/updatereservedbook/${editForm._id}`"
+              :callback="this.getReservedBooks"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
             />

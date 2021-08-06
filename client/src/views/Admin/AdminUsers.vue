@@ -24,6 +24,8 @@
               v-model:password="data.password"
               v-model:isAdmin="data.isAdmin"
               :dataForm="data"
+              path="auth/user"
+              :callback="this.getUsers"
               @closeModal="closeModal"
               @showMessage="showMessage"
             />
@@ -42,6 +44,8 @@
               v-model:password="editForm.password"
               v-model:isAdmin="editForm.isAdmin"
               :dataForm="editForm"
+              :path="`/auth/updateuser/${editForm._id}`"
+              :callback="this.getUsers"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
             />
