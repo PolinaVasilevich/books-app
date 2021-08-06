@@ -23,6 +23,8 @@
               v-model:first_name="data.first_name"
               v-model:last_name="data.last_name"
               :dataForm="data"
+              path="books/author"
+              :callback="this.getAuthors"
               @closeModal="closeModal"
               @showMessage="showMessage"
             />
@@ -40,6 +42,8 @@
               v-model:first_name="editForm.first_name"
               v-model:last_name="editForm.last_name"
               :dataForm="editForm"
+              :path="`/books/updateauthor/${editForm._id}`"
+              :callback="this.getAuthors"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
             />

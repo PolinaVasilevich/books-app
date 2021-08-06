@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <form @submit.prevent="onSubmit" @reset="onReset">
+    <slot name="input"></slot>
     <div class="btns">
       <button type="submit" class="btn btn-primary">Submit</button>
       <button type="reset" class="btn btn-danger">Reset</button>
     </div>
-  </div>
+  </form>
 </template>
 
 <script>
@@ -12,7 +13,7 @@ import API from "@/utils/api";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 
 export default {
-  name: "admin-buttons-form",
+  name: "admin-form",
   mixins: [adminFormMixin],
   data() {
     return { message: "" };
@@ -41,6 +42,8 @@ export default {
       try {
         await API.post(path, payload);
         this.callback();
+        this.message = "New record has created";
+        this.$emit("showMessage", this.message);
       } catch (error) {
         console.log(error);
         this.callback();
@@ -51,6 +54,8 @@ export default {
       try {
         await API.put(path, payload);
         this.callback();
+        this.message = "Record has updated";
+        this.$emit("showMessage", this.message);
       } catch (error) {
         console.log(error);
         this.callback();
@@ -60,12 +65,8 @@ export default {
     onSubmit() {
       if (this.typeForm === "create") {
         this.addNewRecord(this.path, this.payload);
-        this.message = "New record has created";
-        this.$emit("showMessage", this.message);
       } else if (this.typeForm === "update") {
         this.updateData(this.path, this.payload);
-        this.message = "Record has updated";
-        this.$emit("showMessage", this.message);
       }
       this.$emit("closeModal");
     },

@@ -26,6 +26,8 @@
               v-model:img="data.img"
               v-model:count="data.count"
               :dataForm="data"
+              path="books/book"
+              :callback="this.getBooks"
               @closeModal="closeModal"
               @showMessage="showMessage"
             />
@@ -46,6 +48,8 @@
               v-model:img="editForm.img"
               v-model:count="editForm.count"
               :dataForm="editForm"
+              :path="`/books/updatebook/${editForm._id}`"
+              :callback="this.getBooks"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
             />

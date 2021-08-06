@@ -22,6 +22,8 @@
               typeForm="create"
               v-model:name="data.name"
               :dataForm="data"
+              path="books/genre"
+              :callback="this.getGenres"
               @closeModal="closeModal"
               @showMessage="showMessage"
             />
@@ -38,6 +40,8 @@
               typeForm="update"
               v-model:name="editForm.name"
               :dataForm="editForm"
+              :path="`/books/updategenre/${editForm._id}`"
+              :callback="this.getGenres"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
             />

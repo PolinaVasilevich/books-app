@@ -1,25 +1,32 @@
 <template>
-  <form @submit.prevent="onSubmit" @reset="onReset">
-    <input
-      :value="name"
-      @input="$emit('update:name', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter name genre"
-      required
-    />
-    <div class="btns">
-      <button type="submit" class="btn btn-primary">Submit</button>
-      <button type="reset" class="btn btn-danger">Reset</button>
-    </div>
-  </form>
+  <admin-form
+    :typeForm="typeForm"
+    :payload="dataForm"
+    :path="path"
+    :callback="callback"
+    @showMessage="showMessage"
+  >
+    <template v-slot:input>
+      <input
+        :value="name"
+        @input="$emit('update:name', $event.target.value)"
+        class="form-control input"
+        type="text"
+        placeholder="Enter name genre"
+        required
+      />
+    </template>
+  </admin-form>
 </template>
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 
+import AdminForm from "@/components/Admin/Forms/AdminForm";
+
 export default {
-  name: "admin-genre-create-form",
+  name: "admin-genre-form",
+  components: { AdminForm },
   mixins: [adminFormMixin],
   data() {
     return { message: "" };
@@ -34,7 +41,15 @@ export default {
       type: Object,
       required: true,
     },
+    path: {
+      type: String,
+      required: true,
+    },
 
+    callback: {
+      type: Function,
+      required: true,
+    },
     name: {
       type: String,
       required: true,

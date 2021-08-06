@@ -1,63 +1,70 @@
 <template>
-  <form @submit.prevent="onSubmit" @reset="onReset">
-    <input
-      :value="title"
-      @input="$emit('update:title', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter title"
-      required
-    />
+  <admin-form
+    :typeForm="typeForm"
+    :payload="dataForm"
+    :path="path"
+    :callback="callback"
+    @showMessage="showMessage"
+  >
+    <template v-slot:input>
+      <input
+        :value="title"
+        @input="$emit('update:title', $event.target.value)"
+        class="form-control input"
+        type="text"
+        placeholder="Enter title"
+        required
+      />
 
-    <select class="form-control select" v-model="selectAuthor">
-      <option v-for="item in authors" :key="item._id" :value="item">
-        {{ item.first_name + " " + item.last_name }}
-      </option>
-    </select>
+      <select class="form-control select" v-model="selectAuthor">
+        <option v-for="item in authors" :key="item._id" :value="item">
+          {{ item.first_name + " " + item.last_name }}
+        </option>
+      </select>
 
-    <select class="form-control select" v-model="selectGenre">
-      <option
-        v-for="item in genres"
-        :key="item._id"
-        :value="item"
-        :selected="item._id === genre._id"
-      >
-        {{ item.name }}
-      </option>
-    </select>
+      <select class="form-control select" v-model="selectGenre">
+        <option
+          v-for="item in genres"
+          :key="item._id"
+          :value="item"
+          :selected="item._id === genre._id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
 
-    <input
-      :value="img"
-      @input="$emit('update:img', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter image"
-      required
-    />
+      <input
+        :value="img"
+        @input="$emit('update:img', $event.target.value)"
+        class="form-control input"
+        type="text"
+        placeholder="Enter image"
+        required
+      />
 
-    <input
-      :value="count"
-      @input="$emit('update:count', $event.target.value)"
-      class="form-control input"
-      type="number"
-      placeholder="Enter count"
-      min="1"
-      required
-    />
-
-    <div class="btns">
-      <button type="submit" class="btn btn-primary">Submit</button>
-      <button type="reset" class="btn btn-danger">Reset</button>
-    </div>
-  </form>
+      <input
+        :value="count"
+        @input="$emit('update:count', $event.target.value)"
+        class="form-control input"
+        type="number"
+        placeholder="Enter count"
+        min="1"
+        required
+      />
+    </template>
+  </admin-form>
 </template>
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import toggle from "@/mixins/toggle.js";
+
+import AdminForm from "@/components/Admin/Forms/AdminForm";
 
 export default {
-  name: "admin-genre-create-form",
-  mixins: [adminFormMixin],
+  name: "admin-books-form",
+  components: { AdminForm },
+  mixins: [adminFormMixin, toggle],
   data() {
     return {
       message: "",
@@ -71,6 +78,16 @@ export default {
 
     dataForm: {
       type: Object,
+      required: true,
+    },
+
+    path: {
+      type: String,
+      required: true,
+    },
+
+    callback: {
+      type: Function,
       required: true,
     },
 
@@ -97,29 +114,6 @@ export default {
     count: {
       type: [String, Number],
       required: true,
-    },
-  },
-
-  methods: {
-    onReset() {
-      this.resetForm(this.dataForm);
-    },
-
-    onSubmit() {
-      if (this.typeForm === "create") {
-        this.addNewRecord("books/book", this.dataForm, this.getBooks);
-        this.message = "New record has created";
-        this.$emit("showMessage", this.message);
-      } else if (this.typeForm === "update") {
-        this.updateData(
-          `/books/updatebook/${this.dataForm._id}`,
-          this.dataForm,
-          this.getBooks
-        );
-        this.message = "Record has updated";
-        this.$emit("showMessage", this.message);
-      }
-      this.$emit("closeModal");
     },
   },
 
