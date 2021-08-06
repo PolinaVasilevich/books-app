@@ -1,17 +1,16 @@
 <template>
   <div class="alerts">
-    <my-alert
-      class="alert alert-warning"
-      message="Sorry, but now books out of stock."
-      v-if="!book.count && !isReserved"
-    />
+    <Message v-if="!book.count && !isReserved" severity="warn"
+      >Sorry, but now books out of stock</Message
+    >
 
-    <my-alert
-      class="alert alert-warning"
-      message="You have already reserved this book"
-      v-if="isReserved && !showMessage"
-    />
-    <my-alert class="alert" :message="message" v-if="showMessage" />
+    <Message v-if="isReserved && !showMessage" severity="info"
+      >You have already reserved this book</Message
+    >
+
+    <Message :message="message" v-if="showMessage" severity="success"
+      >You have already reserved this book</Message
+    >
   </div>
 
   <div class="book-page">
@@ -55,15 +54,11 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from "vuex";
-import MyAlert from "@/components/UI/MyAlert";
 import API from "../utils/api";
 
 import "@/assets/styles/bookPage.scss";
 
 export default {
-  components: {
-    MyAlert,
-  },
   data() {
     return {
       book: {},

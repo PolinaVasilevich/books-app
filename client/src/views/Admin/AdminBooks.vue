@@ -142,7 +142,7 @@ export default {
     },
 
     goToPage(bookID) {
-      this.$router.push({ path: `/books/${bookID}` });
+      this.$router.push({ path: `/adminbook/${bookID}` });
     },
   },
 
