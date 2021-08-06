@@ -1,5 +1,10 @@
 <template>
   <div class="app">
+    <i
+      v-if="$route.path !== '/'"
+      @click="getBack"
+      class="bi bi-arrow-left arrow"
+    ></i>
     <my-header>
       <my-button
         ><router-link class="header__link" to="/">Home</router-link></my-button

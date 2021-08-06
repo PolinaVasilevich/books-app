@@ -63,7 +63,12 @@
         </modal-form>
       </template>
       <template v-slot:data>
-        <tr v-for="book in books" :key="book._id">
+        <tr
+          v-for="book in books"
+          :key="book._id"
+          @click="goToPage(book._id)"
+          :style="{ cursor: 'pointer' }"
+        >
           <td>{{ book.title }}</td>
           <td>{{ book.author.first_name + " " + book.author.last_name }}</td>
           <td>{{ book.genre.name }}</td>
@@ -134,6 +139,10 @@ export default {
     editModal(item) {
       this.editForm = item;
       this.openEditModal();
+    },
+
+    goToPage(bookID) {
+      this.$router.push({ path: `/books/${bookID}` });
     },
   },
 
