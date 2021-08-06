@@ -12,7 +12,7 @@
       :value="password"
       @input="$emit('update:last_name', $event.target.value)"
       class="form-control input"
-      type="password"
+      type="text"
       placeholder="Enter password"
       required
     />
@@ -38,6 +38,9 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 export default {
   name: "admin-genre-create-form",
   mixins: [adminFormMixin],
+  data() {
+    return { message: "" };
+  },
   props: {
     typeForm: {
       type: String,
@@ -74,12 +77,16 @@ export default {
     onSubmit() {
       if (this.typeForm === "create") {
         this.addNewRecord("auth/user", this.dataForm, this.getUsers);
+        this.message = "New record has created";
+        this.$emit("showMessage", this.message);
       } else if (this.typeForm === "update") {
         this.updateData(
           `/auth/updateuser/${this.dataForm._id}`,
           this.dataForm,
           this.getUsers
         );
+        this.message = "Record has updated";
+        this.$emit("showMessage", this.message);
       }
       this.$emit("closeModal");
     },

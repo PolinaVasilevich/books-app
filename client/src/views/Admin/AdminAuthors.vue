@@ -1,8 +1,11 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
     <admin-table titleTable="Authors" :headers="headers" :data="authors">
       <template v-slot:modal>
+        <Message v-if="displayMessage" :severity="success">{{
+          message
+        }}</Message>
+
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -21,6 +24,7 @@
               v-model:last_name="data.last_name"
               :dataForm="data"
               @closeModal="closeModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -37,6 +41,7 @@
               v-model:last_name="editForm.last_name"
               :dataForm="editForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -59,7 +64,6 @@
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
@@ -73,7 +77,6 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
     ModalForm,
     AdminAuthorForm,
     AdminButtons,

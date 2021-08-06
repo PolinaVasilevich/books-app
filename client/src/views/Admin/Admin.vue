@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import AdminHeader from "../../components/Admin/AdminHeader.vue";
+import AdminHeader from "@/components/Admin/AdminHeader.vue";
 
 export default {
   components: {

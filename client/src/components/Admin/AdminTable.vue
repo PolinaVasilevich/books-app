@@ -4,7 +4,6 @@
       <div class="col-sm-20">
         <h1>{{ titleTable }}</h1>
         <hr />
-        <br /><br />
         <slot name="modal"></slot>
         <br /><br />
         <table class="table table-hover">

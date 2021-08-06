@@ -1,25 +1,18 @@
 <template>
-  <form @submit.prevent="onSubmit" @reset="onReset">
-    <input
-      :value="name"
-      @input="$emit('update:name', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter name genre"
-      required
-    />
+  <div>
     <div class="btns">
       <button type="submit" class="btn btn-primary">Submit</button>
       <button type="reset" class="btn btn-danger">Reset</button>
     </div>
-  </form>
+  </div>
 </template>
 
 <script>
+import API from "@/utils/api";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 
 export default {
-  name: "admin-genre-create-form",
+  name: "admin-buttons-form",
   mixins: [adminFormMixin],
   data() {
     return { message: "" };
@@ -27,18 +20,16 @@ export default {
   props: {
     typeForm: {
       type: String,
-      default: "create",
     },
 
-    dataForm: {
-      type: Object,
-      required: true,
-    },
-
-    name: {
+    path: {
       type: String,
-      required: true,
     },
+
+    payload: {
+      type: Object,
+    },
+    callback: { type: Function },
   },
 
   methods: {
@@ -46,17 +37,33 @@ export default {
       this.resetForm(this.dataForm);
     },
 
+    async addNewRecord(path, payload) {
+      try {
+        await API.post(path, payload);
+        this.callback();
+      } catch (error) {
+        console.log(error);
+        this.callback();
+      }
+    },
+
+    async updateData(path, payload) {
+      try {
+        await API.put(path, payload);
+        this.callback();
+      } catch (error) {
+        console.log(error);
+        this.callback();
+      }
+    },
+
     onSubmit() {
       if (this.typeForm === "create") {
-        this.addNewRecord("books/genre", this.dataForm, this.getGenres);
+        this.addNewRecord(this.path, this.payload);
         this.message = "New record has created";
         this.$emit("showMessage", this.message);
       } else if (this.typeForm === "update") {
-        this.updateData(
-          `/books/updategenre/${this.dataForm._id}`,
-          this.dataForm,
-          this.getGenres
-        );
+        this.updateData(this.path, this.payload);
         this.message = "Record has updated";
         this.$emit("showMessage", this.message);
       }
@@ -65,3 +72,5 @@ export default {
   },
 };
 </script>
+
+<style></style>

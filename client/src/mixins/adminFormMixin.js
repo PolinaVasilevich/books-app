@@ -37,8 +37,6 @@ export default {
       try {
         await API.delete(path);
         callback();
-        // this.message = "Genre removed!";
-        // this.showMessage = true;
       } catch (error) {
         console.log(error);
         callback();
@@ -49,8 +47,6 @@ export default {
       try {
         await API.put(path, payload);
         callback();
-        // this.message = "Book updated!";
-        // this.showMessage = true;
       } catch (error) {
         console.log(error);
         callback();

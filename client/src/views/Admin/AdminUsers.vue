@@ -1,8 +1,11 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
     <admin-table titleTable="Users" :headers="headers" :data="users">
       <template v-slot:modal>
+        <Message v-if="displayMessage" :severity="success">{{
+          message
+        }}</Message>
+
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -22,6 +25,7 @@
               v-model:isAdmin="data.isAdmin"
               :dataForm="data"
               @closeModal="closeModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -39,6 +43,7 @@
               v-model:isAdmin="editForm.isAdmin"
               :dataForm="editForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -62,7 +67,6 @@
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminUserForm from "@/components/Admin/Forms/AdminUserForm";
@@ -76,7 +80,7 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
+
     ModalForm,
     AdminUserForm,
     AdminButtons,
@@ -104,6 +108,8 @@ export default {
   methods: {
     onDeleteData(data) {
       this.removeData(`/auth/deleteuser/${data._id}`, this.getUsers);
+      this.message = "Record has deleted";
+      this.openMessage();
     },
 
     editModal(item) {

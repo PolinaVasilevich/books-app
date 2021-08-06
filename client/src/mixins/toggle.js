@@ -3,7 +3,8 @@ export default {
     return {
       displayModal: false,
       displayEditModal: false,
-      showMessage: false,
+      displayMessage: false,
+      message: "",
     };
   },
 
@@ -25,11 +26,16 @@ export default {
     },
 
     openMessage() {
-      this.showMessage = true;
+      this.displayMessage = true;
     },
 
     closeMessage() {
-      this.showMessage = false;
+      this.displayMessage = false;
+    },
+
+    showMessage(value) {
+      this.message = value;
+      this.openMessage();
     },
   },
 };

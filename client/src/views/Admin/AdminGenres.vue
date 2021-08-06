@@ -1,8 +1,11 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
     <admin-table titleTable="Genres" :headers="headers" :data="genres">
       <template v-slot:modal>
+        <Message v-if="displayMessage" :severity="success">{{
+          message
+        }}</Message>
+
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -20,6 +23,7 @@
               v-model:name="data.name"
               :dataForm="data"
               @closeModal="closeModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -35,6 +39,7 @@
               v-model:name="editForm.name"
               :dataForm="editForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -56,7 +61,6 @@
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminGenreForm from "@/components/Admin/Forms/AdminGenreForm";
@@ -70,7 +74,6 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
     ModalForm,
     AdminGenreForm,
     AdminButtons,
@@ -94,6 +97,8 @@ export default {
   methods: {
     onDeleteData(data) {
       this.removeData(`/books/deletegenre/${data._id}`, this.getGenres);
+      this.message = "Record has deleted";
+      this.openMessage();
     },
 
     editModal(genre) {

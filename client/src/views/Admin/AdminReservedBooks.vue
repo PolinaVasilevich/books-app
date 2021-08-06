@@ -1,12 +1,14 @@
 <template>
   <div>
-    <!-- <my-alert :message="message" v-if="showMessage" /> -->
     <admin-table
       titleTable="Reserved books"
       :headers="headers"
       :data="reservedBooks"
     >
       <template v-slot:modal>
+        <Message v-if="displayMessage" :severity="success">{{
+          message
+        }}</Message>
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -26,6 +28,7 @@
               v-model:date_reserved="data.date_reserved"
               :dataForm="data"
               @closeModal="closeModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -43,6 +46,7 @@
               v-model:date_reserved="editForm.date_reserved"
               :dataForm="editForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
             />
           </template>
         </modal-form>
@@ -70,7 +74,6 @@
 import moment from "moment";
 
 import AdminTable from "@/components/Admin/AdminTable.vue";
-// import MyAlert from "@/components/UI/MyAlert";
 import ModalForm from "@/components/UI/ModalForm";
 import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
 import AdminButtons from "@/components/Admin/AdminButtons";
@@ -116,6 +119,8 @@ export default {
         await API.delete(`/books/deletereservedbook/${record._id}`, {
           data: { book: record.book },
         });
+        this.message = "Record has deleted";
+        this.openMessage();
         this.getReservedBooks();
         this.getBooks();
         this.getUsers();

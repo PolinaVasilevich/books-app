@@ -34,11 +34,12 @@
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import moment from "moment";
+
 export default {
   name: "admin-genre-create-form",
   mixins: [adminFormMixin],
   data() {
-    return { moment };
+    return { moment, message: "" };
   },
   props: {
     typeForm: {
@@ -79,12 +80,16 @@ export default {
           this.dataForm,
           this.getReservedBooks
         );
+        this.message = "New record has created";
+        this.$emit("showMessage", this.message);
       } else if (this.typeForm === "update") {
         this.updateData(
           `/books/updatereservedbook/${this.dataForm._id}`,
           this.dataForm,
           this.getReservedBooks
         );
+        this.message = "Record has updated";
+        this.$emit("showMessage", this.message);
       }
       this.$emit("closeModal");
     },

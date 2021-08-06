@@ -58,6 +58,11 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 export default {
   name: "admin-genre-create-form",
   mixins: [adminFormMixin],
+  data() {
+    return {
+      message: "",
+    };
+  },
   props: {
     typeForm: {
       type: String,
@@ -103,12 +108,16 @@ export default {
     onSubmit() {
       if (this.typeForm === "create") {
         this.addNewRecord("books/book", this.dataForm, this.getBooks);
+        this.message = "New record has created";
+        this.$emit("showMessage", this.message);
       } else if (this.typeForm === "update") {
         this.updateData(
           `/books/updatebook/${this.dataForm._id}`,
           this.dataForm,
           this.getBooks
         );
+        this.message = "Record has updated";
+        this.$emit("showMessage", this.message);
       }
       this.$emit("closeModal");
     },
