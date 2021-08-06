@@ -2,7 +2,11 @@
   <div>
     <admin-table titleTable="Authors" :headers="headers" :data="authors">
       <template v-slot:modal>
-        <Message v-if="displayMessage" :severity="success">{{
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
           message
         }}</Message>
 
@@ -27,6 +31,7 @@
               :callback="this.getAuthors"
               @closeModal="closeModal"
               @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -46,6 +51,7 @@
               :callback="this.getAuthors"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>

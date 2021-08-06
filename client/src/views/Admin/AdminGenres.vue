@@ -2,7 +2,11 @@
   <div>
     <admin-table titleTable="Genres" :headers="headers" :data="genres">
       <template v-slot:modal>
-        <Message v-if="displayMessage" :severity="success">{{
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
           message
         }}</Message>
 
@@ -26,6 +30,7 @@
               :callback="this.getGenres"
               @closeModal="closeModal"
               @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -44,6 +49,7 @@
               :callback="this.getGenres"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>

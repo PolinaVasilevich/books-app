@@ -45,6 +45,10 @@ export default {
         this.message = "New record has created";
         this.$emit("showMessage", this.message);
       } catch (error) {
+        if (error.response.status === 400 && error.response.data.message) {
+          this.message = error.response.data.message;
+          this.$emit("showErrorMessage", this.message);
+        }
         console.log(error);
         this.callback();
       }
@@ -57,6 +61,10 @@ export default {
         this.message = "Record has updated";
         this.$emit("showMessage", this.message);
       } catch (error) {
+        if (error.response.status === 400 && error.response.data.message) {
+          this.message = error.response.data.message;
+          this.$emit("showErrorMessage", this.message);
+        }
         console.log(error);
         this.callback();
       }

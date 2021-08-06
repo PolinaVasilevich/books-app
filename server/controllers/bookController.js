@@ -259,6 +259,12 @@ class bookController {
         if (reservedBook) {
           return res
             .status(400)
+            .send({ message: "You can't book it. The book is out of stock. " });
+        }
+
+        if (!book.count) {
+          return res
+            .status(400)
             .send({ message: "You have already reserved this book" });
         }
 

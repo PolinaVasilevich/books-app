@@ -2,7 +2,11 @@
   <div>
     <admin-table titleTable="Books" :headers="headers" :data="books">
       <template v-slot:modal>
-        <Message v-if="displayMessage" :severity="success">{{
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
           message
         }}</Message>
 
@@ -30,6 +34,7 @@
               :callback="this.getBooks"
               @closeModal="closeModal"
               @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -52,6 +57,7 @@
               :callback="this.getBooks"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
