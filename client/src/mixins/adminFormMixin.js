@@ -59,6 +59,7 @@ export default {
       genres: (state) => state.books.genres,
       reservedBooks: (state) => state.books.reservedBooks,
       users: (state) => state.login.users,
+      user: (state) => state.login.user,
     }),
   },
 };

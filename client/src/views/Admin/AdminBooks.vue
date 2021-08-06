@@ -74,7 +74,7 @@
           <td>{{ book.title }}</td>
           <td>{{ book.author.first_name + " " + book.author.last_name }}</td>
           <td>{{ book.genre.name }}</td>
-          <td>{{ book.count }}</td>
+          <td @click.stop="goToPage">{{ book.count }}</td>
           <td>
             <admin-buttons
               @showEditForm="editModal(book)"

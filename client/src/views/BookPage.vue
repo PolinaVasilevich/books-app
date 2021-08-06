@@ -9,7 +9,7 @@
     >
 
     <Message :message="message" v-if="showMessage" severity="success"
-      >You have already reserved this book</Message
+      >You have reserved this book</Message
     >
   </div>
 
@@ -34,7 +34,7 @@
         </p>
 
         <button
-          v-if="isLoggedIn"
+          v-if="isLoggedIn && user.username !== 'admin'"
           class="book-page__content__btn btn"
           @click="onReserveBook(book, user)"
           :disabled="!book.count"

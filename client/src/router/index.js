@@ -16,8 +16,6 @@ import AdminReservedBooks from "@/views/Admin/AdminReservedBooks.vue";
 
 import AdminBookPage from "@/views/Admin/AdminBookPage.vue";
 
-import Books from "../views/Admin/Test/Books";
-
 const routes = [
   {
     path: "/",
@@ -116,12 +114,6 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
-  },
-
-  {
-    path: "/test",
-    name: "test",
-    component: Books,
   },
 ];
 

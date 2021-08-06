@@ -14,7 +14,7 @@
           >Admin</router-link
         ></my-button
       >
-      <my-button v-if="isLoggedIn"
+      <my-button v-if="isLoggedIn && user.username !== 'admin'"
         ><router-link
           class="header__link"
           :to="{ name: 'userPage', params: { id: user._id } }"
