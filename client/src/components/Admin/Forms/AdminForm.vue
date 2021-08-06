@@ -35,7 +35,7 @@ export default {
 
   methods: {
     onReset() {
-      this.resetForm(this.dataForm);
+      this.$emit("resetForm");
     },
 
     async addNewRecord(path, payload) {

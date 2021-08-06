@@ -27,10 +27,8 @@ export default {
       }
     },
 
-    resetForm(dataForm) {
-      const newDataForm = {};
-      Object.keys(dataForm).forEach((item) => (dataForm[item] = ""));
-      return newDataForm;
+    resetForm(initialForm) {
+      return initialForm;
     },
 
     async removeData(path, callback) {

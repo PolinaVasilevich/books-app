@@ -1,9 +1,9 @@
 <template>
-  <div
-    class="book-page"
-    :style="{ display: 'flex', justifyContent: 'space-between' }"
-  >
-    <div class="book-page__content">
+  <div class="book-page">
+    <Message v-if="displayMessage" severity="success">{{ message }}</Message>
+
+    <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
+    <div class="book-page__content" style="float: left">
       <div>
         <img
           :src="book.img"
@@ -18,13 +18,27 @@
           {{ book.author.first_name + " " + book.author.last_name }}
         </p>
         <p class="book-page__content__info__text">
+          <strong>Genre: </strong>
+          {{ book.genre.name }}
+        </p>
+
+        <p class="book-page__content__info__text">
           <strong>Count books: </strong>
           {{ book.count }}
         </p>
       </div>
     </div>
-    <div class="book-page__form" :style="{ width: '30%' }">
-      <admin-form :style="{ width: '100%' }">
+    <div class="book-page__form" style="width: 30%; float: right">
+      <admin-form
+        :style="{ width: '100%' }"
+        @resetForm="fillinForm(book)"
+        @showMessage="showMessage"
+        @showErrorMessage="showErrorMessage"
+        typeForm="update"
+        :payload="editForm"
+        :path="`/books/updatebook/${editForm._id}`"
+        :callback="this.getBooks"
+      >
         <template v-slot:input>
           <input
             v-model="editForm.title"
@@ -70,10 +84,12 @@
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin";
+import toggle from "@/mixins/toggle.js";
+
 import AdminForm from "@/components/Admin/Forms/AdminForm";
 
 export default {
-  mixins: [adminFormMixin],
+  mixins: [adminFormMixin, toggle],
   components: { AdminForm },
 
   data() {

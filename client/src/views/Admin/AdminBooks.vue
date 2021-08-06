@@ -32,6 +32,7 @@
               :dataForm="data"
               path="books/book"
               :callback="this.getBooks"
+              @resetForm="data = initialForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -55,6 +56,7 @@
               :dataForm="editForm"
               :path="`/books/updatebook/${editForm._id}`"
               :callback="this.getBooks"
+              @resetForm="editForm = book"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -108,6 +110,14 @@ export default {
 
   data() {
     return {
+      initialForm: {
+        title: "",
+        author: "",
+        genre: "",
+        img: "",
+        count: 0,
+      },
+
       data: {
         title: "",
         author: "",

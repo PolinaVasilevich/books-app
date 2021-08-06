@@ -4,6 +4,7 @@
 @import "@/assets/styles/userPage.scss";
 @import "@/assets/styles/bookList.scss";
 @import "@/assets/styles/header.scss";
+@import "@/assets/styles/books.scss";
 
 * {
   margin: 0;
@@ -59,4 +60,22 @@ body {
   z-index: 9999;
   font-size: 2em;
   cursor: pointer;
+}
+.product-badge {
+  width: 100px;
+  border-radius: 2px;
+  padding: 0.25em 0.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.status-instock {
+  background: #c8e6c9;
+  color: #256029;
+}
+
+.status-outofstock {
+  background: #ffcdd2;
+  color: #c63737;
 }
