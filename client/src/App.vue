@@ -1,5 +1,10 @@
 <template>
   <div class="app">
+    <i
+      v-if="$route.path !== '/'"
+      @click="getBack"
+      class="bi bi-arrow-left arrow"
+    ></i>
     <my-header>
       <my-button
         ><router-link class="header__link" to="/">Home</router-link></my-button
@@ -9,7 +14,7 @@
           >Admin</router-link
         ></my-button
       >
-      <my-button v-if="isLoggedIn"
+      <my-button v-if="isLoggedIn && user.username !== 'admin'"
         ><router-link
           class="header__link"
           :to="{ name: 'userPage', params: { id: user._id } }"

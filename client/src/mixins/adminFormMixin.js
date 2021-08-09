@@ -3,6 +3,11 @@ import { mapActions, mapState } from "vuex";
 import API from "@/utils/api";
 
 export default {
+  data() {
+    return {
+      message: "",
+    };
+  },
   methods: {
     ...mapActions({
       getBooks: "books/getBooks",
@@ -14,7 +19,6 @@ export default {
 
     async addNewRecord(path, payload, callback) {
       try {
-        console.log(callback);
         await API.post(path, payload);
         callback();
       } catch (error) {
@@ -23,18 +27,10 @@ export default {
       }
     },
 
-    resetForm(dataForm) {
-      const newDataForm = {};
-      Object.keys(dataForm).forEach((item) => (dataForm[item] = ""));
-      return newDataForm;
-    },
-
     async removeData(path, callback) {
       try {
         await API.delete(path);
         callback();
-        // this.message = "Genre removed!";
-        // this.showMessage = true;
       } catch (error) {
         console.log(error);
         callback();
@@ -45,8 +41,6 @@ export default {
       try {
         await API.put(path, payload);
         callback();
-        // this.message = "Book updated!";
-        // this.showMessage = true;
       } catch (error) {
         console.log(error);
         callback();
@@ -61,6 +55,7 @@ export default {
       genres: (state) => state.books.genres,
       reservedBooks: (state) => state.books.reservedBooks,
       users: (state) => state.login.users,
+      user: (state) => state.login.user,
     }),
   },
 };

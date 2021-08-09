@@ -1,8 +1,15 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
     <admin-table titleTable="Users" :headers="headers" :data="users">
       <template v-slot:modal>
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
+          message
+        }}</Message>
+
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -21,7 +28,12 @@
               v-model:password="data.password"
               v-model:isAdmin="data.isAdmin"
               :dataForm="data"
+              path="auth/user"
+              :callback="this.getUsers"
+              @resetForm="resetForm"
               @closeModal="closeModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -38,7 +50,12 @@
               v-model:password="editForm.password"
               v-model:isAdmin="editForm.isAdmin"
               :dataForm="editForm"
+              :path="`/auth/updateuser/${editForm._id}`"
+              :callback="this.getUsers"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -62,7 +79,6 @@
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminUserForm from "@/components/Admin/Forms/AdminUserForm";
@@ -76,7 +92,7 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
+
     ModalForm,
     AdminUserForm,
     AdminButtons,
@@ -84,6 +100,12 @@ export default {
 
   data() {
     return {
+      initialEditForm: {
+        username: "",
+        password: "",
+        isAdmin: false,
+      },
+
       data: {
         username: "",
         password: "",
@@ -104,11 +126,26 @@ export default {
   methods: {
     onDeleteData(data) {
       this.removeData(`/auth/deleteuser/${data._id}`, this.getUsers);
+      this.message = "Record has deleted";
+      this.openMessage();
     },
 
     editModal(item) {
       this.editForm = item;
+      this.initialEditForm = { ...item };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.username = "";
+      this.data.password = "";
+      this.data.isAdmin = false;
+    },
+
+    resetEditForm() {
+      this.editForm.username = this.initialEditForm.username;
+      this.editForm.password = this.initialEditForm.password;
+      this.editForm.isAdmin = this.initialEditForm.isAdmin;
     },
   },
 

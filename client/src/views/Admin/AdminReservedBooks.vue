@@ -1,12 +1,18 @@
 <template>
   <div>
-    <!-- <my-alert :message="message" v-if="showMessage" /> -->
     <admin-table
       titleTable="Reserved books"
       :headers="headers"
       :data="reservedBooks"
     >
       <template v-slot:modal>
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
+          message
+        }}</Message>
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -25,7 +31,11 @@
               v-model:book="data.book"
               v-model:date_reserved="data.date_reserved"
               :dataForm="data"
+              path="books/reservebook"
+              :callback="this.getReservedBooks"
               @closeModal="closeModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -42,7 +52,11 @@
               v-model:book="editForm.book"
               v-model:date_reserved="editForm.date_reserved"
               :dataForm="editForm"
+              :path="`/books/updatereservedbook/${editForm._id}`"
+              :callback="this.getReservedBooks"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -70,10 +84,11 @@
 import moment from "moment";
 
 import AdminTable from "@/components/Admin/AdminTable.vue";
-// import MyAlert from "@/components/UI/MyAlert";
 import ModalForm from "@/components/UI/ModalForm";
 import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
 import AdminButtons from "@/components/Admin/AdminButtons";
+
+import API from "@/utils/api";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
@@ -109,11 +124,22 @@ export default {
   },
 
   methods: {
-    onDeleteData(data) {
-      this.removeData(
-        `/books/deletereservedbook/${data._id}`,
-        this.getReservedBooks
-      );
+    async onDeleteData(record) {
+      try {
+        await API.delete(`/books/deletereservedbook/${record._id}`, {
+          data: { book: record.book },
+        });
+        this.message = "Record has deleted";
+        this.openMessage();
+        this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
+      } catch (error) {
+        console.log(error);
+        this.getReservedBooks();
+        this.getBooks();
+        this.getUsers();
+      }
     },
 
     editModal(item) {

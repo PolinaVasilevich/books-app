@@ -1,8 +1,15 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
     <admin-table titleTable="Authors" :headers="headers" :data="authors">
       <template v-slot:modal>
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
+          message
+        }}</Message>
+
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -20,7 +27,12 @@
               v-model:first_name="data.first_name"
               v-model:last_name="data.last_name"
               :dataForm="data"
+              path="books/author"
+              :callback="this.getAuthors"
+              @resetForm="resetForm"
               @closeModal="closeModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -36,7 +48,12 @@
               v-model:first_name="editForm.first_name"
               v-model:last_name="editForm.last_name"
               :dataForm="editForm"
+              :path="`/books/updateauthor/${editForm._id}`"
+              :callback="this.getAuthors"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -59,7 +76,6 @@
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
@@ -73,7 +89,6 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
     ModalForm,
     AdminAuthorForm,
     AdminButtons,
@@ -81,6 +96,7 @@ export default {
 
   data() {
     return {
+      initialEditForm: { first_name: "", last_name: "" },
       data: {
         first_name: "",
         last_name: "",
@@ -99,11 +115,24 @@ export default {
   methods: {
     onDeleteData(data) {
       this.removeData(`/books/deleteauthor/${data._id}`, this.getAuthors);
+      this.message = "Record has deleted";
+      this.openMessage();
     },
 
     editModal(item) {
       this.editForm = item;
+      this.initialEditForm = { ...item };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.first_name = "";
+      this.data.last_name = "";
+    },
+
+    resetEditForm() {
+      this.editForm.first_name = this.initialEditForm.first_name;
+      this.editForm.last_name = this.initialEditForm.last_name;
     },
   },
 

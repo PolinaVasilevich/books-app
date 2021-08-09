@@ -14,6 +14,8 @@ import AdminGenres from "@/views/Admin/AdminGenres.vue";
 import AdminUsers from "@/views/Admin/AdminUsers.vue";
 import AdminReservedBooks from "@/views/Admin/AdminReservedBooks.vue";
 
+import AdminBookPage from "@/views/Admin/AdminBookPage.vue";
+
 const routes = [
   {
     path: "/",
@@ -82,6 +84,16 @@ const routes = [
       },
     ],
 
+    meta: {
+      requiresAuth: true,
+      isAdmin: true,
+    },
+  },
+
+  {
+    path: "/adminbook/:id",
+    name: "adminBookPage",
+    component: AdminBookPage,
     meta: {
       requiresAuth: true,
       isAdmin: true,

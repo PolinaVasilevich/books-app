@@ -64,21 +64,12 @@ class bookController {
           .json({ message: "This book has already been created" });
       }
 
-      const authorBook = await Author.findOne({
-        first_name: author.split(" ")[0],
-        last_name: author.split(" ")[1],
-      });
-
-      const genreBook = await Genre.findOne({
-        name: genre,
-      });
-
       const book = new Book({
         title,
         img,
         count,
-        author: authorBook._id,
-        genre: [genreBook._id],
+        author: author._id,
+        genre: [genre._id],
       });
 
       await book.save();
@@ -138,18 +129,9 @@ class bookController {
     try {
       const { author, genre } = req.body;
 
-      const authorBook = await Author.findOne({
-        first_name: author.split(" ")[0],
-        last_name: author.split(" ")[1],
-      });
-
-      const genreBook = await Genre.findOne({
-        name: genre,
-      });
-
       await Book.findOneAndUpdate(
         { _id: id },
-        { ...req.body, author: authorBook._id, genre: [genreBook._id] },
+        { ...req.body, author: author._id, genre: [genre._id] },
         { new: true, useFindAndModify: false }
       );
       res.json({
@@ -275,6 +257,12 @@ class bookController {
         });
 
         if (reservedBook) {
+          return res
+            .status(400)
+            .send({ message: "You can't book it. The book is out of stock. " });
+        }
+
+        if (!book.count) {
           return res
             .status(400)
             .send({ message: "You have already reserved this book" });

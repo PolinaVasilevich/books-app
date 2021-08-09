@@ -1,8 +1,15 @@
 <template>
   <div>
-    <my-alert :message="message" v-if="showMessage" />
     <admin-table titleTable="Genres" :headers="headers" :data="genres">
       <template v-slot:modal>
+        <Message v-if="displayMessage" severity="success">{{
+          message
+        }}</Message>
+
+        <Message v-if="displayErrorMessage" severity="error">{{
+          message
+        }}</Message>
+
         <Button
           label="Create new record"
           class="p-button-outlined"
@@ -19,7 +26,12 @@
               typeForm="create"
               v-model:name="data.name"
               :dataForm="data"
+              path="books/genre"
+              :callback="this.getGenres"
+              @resetForm="resetForm"
               @closeModal="closeModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -34,7 +46,12 @@
               typeForm="update"
               v-model:name="editForm.name"
               :dataForm="editForm"
+              :path="`/books/updategenre/${editForm._id}`"
+              :callback="this.getGenres"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
             />
           </template>
         </modal-form>
@@ -56,7 +73,6 @@
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import MyAlert from "@/components/UI/MyAlert";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminGenreForm from "@/components/Admin/Forms/AdminGenreForm";
@@ -70,7 +86,6 @@ export default {
   mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
-    MyAlert,
     ModalForm,
     AdminGenreForm,
     AdminButtons,
@@ -87,6 +102,8 @@ export default {
         name: "",
       },
 
+      initialEditForm: { _id: "", name: "" },
+
       headers: ["Name"],
     };
   },
@@ -94,11 +111,22 @@ export default {
   methods: {
     onDeleteData(data) {
       this.removeData(`/books/deletegenre/${data._id}`, this.getGenres);
+      this.message = "Record has deleted";
+      this.openMessage();
     },
 
     editModal(genre) {
       this.editForm = genre;
+      this.initialEditForm = { ...genre };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.name = "";
+    },
+
+    resetEditForm() {
+      this.editForm.name = this.initialEditForm.name;
     },
   },
 

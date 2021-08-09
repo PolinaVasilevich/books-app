@@ -1,17 +1,16 @@
 <template>
   <div class="alerts">
-    <my-alert
-      class="alert alert-warning"
-      message="Sorry, but now books out of stock."
-      v-if="!book.count && !isReserved"
-    />
+    <Message v-if="!book.count && !isReserved" severity="warn"
+      >Sorry, but now books out of stock</Message
+    >
 
-    <my-alert
-      class="alert alert-warning"
-      message="You have already reserved this book"
-      v-if="isReserved && !showMessage"
-    />
-    <my-alert class="alert" :message="message" v-if="showMessage" />
+    <Message v-if="isReserved && !showMessage" severity="info"
+      >You have already reserved this book</Message
+    >
+
+    <Message :message="message" v-if="showMessage" severity="success"
+      >You have reserved this book</Message
+    >
   </div>
 
   <div class="book-page">
@@ -30,12 +29,18 @@
           {{ book.author.first_name + " " + book.author.last_name }}
         </p>
         <p class="book-page__content__info__text">
-          <strong>Count books: </strong>
+          <strong>Genre: </strong>
+          {{ book.genre.name }}
+        </p>
+        <p class="book-page__content__info__text">
+          <strong>Count: </strong>
           {{ book.count }}
         </p>
 
+        <Rating :modelValue="book.rating" :cancel="false" readonly="true" />
+
         <button
-          v-if="isLoggedIn"
+          v-if="isLoggedIn && user.username !== 'admin'"
           class="book-page__content__btn btn"
           @click="onReserveBook(book, user)"
           :disabled="!book.count"
@@ -55,15 +60,11 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from "vuex";
-import MyAlert from "@/components/UI/MyAlert";
 import API from "../utils/api";
 
 import "@/assets/styles/bookPage.scss";
 
 export default {
-  components: {
-    MyAlert,
-  },
   data() {
     return {
       book: {},
@@ -80,8 +81,6 @@ export default {
         const book = this.books.find(
           (book) => book._id === this.$route.params.id
         );
-
-        console.log(this.books);
 
         if (book) {
           this.book = book;

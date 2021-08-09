@@ -1,26 +1,38 @@
 <template>
-  <form @submit.prevent="onSubmit" @reset="onReset">
-    <input
-      :value="name"
-      @input="$emit('update:name', $event.target.value)"
-      class="form-control input"
-      type="text"
-      placeholder="Enter name genre"
-      required
-    />
-    <div class="btns">
-      <button type="submit" class="btn btn-primary">Submit</button>
-      <button type="reset" class="btn btn-danger">Reset</button>
-    </div>
-  </form>
+  <admin-form
+    :typeForm="typeForm"
+    :payload="dataForm"
+    :path="path"
+    :callback="callback"
+    @showMessage="showMessage"
+    @showErrorMessage="showErrorMessage"
+  >
+    <template v-slot:input>
+      <input
+        :value="name"
+        @input="$emit('update:name', $event.target.value)"
+        class="form-control input"
+        type="text"
+        placeholder="Enter name genre"
+        required
+      />
+    </template>
+  </admin-form>
 </template>
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import toggle from "@/mixins/toggle.js";
+
+import AdminForm from "@/components/Admin/Forms/AdminForm";
 
 export default {
-  name: "admin-genre-create-form",
-  mixins: [adminFormMixin],
+  name: "admin-genre-form",
+  components: { AdminForm },
+  mixins: [adminFormMixin, toggle],
+  data() {
+    return { message: "" };
+  },
   props: {
     typeForm: {
       type: String,
@@ -31,30 +43,18 @@ export default {
       type: Object,
       required: true,
     },
-
-    name: {
+    path: {
       type: String,
       required: true,
     },
-  },
 
-  methods: {
-    onReset() {
-      this.resetForm(this.dataForm);
+    callback: {
+      type: Function,
+      required: true,
     },
-
-    onSubmit() {
-      if (this.typeForm === "create") {
-        this.addNewRecord("books/genre", this.dataForm, this.getGenres);
-      } else if (this.typeForm === "update") {
-        console.log(this.dataForm);
-        this.updateData(
-          `/books/updategenre/${this.dataForm._id}`,
-          this.dataForm,
-          this.getGenres
-        );
-      }
-      this.$emit("closeModal");
+    name: {
+      type: String,
+      required: true,
     },
   },
 };

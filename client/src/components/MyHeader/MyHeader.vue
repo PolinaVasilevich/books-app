@@ -4,7 +4,7 @@
       <h1 class="header__logo__title">Books App</h1>
     </div>
     <nav class="header__nav">
-      <div>
+      <div style="display: flex">
         <slot></slot>
       </div>
     </nav>
