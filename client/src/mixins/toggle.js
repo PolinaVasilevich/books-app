@@ -5,6 +5,7 @@ export default {
       displayEditModal: false,
       displayMessage: false,
       displayErrorMessage: false,
+      displayEditForm: false,
       message: "",
     };
   },
@@ -50,6 +51,10 @@ export default {
     showErrorMessage(value) {
       this.message = value;
       this.openErrorMessage();
+    },
+
+    closeEditForm() {
+      this.displayEditForm = false;
     },
   },
 };

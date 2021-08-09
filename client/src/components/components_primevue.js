@@ -8,6 +8,8 @@ import DataViewLayoutOptions from "primevue/dataviewlayoutoptions";
 import Panel from "primevue/panel";
 import Rating from "primevue/rating";
 import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import InputNumber from "primevue/inputnumber";
 
 export default [
   Dialog,
@@ -20,4 +22,6 @@ export default [
   Rating,
   Panel,
   InputText,
+  Textarea,
+  InputNumber,
 ];

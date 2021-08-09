@@ -32,7 +32,7 @@
               :dataForm="data"
               path="books/book"
               :callback="this.getBooks"
-              @resetForm="data = initialForm"
+              @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -56,7 +56,7 @@
               :dataForm="editForm"
               :path="`/books/updatebook/${editForm._id}`"
               :callback="this.getBooks"
-              @resetForm="editForm = book"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -148,11 +148,28 @@ export default {
 
     editModal(item) {
       this.editForm = item;
+      this.initialEditForm = { ...item };
       this.openEditModal();
     },
 
     goToPage(bookID) {
       this.$router.push({ path: `/adminbook/${bookID}` });
+    },
+
+    resetForm() {
+      this.data.title = "";
+      this.data.author = [];
+      this.data.genre = [];
+      this.data.img = "";
+      this.data.count = 0;
+    },
+
+    resetEditForm() {
+      this.editForm.title = this.initialEditForm.title;
+      this.editForm.author = this.initialEditForm.author;
+      this.editForm.genre = this.initialEditForm.genre;
+      this.editForm.img = this.initialEditForm.img;
+      this.editForm.count = this.initialEditForm.count;
     },
   },
 

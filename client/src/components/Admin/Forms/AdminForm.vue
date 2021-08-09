@@ -1,7 +1,7 @@
 <template>
-  <form @submit.prevent="onSubmit" @reset="onReset">
+  <form @submit.prevent="onSubmit" @reset.prevent="onReset">
     <slot name="input"></slot>
-    <div class="btns">
+    <div class="btns" v-if="showButtons">
       <button type="submit" class="btn btn-primary">Submit</button>
       <button type="reset" class="btn btn-danger">Reset</button>
     </div>
@@ -31,6 +31,11 @@ export default {
       type: Object,
     },
     callback: { type: Function },
+
+    showButtons: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   methods: {
@@ -77,6 +82,7 @@ export default {
         this.updateData(this.path, this.payload);
       }
       this.$emit("closeModal");
+      this.$emit("closeEditForm");
     },
   },
 };

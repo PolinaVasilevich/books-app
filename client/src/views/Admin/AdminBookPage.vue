@@ -1,9 +1,9 @@
 <template>
-  <div class="book-page">
+  <div class="admin-book-page">
     <Message v-if="displayMessage" severity="success">{{ message }}</Message>
 
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
-    <div class="book-page__content" style="float: left">
+    <div class="flex-container">
       <div>
         <img
           :src="book.img"
@@ -11,86 +11,95 @@
           class="book-page__content__img"
         />
       </div>
-      <div class="book-page__content__info">
-        <h2 class="book-page__content__info__title">{{ book.title }}</h2>
-        <p class="book-page__content__info__text">
-          <strong>Author: </strong>
-          {{ book.author.first_name + " " + book.author.last_name }}
-        </p>
-        <p class="book-page__content__info__text">
-          <strong>Genre: </strong>
-          {{ book.genre.name }}
-        </p>
+      <div style="width: 100%" class="flex-container">
+        <Button
+          icon="pi pi pi-pencil"
+          class="p-button-rounded p-button-success p-button-text"
+          style="fontsize: 2rem"
+          @click="displayEditForm = !displayEditForm"
+        />
 
-        <p class="book-page__content__info__text">
-          <strong>Count books: </strong>
-          {{ book.count }}
-        </p>
+        <admin-form
+          style="width: 100%"
+          typeForm="update"
+          :showButtons="displayEditForm"
+          :payload="editForm"
+          :path="`/books/updatebook/${editForm._id}`"
+          :callback="this.getBooks"
+          @resetForm="resetForm"
+          @showMessage="showMessage"
+          @showErrorMessage="showErrorMessage"
+          @closeEditForm="closeEditForm"
+        >
+          <template v-slot:input>
+            <Textarea
+              v-model="editForm.title"
+              :autoResize="true"
+              placeholder="Enter title book"
+              class="book-info-title"
+              :class="{ 'disabled-form': !displayEditForm }"
+            />
+
+            <p class="flex-container book-info-text-container">
+              <strong class="book-info-text">Author: </strong>
+              <select
+                class="form-control book-info-text"
+                v-model="editForm.author"
+                :class="{ 'disabled-form': !displayEditForm }"
+              >
+                <option v-for="item in authors" :key="item._id" :value="item">
+                  {{ item.first_name + " " + item.last_name }}
+                </option>
+              </select>
+            </p>
+
+            <p class="flex-container book-info-text-container">
+              <strong class="book-info-text">Genre: </strong>
+
+              <select
+                class="form-control book-info-text"
+                v-model="editForm.genre"
+                :class="{ 'disabled-form': !displayEditForm }"
+              >
+                <option v-for="item in genres" :key="item._id" :value="item">
+                  {{ item.name }}
+                </option>
+              </select>
+            </p>
+
+            <p class="flex-container book-info-text-container">
+              <strong class="book-info-text">Count: </strong>
+              <input
+                v-model="editForm.count"
+                class="form-control book-info-text"
+                :class="{ 'disabled-form': !displayEditForm }"
+                type="number"
+                placeholder="Enter count books"
+                min="1"
+                required
+              />
+            </p>
+            <Rating
+              v-model="editForm.rating"
+              :cancel="displayEditForm"
+              :readonly="!displayEditForm"
+            />
+          </template>
+        </admin-form>
       </div>
-    </div>
-    <div class="book-page__form" style="width: 30%; float: right">
-      <admin-form
-        :style="{ width: '100%' }"
-        @resetForm="fillinForm(book)"
-        @showMessage="showMessage"
-        @showErrorMessage="showErrorMessage"
-        typeForm="update"
-        :payload="editForm"
-        :path="`/books/updatebook/${editForm._id}`"
-        :callback="this.getBooks"
-      >
-        <template v-slot:input>
-          <input
-            v-model="editForm.title"
-            class="form-control input"
-            type="text"
-            placeholder="Enter title"
-            required
-          />
-
-          <select class="form-control select" v-model="editForm.author">
-            <option v-for="item in authors" :key="item._id" :value="item">
-              {{ item.first_name + " " + item.last_name }}
-            </option>
-          </select>
-
-          <select class="form-control select" v-model="editForm.genre">
-            <option v-for="item in genres" :key="item._id" :value="item">
-              {{ item.name }}
-            </option>
-          </select>
-
-          <input
-            v-model="editForm.img"
-            class="form-control input"
-            type="text"
-            placeholder="Enter image"
-            required
-          />
-
-          <input
-            v-model="editForm.count"
-            class="form-control input"
-            type="number"
-            placeholder="Enter count"
-            min="1"
-            required
-          />
-        </template>
-      </admin-form>
     </div>
   </div>
 </template>
 
 <script>
+import AdminForm from "@/components/Admin/Forms/AdminForm";
+
 import adminFormMixin from "@/mixins/adminFormMixin";
 import toggle from "@/mixins/toggle.js";
 
-import AdminForm from "@/components/Admin/Forms/AdminForm";
-
 export default {
-  mixins: [adminFormMixin, toggle],
   components: { AdminForm },
+  mixins: [adminFormMixin, toggle],
 
   data() {
     return {
@@ -102,6 +111,7 @@ export default {
         genre: "",
         img: "",
         count: 0,
+        rating: 0,
       },
     };
   },
@@ -122,8 +132,9 @@ export default {
       }
     },
 
-    fillinForm(book) {
-      this.editForm = book;
+    resetForm() {
+      this.getBooks();
+      this.getBook();
     },
   },
 

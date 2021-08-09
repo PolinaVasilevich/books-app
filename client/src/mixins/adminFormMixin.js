@@ -27,10 +27,6 @@ export default {
       }
     },
 
-    resetForm(initialForm) {
-      return initialForm;
-    },
-
     async removeData(path, callback) {
       try {
         await API.delete(path);

@@ -29,6 +29,7 @@
               :dataForm="data"
               path="books/author"
               :callback="this.getAuthors"
+              @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -49,6 +50,7 @@
               :dataForm="editForm"
               :path="`/books/updateauthor/${editForm._id}`"
               :callback="this.getAuthors"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -94,6 +96,7 @@ export default {
 
   data() {
     return {
+      initialEditForm: { first_name: "", last_name: "" },
       data: {
         first_name: "",
         last_name: "",
@@ -118,7 +121,18 @@ export default {
 
     editModal(item) {
       this.editForm = item;
+      this.initialEditForm = { ...item };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.first_name = "";
+      this.data.last_name = "";
+    },
+
+    resetEditForm() {
+      this.editForm.first_name = this.initialEditForm.first_name;
+      this.editForm.last_name = this.initialEditForm.last_name;
     },
   },
 

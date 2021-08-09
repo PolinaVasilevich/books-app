@@ -29,9 +29,15 @@
           {{ book.author.first_name + " " + book.author.last_name }}
         </p>
         <p class="book-page__content__info__text">
-          <strong>Count books: </strong>
+          <strong>Genre: </strong>
+          {{ book.genre.name }}
+        </p>
+        <p class="book-page__content__info__text">
+          <strong>Count: </strong>
           {{ book.count }}
         </p>
+
+        <Rating :modelValue="book.rating" :cancel="false" readonly="true" />
 
         <button
           v-if="isLoggedIn && user.username !== 'admin'"

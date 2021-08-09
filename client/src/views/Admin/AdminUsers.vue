@@ -30,6 +30,7 @@
               :dataForm="data"
               path="auth/user"
               :callback="this.getUsers"
+              @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -51,6 +52,7 @@
               :dataForm="editForm"
               :path="`/auth/updateuser/${editForm._id}`"
               :callback="this.getUsers"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -98,6 +100,12 @@ export default {
 
   data() {
     return {
+      initialEditForm: {
+        username: "",
+        password: "",
+        isAdmin: false,
+      },
+
       data: {
         username: "",
         password: "",
@@ -124,7 +132,20 @@ export default {
 
     editModal(item) {
       this.editForm = item;
+      this.initialEditForm = { ...item };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.username = "";
+      this.data.password = "";
+      this.data.isAdmin = false;
+    },
+
+    resetEditForm() {
+      this.editForm.username = this.initialEditForm.username;
+      this.editForm.password = this.initialEditForm.password;
+      this.editForm.isAdmin = this.initialEditForm.isAdmin;
     },
   },
 

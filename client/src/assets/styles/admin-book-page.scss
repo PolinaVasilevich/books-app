@@ -1,0 +1,29 @@
+.flex-container {
+  display: flex;
+}
+
+.book-container-info {
+  width: 100%;
+}
+
+.book-info-title {
+  padding: 0 !important;
+  margin: 0;
+  width: 100%;
+  font-weight: 500 !important;
+  font-size: 1.85em !important;
+  color: #000 !important;
+}
+
+.book-info-text {
+  font-size: 1.2em;
+}
+
+.book-info-text-container {
+  align-items: center;
+}
+
+.disabled-form {
+  border: none !important;
+  pointer-events: none;
+}

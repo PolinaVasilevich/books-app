@@ -6,6 +6,7 @@
     :callback="callback"
     @showMessage="showMessage"
     @showErrorMessage="showErrorMessage"
+    @resetForm="$emit('resetForm')"
   >
     <template v-slot:input>
       <input

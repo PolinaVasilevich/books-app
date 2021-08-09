@@ -28,6 +28,7 @@
               :dataForm="data"
               path="books/genre"
               :callback="this.getGenres"
+              @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -47,6 +48,7 @@
               :dataForm="editForm"
               :path="`/books/updategenre/${editForm._id}`"
               :callback="this.getGenres"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -100,6 +102,8 @@ export default {
         name: "",
       },
 
+      initialEditForm: { _id: "", name: "" },
+
       headers: ["Name"],
     };
   },
@@ -113,7 +117,16 @@ export default {
 
     editModal(genre) {
       this.editForm = genre;
+      this.initialEditForm = { ...genre };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.name = "";
+    },
+
+    resetEditForm() {
+      this.editForm.name = this.initialEditForm.name;
     },
   },
 

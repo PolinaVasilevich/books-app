@@ -52,7 +52,14 @@
         <div class="p-col-12">
           <div class="product-list-item">
             <router-link
-              :to="{ name: 'book', params: { id: slotProps.data._id } }"
+              :to="
+                !this.user.isAdmin
+                  ? { name: 'book', params: { id: slotProps.data._id } }
+                  : {
+                      name: 'adminBookPage',
+                      params: { id: slotProps.data._id },
+                    }
+              "
               ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
             </router-link>
 
@@ -107,7 +114,14 @@
             </div>
             <div class="product-grid-item-content">
               <router-link
-                :to="{ name: 'book', params: { id: slotProps.data._id } }"
+                :to="
+                  !this.user.isAdmin
+                    ? { name: 'book', params: { id: slotProps.data._id } }
+                    : {
+                        name: 'adminBookPage',
+                        params: { id: slotProps.data._id },
+                      }
+                "
                 ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
               </router-link>
               <div class="product-name">{{ slotProps.data.title }}</div>
