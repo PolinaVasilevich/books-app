@@ -104,6 +104,12 @@
           />
         </template>
       </Dialog>
+
+      <!-- <div>
+        <p v-for="review in reviews" :key="review._id">
+          {{ review.text }}
+        </p>
+      </div> -->
     </div>
   </div>
 </template>
@@ -177,10 +183,19 @@ export default {
         }
       }
     },
+
     saveReview() {
       if (this.reviews.length) {
-        (this.book.rating + this.data.rating) / this.reviews.length;
+        const rating = Math.round(
+          (this.book.rating + this.data.rating) / this.reviews.length
+        );
+        this.data = { ...this.data, rating };
       }
+      this.createRecord("books/review", {
+        ...this.data,
+        book: this.book,
+        user: this.user,
+      });
       this.closeModal();
     },
   },

@@ -82,7 +82,7 @@ class bookController {
 
   async createReview(req, res) {
     try {
-      const { book, user, text } = req.body;
+      const { book, user, text, rating } = req.body;
 
       const review = new Review({
         text,

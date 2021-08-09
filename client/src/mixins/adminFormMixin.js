@@ -47,6 +47,14 @@ export default {
         callback();
       }
     },
+
+    async createRecord(path, payload) {
+      try {
+        await API.post(path, payload);
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   computed: {
