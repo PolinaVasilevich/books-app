@@ -43,7 +43,7 @@
             <p class="flex-container book-info-text-container">
               <strong class="book-info-text">Author: </strong>
               <select
-                class="form-control book-info-text"
+                class="form-control book-info-text input-margin"
                 v-model="editForm.author"
                 :class="{ 'disabled-form': !displayEditForm }"
               >
@@ -57,7 +57,7 @@
               <strong class="book-info-text">Genre: </strong>
 
               <select
-                class="form-control book-info-text"
+                class="form-control book-info-text input-margin"
                 v-model="editForm.genre"
                 :class="{ 'disabled-form': !displayEditForm }"
               >
@@ -67,11 +67,24 @@
               </select>
             </p>
 
+            <p
+              class="flex-container book-info-text-container"
+              v-if="displayEditForm"
+            >
+              <strong class="book-info-text">Image: </strong>
+              <Textarea
+                v-model="editForm.img"
+                :autoResize="true"
+                placeholder="Enter image book"
+                class="form-control book-info-text input-margin"
+              />
+            </p>
+
             <p class="flex-container book-info-text-container">
               <strong class="book-info-text">Count: </strong>
               <input
                 v-model="editForm.count"
-                class="form-control book-info-text"
+                class="form-control book-info-text input-margin"
                 :class="{ 'disabled-form': !displayEditForm }"
                 type="number"
                 placeholder="Enter count books"

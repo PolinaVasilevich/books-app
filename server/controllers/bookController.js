@@ -1,8 +1,8 @@
 const Book = require("../models/Book");
 const Author = require("../models/Author");
 const Genre = require("../models/Genre");
-const User = require("../models/User/User");
 const BookInstance = require("../models/bookinstance");
+const Review = require("../models/Review");
 
 class bookController {
   ///BGN CREATE///
@@ -80,6 +80,24 @@ class bookController {
     }
   }
 
+  async createReview(req, res) {
+    try {
+      const { book, user, text } = req.body;
+
+      const review = new Review({
+        text,
+        book: book._id,
+        user: user._id,
+      });
+
+      await review.save();
+      return res.json({ message: "Review has created" });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: "Create review error" });
+    }
+  }
+
   ///END CREATE///
 
   ///BGN GET///
@@ -118,6 +136,17 @@ class bookController {
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async getReviews(req, res) {
+    try {
+      const Reviews = await Review.find()
+        .populate("user")
+        .populate({ path: "book", populate: ["author", "genre"] });
+      res.json(Reviews);
+    } catch (error) {
+      console.log(error);
     }
   }
 

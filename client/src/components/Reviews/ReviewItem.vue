@@ -1,5 +1,7 @@
 <template>
-  <div></div>
+  <div>
+    <Textarea />
+  </div>
 </template>
 
 <script>

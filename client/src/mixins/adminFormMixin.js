@@ -1,4 +1,4 @@
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapGetters } from "vuex";
 
 import API from "@/utils/api";
 
@@ -14,6 +14,7 @@ export default {
       getAuthors: "books/getAuthors",
       getGenres: "books/getGenres",
       getReservedBooks: "books/getReservedBooks",
+      getReviews: "books/getReviews",
       getUsers: "login/getUsers",
     }),
 
@@ -54,8 +55,14 @@ export default {
       authors: (state) => state.books.authors,
       genres: (state) => state.books.genres,
       reservedBooks: (state) => state.books.reservedBooks,
+      reviews: (state) => state.books.reviews,
       users: (state) => state.login.users,
       user: (state) => state.login.user,
+    }),
+
+    ...mapGetters("login", {
+      isLoggedIn: "isLoggedIn",
+      isAdmin: "isAdmin",
     }),
   },
 };

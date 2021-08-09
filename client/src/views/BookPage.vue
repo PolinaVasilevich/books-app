@@ -4,11 +4,11 @@
       >Sorry, but now books out of stock</Message
     >
 
-    <Message v-if="isReserved && !showMessage" severity="info"
+    <Message v-if="isReserved && !displayMessage" severity="info"
       >You have already reserved this book</Message
     >
 
-    <Message :message="message" v-if="showMessage" severity="success"
+    <Message :message="message" v-if="displayMessage" severity="success"
       >You have reserved this book</Message
     >
   </div>
@@ -55,23 +55,75 @@
         </button>
       </div>
     </div>
+    <div>
+      <!-- <Card style="margin-top: 50px; width: 100%">
+        <template #title> Add review </template>
+        <template #content>
+          <Textarea style="width: 100%" />
+        </template>
+        <template #footer>
+          <Button
+            label="Save"
+            icon="pi pi-check"
+            class="p-button-text"
+            @click="saveProduct"
+          />
+        </template>
+      </Card> -->
+
+      <Button
+        label="Add review"
+        class="p-button-outlined p-button-success"
+        @click="openModal"
+      />
+
+      <Dialog
+        v-model:visible="displayModal"
+        :style="{ width: '450px' }"
+        header="Add review"
+        :modal="true"
+        class="p-fluid"
+      >
+        <div class="p-field">
+          <label for="name">Text</label>
+          <Textarea
+            v-model="data.text"
+            :autoResize="true"
+            required="true"
+            rows="5"
+          />
+          <Rating v-model="data.rating" :cancel="false" :readonly="false" />
+        </div>
+
+        <template #footer>
+          <Button
+            label="Save"
+            icon="pi pi-check"
+            class="p-button-text"
+            @click="saveReview"
+          />
+        </template>
+      </Dialog>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from "vuex";
 import API from "../utils/api";
 
-import "@/assets/styles/bookPage.scss";
+import adminFormMixin from "@/mixins/adminFormMixin.js";
+import toggle from "@/mixins/toggle.js";
 
 export default {
+  mixins: [toggle, adminFormMixin],
   data() {
     return {
       book: {},
-      allbooks: [],
-      message: "",
-      showMessage: false,
       isReserved: false,
+      data: {
+        text: "",
+        rating: 0,
+      },
     };
   },
 
@@ -109,8 +161,7 @@ export default {
             book: this.book,
           });
 
-          this.message = `Book "${this.book.title}" has reserved`;
-          this.showMessage = true;
+          this.showMessage(`Book "${this.book.title}" has reserved`);
           this.isReserved = true;
 
           this.getBooks();
@@ -118,8 +169,7 @@ export default {
           this.getReservedBooks();
         } catch (error) {
           console.log(error);
-          this.message = error.response.data.message;
-          this.showMessage = true;
+          this.showErrorMessage(error.response.data.message);
 
           this.getBooks();
           this.getBook();
@@ -127,26 +177,16 @@ export default {
         }
       }
     },
-    ...mapActions({
-      getBooks: "books/getBooks",
-      getReservedBooks: "books/getReservedBooks",
-    }),
-  },
-
-  computed: {
-    ...mapState({
-      books: (state) => state.books.books,
-      reservedBooks: (state) => state.books.reservedBooks,
-      user: (state) => state.login.user,
-    }),
-
-    ...mapGetters("login", {
-      isLoggedIn: "isLoggedIn",
-      isAdmin: "isAdmin",
-    }),
+    saveReview() {
+      if (this.reviews.length) {
+        (this.book.rating + this.data.rating) / this.reviews.length;
+      }
+      this.closeModal();
+    },
   },
 
   created() {
+    this.getReviews();
     this.getBooks();
     this.getBook();
     this.getReservedBooks();

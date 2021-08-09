@@ -14,6 +14,7 @@ const BookSchema = new Schema({
   },
   genre: { type: Schema.ObjectId, ref: "Genre" },
   rating: { type: Number, default: 0 },
+  review: [{ type: Schema.ObjectId, ref: "Review" }],
 });
 
 BookSchema.virtual("url").get(function () {
