@@ -26,18 +26,23 @@
         <h2 class="book-page__content__info__title">{{ book.title }}</h2>
         <p class="book-page__content__info__text">
           <strong>Author: </strong>
-          {{ book.author.first_name + " " + book.author.last_name }}
+          {{ book.author?.first_name + " " + book.author?.last_name }}
         </p>
         <p class="book-page__content__info__text">
           <strong>Genre: </strong>
-          {{ book.genre.name }}
+          {{ book.genre?.name }}
         </p>
         <p class="book-page__content__info__text">
           <strong>Count: </strong>
-          {{ book.count }}
+          {{ book?.count }}
         </p>
 
-        <Rating :modelValue="book.rating" :cancel="false" :readonly="true" />
+        <Rating
+          :modelValue="book.rating"
+          :cancel="false"
+          :readonly="true"
+          v-if="book.rating"
+        />
 
         <button
           v-if="isLoggedIn && user.username !== 'admin'"
@@ -115,7 +120,6 @@ export default {
       isReserved: false,
       data: {
         text: "",
-        rating: 0,
       },
     };
   },
@@ -194,9 +198,10 @@ export default {
     },
   },
   created() {
+    this.getBook();
     this.getReviews();
     this.getBooks();
-    this.getBook();
+
     this.getUsers();
     this.getReservedBooks();
     this.checkReserveBook(this.book._id, this.user._id);

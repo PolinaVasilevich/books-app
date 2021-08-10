@@ -91,6 +91,35 @@ class bookController {
         rating,
       });
 
+      //   Review.aggregate([
+      //     { "$unwind": "$book" },
+      //     {
+      //         "$group": {
+      //             "_id": "$book",
+      //             "ratingAvg": { "$avg": "$rating" }
+      //         }
+      //     }
+      // ]).then(result => {
+      //   Book.populate(result, { "path": "_id" }, function(err, result) {
+      //     if(err) handleError(err);
+      //     console.log(result);
+      // }).catch(error => console.log(error))
+
+      // Review.aggregate([
+      //   {
+      //     $group: {
+      //       _id: "$book._id",
+      //       avgRating: { $avg: "$rating" },
+      //     },
+      //   },
+      // ])
+      //   .then((result) => {
+      //     console.log(result);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+
       await review.save();
       return res.json({ message: "Review has created" });
     } catch (e) {

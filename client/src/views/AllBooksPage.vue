@@ -204,7 +204,7 @@ export default {
       },
       isSort: false,
       isSortUp: false,
-      sortKey: null,
+      sortKey: { label: "Sort By Title", value: "title" },
       sortOrder: null,
       sortField: null,
       sortOptions: [
