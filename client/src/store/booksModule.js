@@ -9,6 +9,28 @@ export const booksModule = {
     reviews: JSON.parse(localStorage.getItem("reviews")) || [],
   }),
 
+  getters: {
+    books(state) {
+      return state.books;
+    },
+
+    authors(state) {
+      return state.authors;
+    },
+
+    genres(state) {
+      return state.genres;
+    },
+
+    reservedBooks(state) {
+      return state.reservedBooks;
+    },
+
+    reviews(state) {
+      return state.reviews;
+    },
+  },
+
   mutations: {
     setBooks(state, books) {
       state.books = books;

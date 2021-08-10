@@ -44,6 +44,33 @@
           </div>
           <div class="p-col-6" style="text-align: right">
             <DataViewLayoutOptions v-model="layout" />
+            <div>
+              <Dropdown
+                v-model="sortKey"
+                :options="sortOptions"
+                optionLabel="label"
+                placeholder="Sort By..."
+                @change="onSortChangeOption($event)"
+                style="text-align: left; margin: 10px 10px 0 0"
+              />
+
+              <span
+                class="p-sortable-column-icon pi pi-fw pi-sort-alt"
+                style="cursor: pointer"
+                @click="isSort = !isSort"
+                v-if="!isSort"
+              ></span>
+
+              <span
+                class="p-sortable-column-icon pi pi-fw p-highlight"
+                :class="[
+                  isSortUp ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down',
+                ]"
+                style="cursor: pointer"
+                @click="onSortChange"
+                v-else
+              ></span>
+            </div>
           </div>
         </div>
       </template>
@@ -147,6 +174,7 @@
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 import ModalForm from "@/components/UI/ModalForm";
@@ -156,7 +184,7 @@ export default {
     ModalForm,
     AdminBooksForm,
   },
-  mixins: [adminFormMixin, toggle],
+  mixins: [adminFormMixin, toggle, dataStore],
   data() {
     return {
       layout: "grid",
@@ -167,6 +195,15 @@ export default {
         img: "",
         count: 0,
       },
+      isSort: false,
+      isSortUp: false,
+      sortKey: null,
+      sortOrder: null,
+      sortField: null,
+      sortOptions: [
+        { label: "Sort By Title", value: "title" },
+        { label: "Sort By Rating", value: "rating" },
+      ],
     };
   },
 
@@ -179,6 +216,37 @@ export default {
       if (!count) return "OUTOFSTOCK";
       if (count < 5) return "LOWSTOCK";
       else return "INSTOCK";
+    },
+
+    onSortChangeOption(event) {
+      this.sortField = event.value.value;
+    },
+
+    onSortChange() {
+      this.isSortUp = !this.isSortUp;
+      if (typeof this.books[0][this.sortField] === "string") {
+        this.books.sort((firstField, secondField) => {
+          if (this.isSortUp) {
+            return firstField[this.sortField].toLowerCase() >
+              secondField[this.sortField].toLowerCase()
+              ? 1
+              : -1;
+          } else {
+            return firstField[this.sortField].toLowerCase() <
+              secondField[this.sortField].toLowerCase()
+              ? 1
+              : -1;
+          }
+        });
+      } else if (typeof this.books[0][this.sortField] === "number") {
+        this.books.sort((firstField, secondField) => {
+          if (this.isSortUp) {
+            return firstField[this.sortField] - secondField[this.sortField];
+          } else {
+            return secondField[this.sortField] - firstField[this.sortField];
+          }
+        });
+      }
     },
   },
 };

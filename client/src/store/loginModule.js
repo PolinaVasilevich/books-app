@@ -20,6 +20,14 @@ export const loginModule = {
     isAdmin(state) {
       return !!state.user.isAdmin;
     },
+
+    users(state) {
+      return state.users;
+    },
+
+    user(state) {
+      return state.user;
+    },
   },
 
   mutations: {

@@ -36,7 +36,6 @@
 </template>
 
 <script>
-import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
 import AdminForm from "@/components/Admin/Forms/AdminForm";
@@ -45,7 +44,7 @@ import moment from "moment";
 export default {
   name: "admin-genre-create-form",
   components: { AdminForm },
-  mixins: [adminFormMixin, toggle],
+  mixins: [toggle],
   data() {
     return { moment, message: "" };
   },
@@ -84,6 +83,14 @@ export default {
       type: Date,
       required: true,
     },
+
+    users: {
+      type: Array,
+    },
+
+    books: {
+      type: Array,
+    },
   },
 
   methods: {
@@ -93,18 +100,13 @@ export default {
 
     onSubmit() {
       if (this.typeForm === "create") {
-        this.addNewRecord(
-          "books/reservebook",
-          this.dataForm,
-          this.getReservedBooks
-        );
+        this.addNewRecord("books/reservebook", this.dataForm, this.callback);
         this.message = "New record has created";
         this.$emit("showMessage", this.message);
       } else if (this.typeForm === "update") {
         this.updateData(
           `/books/updatereservedbook/${this.dataForm._id}`,
-          this.dataForm,
-          this.getReservedBooks
+          this.callback
         );
         this.message = "Record has updated";
         this.$emit("showMessage", this.message);
@@ -131,11 +133,6 @@ export default {
         this.$emit("update:book", value);
       },
     },
-  },
-  created() {
-    this.getReservedBooks();
-    this.getUsers();
-    this.getBooks();
   },
 };
 </script>

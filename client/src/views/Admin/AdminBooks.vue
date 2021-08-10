@@ -29,6 +29,8 @@
               v-model:genre="data.genre"
               v-model:img="data.img"
               v-model:count="data.count"
+              v-model:authors="authors"
+              v-model:genres="genres"
               :dataForm="data"
               path="books/book"
               :callback="this.getBooks"
@@ -53,6 +55,8 @@
               v-model:genre="editForm.genre"
               v-model:img="editForm.img"
               v-model:count="editForm.count"
+              v-model:authors="authors"
+              v-model:genres="genres"
               :dataForm="editForm"
               :path="`/books/updatebook/${editForm._id}`"
               :callback="this.getBooks"
@@ -95,11 +99,12 @@ import AdminBooksForm from "@/components/Admin/Forms/AdminBooksForm";
 import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-authors",
-  mixins: [toggle, adminFormMixin],
+  mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
 

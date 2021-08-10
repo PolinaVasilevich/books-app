@@ -108,11 +108,12 @@
 import AdminForm from "@/components/Admin/Forms/AdminForm";
 
 import adminFormMixin from "@/mixins/adminFormMixin";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   components: { AdminForm },
-  mixins: [adminFormMixin, toggle],
+  mixins: [adminFormMixin, toggle, dataStore],
 
   data() {
     return {

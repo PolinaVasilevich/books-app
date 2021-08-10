@@ -79,11 +79,12 @@ import AdminGenreForm from "@/components/Admin/Forms/AdminGenreForm";
 import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-genres",
-  mixins: [toggle, adminFormMixin],
+  mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
     ModalForm,

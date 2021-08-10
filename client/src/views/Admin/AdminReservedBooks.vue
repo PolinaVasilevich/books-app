@@ -91,11 +91,12 @@ import AdminButtons from "@/components/Admin/AdminButtons";
 import API from "@/utils/api";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-users",
-  mixins: [toggle, adminFormMixin],
+  mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
     ModalForm,

@@ -82,11 +82,12 @@ import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-authors",
-  mixins: [toggle, adminFormMixin],
+  mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
     ModalForm,

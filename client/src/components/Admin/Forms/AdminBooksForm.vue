@@ -117,6 +117,14 @@ export default {
       type: [String, Number],
       required: true,
     },
+
+    authors: {
+      type: Object,
+    },
+
+    genres: {
+      type: Object,
+    },
   },
 
   computed: {
@@ -137,11 +145,6 @@ export default {
         this.$emit("update:genre", value);
       },
     },
-  },
-
-  created() {
-    this.getAuthors();
-    this.getGenres();
   },
 };
 </script>
