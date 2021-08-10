@@ -1,0 +1,16 @@
+.review-list {
+  margin-top: 50px;
+
+  .review-item {
+    margin-bottom: 30px;
+
+    .content {
+      display: flex;
+      align-items: center;
+    }
+
+    .margin {
+      margin-right: 15px;
+    }
+  }
+}

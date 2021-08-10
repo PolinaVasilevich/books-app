@@ -37,7 +37,7 @@
           {{ book.count }}
         </p>
 
-        <Rating :modelValue="book.rating" :cancel="false" readonly="true" />
+        <Rating :modelValue="book.rating" :cancel="false" :readonly="true" />
 
         <button
           v-if="isLoggedIn && user.username !== 'admin'"
@@ -56,21 +56,7 @@
       </div>
     </div>
     <div>
-      <!-- <Card style="margin-top: 50px; width: 100%">
-        <template #title> Add review </template>
-        <template #content>
-          <Textarea style="width: 100%" />
-        </template>
-        <template #footer>
-          <Button
-            label="Save"
-            icon="pi pi-check"
-            class="p-button-text"
-            @click="saveProduct"
-          />
-        </template>
-      </Card> -->
-
+      <review-list :items="reviewsBook" />
       <Button
         label="Add review"
         class="p-button-outlined p-button-success"
@@ -92,7 +78,10 @@
             required="true"
             rows="5"
           />
-          <Rating v-model="data.rating" :cancel="false" :readonly="false" />
+          <div>
+            <span>Your rating: </span
+            ><Rating v-model="data.rating" :readonly="false" />
+          </div>
         </div>
 
         <template #footer>
@@ -104,12 +93,6 @@
           />
         </template>
       </Dialog>
-
-      <!-- <div>
-        <p v-for="review in reviews" :key="review._id">
-          {{ review.text }}
-        </p>
-      </div> -->
     </div>
   </div>
 </template>
@@ -118,10 +101,14 @@
 import API from "../utils/api";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
+import ReviewList from "@/components/Reviews/ReviewList";
+
 export default {
-  mixins: [toggle, adminFormMixin],
+  components: { ReviewList },
+  mixins: [toggle, adminFormMixin, dataStore],
   data() {
     return {
       book: {},
@@ -185,25 +172,32 @@ export default {
     },
 
     saveReview() {
-      if (this.reviews.length) {
-        const rating = Math.round(
-          (this.book.rating + this.data.rating) / this.reviews.length
-        );
-        this.data = { ...this.data, rating };
-      }
+      // if (this.reviews.length) {
+      //   const rating = Math.round(
+      //     (this.book.rating + this.data.rating) / this.reviews.length
+      //   );
+      //   this.data = { ...this.data, rating };
+      // }
       this.createRecord("books/review", {
         ...this.data,
         book: this.book,
         user: this.user,
       });
+      this.getReviews();
       this.closeModal();
     },
   },
 
+  computed: {
+    reviewsBook() {
+      return this.reviews.filter((item) => item.book._id === this.book._id);
+    },
+  },
   created() {
     this.getReviews();
     this.getBooks();
     this.getBook();
+    this.getUsers();
     this.getReservedBooks();
     this.checkReserveBook(this.book._id, this.user._id);
   },

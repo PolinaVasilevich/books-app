@@ -6,6 +6,7 @@
 @import "@/assets/styles/header.scss";
 @import "@/assets/styles/books.scss";
 @import "@/assets/styles/admin-book-page.scss";
+@import "@/assets/styles/reviews.scss";
 
 * {
   margin: 0;
@@ -29,7 +30,7 @@ body {
   font-variant-ligatures: no-common-ligatures;
   overflow-x: hidden;
   word-wrap: break-word;
-  // background-color: #fafafa;
+  background-color: #fafafa;
 }
 
 .btns,
@@ -51,7 +52,7 @@ body {
 }
 
 .app__content {
-  margin-top: 100px;
+  margin-top: 70px;
   padding: 10px 100px;
 }
 

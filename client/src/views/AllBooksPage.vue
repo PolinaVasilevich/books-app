@@ -108,6 +108,7 @@
                 :modelValue="slotProps.data.rating"
                 :readonly="true"
                 :cancel="false"
+                v-if="slotProps.data.rating"
               ></Rating>
             </div>
             <div class="product-list-action">
@@ -168,6 +169,7 @@
                 :modelValue="slotProps.data.rating"
                 :readonly="true"
                 :cancel="false"
+                v-if="slotProps.data.rating"
               ></Rating>
             </div>
           </div>

@@ -1,9 +1,9 @@
 <template>
-  <div class="admin-book-page">
+  <div class="book-page">
     <Message v-if="displayMessage" severity="success">{{ message }}</Message>
 
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
-    <div class="flex-container">
+    <div class="flex-container" style="margin-top: 70px">
       <div>
         <img
           :src="book.img"

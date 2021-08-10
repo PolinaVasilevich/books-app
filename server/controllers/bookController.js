@@ -88,6 +88,7 @@ class bookController {
         text,
         book: book._id,
         user: user._id,
+        rating,
       });
 
       await review.save();
