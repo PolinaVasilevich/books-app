@@ -115,14 +115,6 @@ export default {
 
   data() {
     return {
-      initialForm: {
-        title: "",
-        author: "",
-        genre: "",
-        img: "",
-        count: 0,
-      },
-
       data: {
         title: "",
         author: "",
@@ -163,10 +155,12 @@ export default {
 
     resetForm() {
       this.data.title = "";
-      this.data.author = [];
-      this.data.genre = [];
+      this.data.author = this.authors[0];
+      this.data.genre = this.genres[0];
       this.data.img = "";
       this.data.count = 0;
+
+      console.log("--------------reset-----------------");
     },
 
     resetEditForm() {

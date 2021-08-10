@@ -1,11 +1,12 @@
 <template>
   <admin-form
     :typeForm="typeForm"
-    :payload="dataForm"
+    :dataForm="dataForm"
     :path="path"
     :callback="callback"
     @showMessage="showMessage"
     @showErrorMessage="showErrorMessage"
+    @resetForm="$emit('resetForm')"
   >
     <template v-slot:input>
       <select class="form-control select" v-model="selectUser">
@@ -37,6 +38,7 @@
 
 <script>
 import toggle from "@/mixins/toggle.js";
+import adminFormData from "@/mixins/adminFormData.js";
 
 import AdminForm from "@/components/Admin/Forms/AdminForm";
 import moment from "moment";
@@ -44,31 +46,11 @@ import moment from "moment";
 export default {
   name: "admin-genre-create-form",
   components: { AdminForm },
-  mixins: [toggle],
+  mixins: [toggle, adminFormData],
   data() {
-    return { moment, message: "" };
+    return { moment };
   },
   props: {
-    typeForm: {
-      type: String,
-      default: "create",
-    },
-
-    dataForm: {
-      type: Object,
-      required: true,
-    },
-
-    path: {
-      type: String,
-      required: true,
-    },
-
-    callback: {
-      type: Function,
-      required: true,
-    },
-
     user: {
       type: Object,
       required: true,
@@ -94,10 +76,6 @@ export default {
   },
 
   methods: {
-    onReset() {
-      this.resetForm(this.dataForm);
-    },
-
     onSubmit() {
       if (this.typeForm === "create") {
         this.addNewRecord("books/reservebook", this.dataForm, this.callback);

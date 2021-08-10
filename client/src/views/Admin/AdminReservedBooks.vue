@@ -31,8 +31,11 @@
               v-model:book="data.book"
               v-model:date_reserved="data.date_reserved"
               :dataForm="data"
+              :books="books"
+              :users="users"
               path="books/reservebook"
               :callback="this.getReservedBooks"
+              @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -52,8 +55,11 @@
               v-model:book="editForm.book"
               v-model:date_reserved="editForm.date_reserved"
               :dataForm="editForm"
+              :books="books"
+              :users="users"
               :path="`/books/updatereservedbook/${editForm._id}`"
               :callback="this.getReservedBooks"
+              @resetForm="resetEditForm"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -145,7 +151,22 @@ export default {
 
     editModal(item) {
       this.editForm = item;
+      this.initialEditForm = { ...item };
       this.openEditModal();
+    },
+
+    resetForm() {
+      this.data.user = this.users[0];
+      this.data.book = this.books[0];
+      this.data.date_reserved = moment(new Date()).format("YYYY-MM-DDTHH:mm");
+    },
+
+    resetEditForm() {
+      this.editForm.user = this.initialEditForm.user;
+      this.editForm.book = this.initialEditForm.book;
+      this.editForm.date_reserved = moment(
+        this.initialEditForm.date_reserved
+      ).format("YYYY-MM-DDTHH:mm");
     },
   },
 

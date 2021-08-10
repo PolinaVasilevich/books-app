@@ -11,27 +11,13 @@
 <script>
 import API from "@/utils/api";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
+import adminFormData from "@/mixins/adminFormData.js";
 
 export default {
   name: "admin-form",
-  mixins: [adminFormMixin],
-  data() {
-    return { message: "" };
-  },
+  mixins: [adminFormMixin, adminFormData],
+
   props: {
-    typeForm: {
-      type: String,
-    },
-
-    path: {
-      type: String,
-    },
-
-    payload: {
-      type: Object,
-    },
-    callback: { type: Function },
-
     showButtons: {
       type: Boolean,
       default: true,
@@ -77,9 +63,11 @@ export default {
 
     onSubmit() {
       if (this.typeForm === "create") {
-        this.addNewRecord(this.path, this.payload);
+        this.addNewRecord(this.path, this.dataForm);
+        this.onReset();
       } else if (this.typeForm === "update") {
-        this.updateData(this.path, this.payload);
+        this.updateData(this.path, this.dataForm);
+        this.onReset();
       }
       this.$emit("closeModal");
       this.$emit("closeEditForm");
