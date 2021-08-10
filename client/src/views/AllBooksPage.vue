@@ -5,10 +5,10 @@
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
     <Button
       v-if="user.username === 'admin'"
-      label="Create new record"
+      label="Add book"
       class="p-button-outlined"
       @click="openModal"
-      style="margin-bottom: 30px; width: 190px; align-self: flex-end"
+      style="margin-bottom: 30px; align-self: flex-end"
     />
 
     <modal-form
@@ -33,13 +33,18 @@
         />
       </template>
     </modal-form>
-    <DataView :value="books" :layout="layout" :paginator="true" :rows="6">
+    <DataView
+      :value="filteredData"
+      :layout="layout"
+      :paginator="true"
+      :rows="6"
+    >
       <template #header>
         <div class="p-grid p-nogutter">
           <div class="p-col-6" style="text-align: left">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." />
+              <InputText placeholder="Search..." v-model="filter" />
             </span>
           </div>
           <div class="p-col-6" style="text-align: right">
@@ -121,7 +126,7 @@
       </template>
 
       <template #grid="slotProps">
-        <div class="p-col-12 p-md-4">
+        <div class="p-col-12 p-md-4" style="display: flex">
           <div class="product-grid-item card">
             <div class="product-grid-item-top">
               <div>
@@ -204,6 +209,7 @@ export default {
         { label: "Sort By Title", value: "title" },
         { label: "Sort By Rating", value: "rating" },
       ],
+      filter: "",
     };
   },
 
@@ -247,6 +253,15 @@ export default {
           }
         });
       }
+    },
+  },
+
+  computed: {
+    filteredData() {
+      return this.books.filter((elem) => {
+        if (this.filter === "") return true;
+        else return elem.title.toLowerCase().includes(this.filter);
+      });
     },
   },
 };

@@ -23,7 +23,7 @@
           style="width: 100%"
           typeForm="update"
           :showButtons="displayEditForm"
-          :payload="editForm"
+          :dataForm="editForm"
           :path="`/books/updatebook/${editForm._id}`"
           :callback="this.getBooks"
           @resetForm="resetForm"
@@ -153,10 +153,10 @@ export default {
   },
 
   created() {
+    this.getBook();
     this.getBooks();
     this.getAuthors();
     this.getGenres();
-    this.getBook();
   },
 };
 </script>
