@@ -6,6 +6,7 @@
 @import "@/assets/styles/header.scss";
 @import "@/assets/styles/books.scss";
 @import "@/assets/styles/admin-book-page.scss";
+@import "@/assets/styles/reviews.scss";
 
 * {
   margin: 0;
@@ -18,6 +19,8 @@
 }
 
 body {
+  // max-width: 1600px;
+  // margin: 0 auto;
   color: #7a7a7a;
   font-size: 16px;
   font-weight: 400;
@@ -27,7 +30,7 @@ body {
   font-variant-ligatures: no-common-ligatures;
   overflow-x: hidden;
   word-wrap: break-word;
-  // background-color: #fafafa;
+  background-color: #fafafa;
 }
 
 .btns,
@@ -49,12 +52,12 @@ body {
 }
 
 .app__content {
-  margin-top: 100px;
+  margin-top: 70px;
   padding: 10px 100px;
 }
 
 .arrow {
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 30px;
   z-index: 9999;
@@ -83,4 +86,9 @@ body {
 .status-lowstock {
   background: #feedaf;
   color: #8a5340;
+}
+
+.p-highlight {
+  background: #f8f9fa;
+  color: #2196f3;
 }

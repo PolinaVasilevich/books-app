@@ -1,8 +1,10 @@
 const Book = require("../models/Book");
 const Author = require("../models/Author");
 const Genre = require("../models/Genre");
-const User = require("../models/User/User");
 const BookInstance = require("../models/bookinstance");
+const Review = require("../models/Review");
+
+const mongoose = require("mongoose");
 
 class bookController {
   ///BGN CREATE///
@@ -80,6 +82,58 @@ class bookController {
     }
   }
 
+  async createReview(req, res) {
+    try {
+      const { book, user, text, rating } = req.body;
+
+      const review = new Review({
+        text,
+        book: book._id,
+        user: user._id,
+        rating,
+      });
+
+      await review.save();
+
+      const data = await Review.aggregate([
+        {
+          $unwind: "$book",
+        },
+        {
+          $group: {
+            _id: "$book",
+            ratingAvg: { $avg: "$rating" },
+          },
+        },
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(book._id),
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+
+            ratingAvg: { $round: ["$ratingAvg"] },
+          },
+        },
+      ]);
+
+      await Book.findByIdAndUpdate(
+        { _id: book._id },
+        {
+          $set: {
+            rating: data[0].ratingAvg,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: "Create review error" });
+    }
+  }
+
   ///END CREATE///
 
   ///BGN GET///
@@ -118,6 +172,17 @@ class bookController {
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async getReviews(req, res) {
+    try {
+      const Reviews = await Review.find()
+        .populate("user")
+        .populate({ path: "book", populate: ["author", "genre"] });
+      res.json(Reviews);
+    } catch (error) {
+      console.log(error);
     }
   }
 

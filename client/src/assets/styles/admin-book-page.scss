@@ -21,9 +21,14 @@
 
 .book-info-text-container {
   align-items: center;
+  justify-content: flex-end;
 }
 
 .disabled-form {
   border: none !important;
   pointer-events: none;
+}
+
+.input-margin {
+  margin-left: 15px !important;
 }

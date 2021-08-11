@@ -1,9 +1,9 @@
 <template>
-  <div class="admin-book-page">
+  <div class="book-page">
     <Message v-if="displayMessage" severity="success">{{ message }}</Message>
 
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
-    <div class="flex-container">
+    <div class="flex-container" style="margin-top: 70px">
       <div>
         <img
           :src="book.img"
@@ -23,7 +23,7 @@
           style="width: 100%"
           typeForm="update"
           :showButtons="displayEditForm"
-          :payload="editForm"
+          :dataForm="editForm"
           :path="`/books/updatebook/${editForm._id}`"
           :callback="this.getBooks"
           @resetForm="resetForm"
@@ -43,7 +43,7 @@
             <p class="flex-container book-info-text-container">
               <strong class="book-info-text">Author: </strong>
               <select
-                class="form-control book-info-text"
+                class="form-control book-info-text input-margin"
                 v-model="editForm.author"
                 :class="{ 'disabled-form': !displayEditForm }"
               >
@@ -57,7 +57,7 @@
               <strong class="book-info-text">Genre: </strong>
 
               <select
-                class="form-control book-info-text"
+                class="form-control book-info-text input-margin"
                 v-model="editForm.genre"
                 :class="{ 'disabled-form': !displayEditForm }"
               >
@@ -67,11 +67,24 @@
               </select>
             </p>
 
+            <p
+              class="flex-container book-info-text-container"
+              v-if="displayEditForm"
+            >
+              <strong class="book-info-text">Image: </strong>
+              <Textarea
+                v-model="editForm.img"
+                :autoResize="true"
+                placeholder="Enter image book"
+                class="form-control book-info-text input-margin"
+              />
+            </p>
+
             <p class="flex-container book-info-text-container">
               <strong class="book-info-text">Count: </strong>
               <input
                 v-model="editForm.count"
-                class="form-control book-info-text"
+                class="form-control book-info-text input-margin"
                 :class="{ 'disabled-form': !displayEditForm }"
                 type="number"
                 placeholder="Enter count books"
@@ -95,11 +108,12 @@
 import AdminForm from "@/components/Admin/Forms/AdminForm";
 
 import adminFormMixin from "@/mixins/adminFormMixin";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
   components: { AdminForm },
-  mixins: [adminFormMixin, toggle],
+  mixins: [adminFormMixin, toggle, dataStore],
 
   data() {
     return {
@@ -139,10 +153,10 @@ export default {
   },
 
   created() {
+    this.getBook();
     this.getBooks();
     this.getAuthors();
     this.getGenres();
-    this.getBook();
   },
 };
 </script>

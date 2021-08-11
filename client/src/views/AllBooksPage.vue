@@ -5,10 +5,10 @@
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
     <Button
       v-if="user.username === 'admin'"
-      label="Create new record"
+      label="Add book"
       class="p-button-outlined"
       @click="openModal"
-      style="margin-bottom: 30px; width: 190px; align-self: flex-end"
+      style="margin-bottom: 30px; align-self: flex-end"
     />
 
     <modal-form
@@ -33,17 +33,49 @@
         />
       </template>
     </modal-form>
-    <DataView :value="books" :layout="layout" :paginator="true" :rows="6">
+    <DataView
+      :value="filteredData"
+      :layout="layout"
+      :paginator="true"
+      :rows="6"
+    >
       <template #header>
         <div class="p-grid p-nogutter">
           <div class="p-col-6" style="text-align: left">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." />
+              <InputText placeholder="Search..." v-model="filter" />
             </span>
           </div>
           <div class="p-col-6" style="text-align: right">
             <DataViewLayoutOptions v-model="layout" />
+            <div>
+              <Dropdown
+                v-model="sortKey"
+                :options="sortOptions"
+                optionLabel="label"
+                placeholder="Sort By..."
+                @change="onSortChangeOption($event)"
+                style="text-align: left; margin: 10px 10px 0 0"
+              />
+
+              <span
+                class="p-sortable-column-icon pi pi-fw pi-sort-alt"
+                style="cursor: pointer"
+                @click="isSort = !isSort"
+                v-if="!isSort"
+              ></span>
+
+              <span
+                class="p-sortable-column-icon pi pi-fw p-highlight"
+                :class="[
+                  isSortUp ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down',
+                ]"
+                style="cursor: pointer"
+                @click="onSortChange"
+                v-else
+              ></span>
+            </div>
           </div>
         </div>
       </template>
@@ -76,6 +108,7 @@
                 :modelValue="slotProps.data.rating"
                 :readonly="true"
                 :cancel="false"
+                v-if="slotProps.data.rating"
               ></Rating>
             </div>
             <div class="product-list-action">
@@ -94,7 +127,7 @@
       </template>
 
       <template #grid="slotProps">
-        <div class="p-col-12 p-md-4">
+        <div class="p-col-12 p-md-4" style="display: flex">
           <div class="product-grid-item card">
             <div class="product-grid-item-top">
               <div>
@@ -136,6 +169,7 @@
                 :modelValue="slotProps.data.rating"
                 :readonly="true"
                 :cancel="false"
+                v-if="slotProps.data.rating"
               ></Rating>
             </div>
           </div>
@@ -147,6 +181,7 @@
 
 <script>
 import adminFormMixin from "@/mixins/adminFormMixin";
+import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 import ModalForm from "@/components/UI/ModalForm";
@@ -156,7 +191,7 @@ export default {
     ModalForm,
     AdminBooksForm,
   },
-  mixins: [adminFormMixin, toggle],
+  mixins: [adminFormMixin, toggle, dataStore],
   data() {
     return {
       layout: "grid",
@@ -167,6 +202,16 @@ export default {
         img: "",
         count: 0,
       },
+      isSort: false,
+      isSortUp: false,
+      sortKey: { label: "Sort By Title", value: "title" },
+      sortOrder: null,
+      sortField: null,
+      sortOptions: [
+        { label: "Sort By Title", value: "title" },
+        { label: "Sort By Rating", value: "rating" },
+      ],
+      filter: "",
     };
   },
 
@@ -179,6 +224,46 @@ export default {
       if (!count) return "OUTOFSTOCK";
       if (count < 5) return "LOWSTOCK";
       else return "INSTOCK";
+    },
+
+    onSortChangeOption(event) {
+      this.sortField = event.value.value;
+    },
+
+    onSortChange() {
+      this.isSortUp = !this.isSortUp;
+      if (typeof this.books[0][this.sortField] === "string") {
+        this.books.sort((firstField, secondField) => {
+          if (this.isSortUp) {
+            return firstField[this.sortField].toLowerCase() >
+              secondField[this.sortField].toLowerCase()
+              ? 1
+              : -1;
+          } else {
+            return firstField[this.sortField].toLowerCase() <
+              secondField[this.sortField].toLowerCase()
+              ? 1
+              : -1;
+          }
+        });
+      } else if (typeof this.books[0][this.sortField] === "number") {
+        this.books.sort((firstField, secondField) => {
+          if (this.isSortUp) {
+            return firstField[this.sortField] - secondField[this.sortField];
+          } else {
+            return secondField[this.sortField] - firstField[this.sortField];
+          }
+        });
+      }
+    },
+  },
+
+  computed: {
+    filteredData() {
+      return this.books.filter((elem) => {
+        if (this.filter === "") return true;
+        else return elem.title.toLowerCase().includes(this.filter);
+      });
     },
   },
 };

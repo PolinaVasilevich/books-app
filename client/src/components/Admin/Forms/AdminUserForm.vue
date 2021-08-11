@@ -1,7 +1,7 @@
 <template>
   <admin-form
     :typeForm="typeForm"
-    :payload="dataForm"
+    :dataForm="dataForm"
     :path="path"
     :callback="callback"
     @showMessage="showMessage"
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import adminFormMixin from "@/mixins/adminFormMixin.js";
+import adminFormData from "@/mixins/adminFormData.js";
 import toggle from "@/mixins/toggle.js";
 
 import AdminForm from "@/components/Admin/Forms/AdminForm";
@@ -46,31 +46,9 @@ import AdminForm from "@/components/Admin/Forms/AdminForm";
 export default {
   name: "admin-user-form",
   components: { AdminForm },
-  mixins: [adminFormMixin, toggle],
-  data() {
-    return { message: "" };
-  },
+  mixins: [adminFormData, toggle],
+
   props: {
-    typeForm: {
-      type: String,
-      default: "create",
-    },
-
-    dataForm: {
-      type: Object,
-      required: true,
-    },
-
-    path: {
-      type: String,
-      required: true,
-    },
-
-    callback: {
-      type: Function,
-      required: true,
-    },
-
     username: {
       type: String,
       required: true,

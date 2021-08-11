@@ -1,5 +1,3 @@
-import { mapActions, mapState } from "vuex";
-
 import API from "@/utils/api";
 
 export default {
@@ -9,14 +7,6 @@ export default {
     };
   },
   methods: {
-    ...mapActions({
-      getBooks: "books/getBooks",
-      getAuthors: "books/getAuthors",
-      getGenres: "books/getGenres",
-      getReservedBooks: "books/getReservedBooks",
-      getUsers: "login/getUsers",
-    }),
-
     async addNewRecord(path, payload, callback) {
       try {
         await API.post(path, payload);
@@ -46,16 +36,13 @@ export default {
         callback();
       }
     },
-  },
 
-  computed: {
-    ...mapState({
-      books: (state) => state.books.books,
-      authors: (state) => state.books.authors,
-      genres: (state) => state.books.genres,
-      reservedBooks: (state) => state.books.reservedBooks,
-      users: (state) => state.login.users,
-      user: (state) => state.login.user,
-    }),
+    async createRecord(path, payload) {
+      try {
+        await API.post(path, payload);
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };

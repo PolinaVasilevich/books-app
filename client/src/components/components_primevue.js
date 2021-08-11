@@ -10,6 +10,8 @@ import Rating from "primevue/rating";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
+import Card from "primevue/card";
+import Toolbar from "primevue/toolbar";
 
 export default [
   Dialog,
@@ -24,4 +26,6 @@ export default [
   InputText,
   Textarea,
   InputNumber,
+  Card,
+  Toolbar,
 ];
