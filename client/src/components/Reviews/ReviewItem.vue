@@ -16,14 +16,14 @@
         </div>
       </template>
       <template #icons>
-        <button
+        <!-- <button
           class="p-panel-header-icon p-link p-mr-2"
           @click="toggle"
           v-if="isAdmin"
         >
           <span class="pi pi-cog"></span>
-        </button>
-        <Menu id="config_menu" ref="menu" :model="items" :popup="true" />
+        </button> -->
+        <!-- <Menu id="config_menu" ref="menu" :model="items" :popup="true" /> -->
       </template>
       <p>
         {{ review?.text }}

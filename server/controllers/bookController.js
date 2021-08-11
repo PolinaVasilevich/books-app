@@ -4,6 +4,8 @@ const Genre = require("../models/Genre");
 const BookInstance = require("../models/bookinstance");
 const Review = require("../models/Review");
 
+const mongoose = require("mongoose");
+
 class bookController {
   ///BGN CREATE///
   async createAuthor(req, res) {
@@ -91,39 +93,43 @@ class bookController {
         rating,
       });
 
-      //   Review.aggregate([
-      //     { "$unwind": "$book" },
-      //     {
-      //         "$group": {
-      //             "_id": "$book",
-      //             "ratingAvg": { "$avg": "$rating" }
-      //         }
-      //     }
-      // ]).then(result => {
-      //   Book.populate(result, { "path": "_id" }, function(err, result) {
-      //     if(err) handleError(err);
-      //     console.log(result);
-      // }).catch(error => console.log(error))
-
-      // Review.aggregate([
-      //   {
-      //     $group: {
-      //       _id: "$book._id",
-      //       avgRating: { $avg: "$rating" },
-      //     },
-      //   },
-      // ])
-      //   .then((result) => {
-      //     console.log(result);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
-
       await review.save();
-      return res.json({ message: "Review has created" });
-    } catch (e) {
-      console.log(e);
+
+      const data = await Review.aggregate([
+        {
+          $unwind: "$book",
+        },
+        {
+          $group: {
+            _id: "$book",
+            ratingAvg: { $avg: "$rating" },
+          },
+        },
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(book._id),
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+
+            ratingAvg: { $round: ["$ratingAvg"] },
+          },
+        },
+      ]);
+
+      await Book.findByIdAndUpdate(
+        { _id: book._id },
+        {
+          $set: {
+            rating: data[0].ratingAvg,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+    } catch (error) {
+      console.log(error);
       res.status(400).json({ message: "Create review error" });
     }
   }

@@ -4,6 +4,7 @@ export default {
   methods: {
     ...mapActions({
       getBooks: "books/getBooks",
+      getBook: "books/getBook",
       getAuthors: "books/getAuthors",
       getGenres: "books/getGenres",
       getReservedBooks: "books/getReservedBooks",
@@ -20,6 +21,7 @@ export default {
       user: "login/user",
 
       books: "books/books",
+      book: "books/book",
       authors: "books/authors",
       genres: "books/genres",
       reservedBooks: "books/reservedBooks",

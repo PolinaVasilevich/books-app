@@ -1,6 +1,6 @@
 <template>
   <div class="alerts">
-    <Message v-if="!book.count && !isReserved" severity="warn"
+    <Message v-if="!currentBook.count && !isReserved" severity="warn"
       >Sorry, but now books out of stock</Message
     >
 
@@ -17,39 +17,41 @@
     <div class="book-page__content">
       <div>
         <img
-          :src="book.img"
-          :alt="book.title"
+          :src="currentBook.img"
+          :alt="currentBook.title"
           class="book-page__content__img"
         />
       </div>
       <div class="book-page__content__info">
-        <h2 class="book-page__content__info__title">{{ book.title }}</h2>
+        <h2 class="book-page__content__info__title">{{ currentBook.title }}</h2>
         <p class="book-page__content__info__text">
           <strong>Author: </strong>
-          {{ book.author?.first_name + " " + book.author?.last_name }}
+          {{
+            currentBook.author?.first_name + " " + currentBook.author?.last_name
+          }}
         </p>
         <p class="book-page__content__info__text">
           <strong>Genre: </strong>
-          {{ book.genre?.name }}
+          {{ currentBook.genre?.name }}
         </p>
         <p class="book-page__content__info__text">
           <strong>Count: </strong>
-          {{ book?.count }}
+          {{ currentBook?.count }}
         </p>
 
         <Rating
-          :modelValue="book.rating"
+          :modelValue="currentBook.rating"
           :cancel="false"
           :readonly="true"
-          v-if="book.rating"
+          v-if="currentBook.rating"
         />
 
         <button
           v-if="isLoggedIn && user.username !== 'admin'"
           class="book-page__content__btn btn"
-          @click="onReserveBook(book, user)"
-          :disabled="!book.count"
-          :class="{ disabled: !book.count || isReserved }"
+          @click="onReserveBook(currentBook, user)"
+          :disabled="!currentBook.count"
+          :class="{ disabled: !currentBook.count || isReserved }"
         >
           <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
             Reserve book</i
@@ -77,12 +79,7 @@
       >
         <div class="p-field">
           <label for="name">Text</label>
-          <Textarea
-            v-model="data.text"
-            :autoResize="true"
-            required="true"
-            rows="5"
-          />
+          <Textarea v-model="data.text" :autoResize="true" rows="5" required />
           <div>
             <span>Your rating: </span
             ><Rating v-model="data.rating" :readonly="false" />
@@ -94,7 +91,7 @@
             label="Save"
             icon="pi pi-check"
             class="p-button-text"
-            @click="saveReview"
+            @click="onSave"
           />
         </template>
       </Dialog>
@@ -116,7 +113,8 @@ export default {
   mixins: [toggle, adminFormMixin, dataStore],
   data() {
     return {
-      book: {},
+      reviewsBook: [],
+
       isReserved: false,
       data: {
         text: "",
@@ -125,18 +123,12 @@ export default {
   },
 
   methods: {
-    getBook() {
-      try {
-        const book = this.books.find(
-          (book) => book._id === this.$route.params.id
-        );
+    getReviewsBook() {
+      const reviewsBook = this.reviews.filter(
+        (item) => item.book._id === this.currentBook._id
+      );
 
-        if (book) {
-          this.book = book;
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      this.reviewsBook = reviewsBook;
     },
 
     checkReserveBook(bookID, userID) {
@@ -151,60 +143,62 @@ export default {
     },
 
     async onReserveBook() {
-      if (this.book.count) {
+      if (this.currentBook.count) {
         try {
           await API.post(`books/reservebook`, {
             user: this.user,
-            book: this.book,
+            book: this.currentBook,
           });
 
-          this.showMessage(`Book "${this.book.title}" has reserved`);
+          this.showMessage(`Book "${this.currentBook.title}" has reserved`);
           this.isReserved = true;
 
           this.getBooks();
-          this.getBook();
           this.getReservedBooks();
         } catch (error) {
           console.log(error);
           this.showErrorMessage(error.response.data.message);
 
           this.getBooks();
-          this.getBook();
           this.getReservedBooks();
         }
       }
     },
 
-    saveReview() {
-      // if (this.reviews.length) {
-      //   const rating = Math.round(
-      //     (this.book.rating + this.data.rating) / this.reviews.length
-      //   );
-      //   this.data = { ...this.data, rating };
-      // }
-      this.createRecord("books/review", {
-        ...this.data,
-        book: this.book,
-        user: this.user,
-      });
-      this.getReviews();
+    async saveReview() {
+      try {
+        await API.post("books/review", {
+          ...this.data,
+          book: this.currentBook,
+          user: this.user,
+        });
+        this.getReviews();
+
+        this.showMessage(`Your review has added`);
+      } catch (error) {
+        console.log(error);
+        this.showErrorMessage(error.response.data.message);
+        this.getReviewsBook();
+      }
+    },
+
+    onSave() {
+      this.saveReview();
+      this.getReviewsBook();
       this.closeModal();
     },
   },
 
   computed: {
-    reviewsBook() {
-      return this.reviews.filter((item) => item.book._id === this.book._id);
+    currentBook() {
+      return this.books.find((book) => book._id === this.$route.params.id);
     },
   },
   created() {
-    this.getBook();
     this.getReviews();
-    this.getBooks();
-
-    this.getUsers();
+    this.getReviewsBook();
     this.getReservedBooks();
-    this.checkReserveBook(this.book._id, this.user._id);
+    this.checkReserveBook(this.currentBook._id, this.user._id);
   },
 };
 </script>
