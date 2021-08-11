@@ -12,6 +12,9 @@ import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import Card from "primevue/card";
 import Toolbar from "primevue/toolbar";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import ColumnGroup from "primevue/columngroup";
 
 export default [
   Dialog,
@@ -28,4 +31,7 @@ export default [
   InputNumber,
   Card,
   Toolbar,
+  DataTable,
+  Column,
+  ColumnGroup,
 ];

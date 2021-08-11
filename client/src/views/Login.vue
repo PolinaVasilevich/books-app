@@ -15,7 +15,7 @@ export default {
         .dispatch("login/login", user)
         .then(() => {
           if (user.username === "admin") {
-            this.$router.push(`/admin`);
+            this.$router.push(`/admin/adminbooks`);
           } else {
             this.$router.push(`/user/${user.username}`);
           }
