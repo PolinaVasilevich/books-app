@@ -16,14 +16,14 @@
         </div>
       </template>
       <template #icons>
-        <!-- <button
+        <button
           class="p-panel-header-icon p-link p-mr-2"
-          @click="toggle"
-          v-if="isAdmin"
+          @click="this.$refs.menu.toggle($event)"
+          :v-if="isAdmin"
         >
           <span class="pi pi-cog"></span>
-        </button> -->
-        <!-- <Menu id="config_menu" ref="menu" :model="items" :popup="true" /> -->
+        </button>
+        <Menu id="config_menu" ref="menu" :model="menuItems" :popup="true" />
       </template>
       <p>
         {{ review?.text }}
@@ -37,17 +37,46 @@ import moment from "moment";
 
 export default {
   name: "review-item",
+  data() {
+    return {
+      moment,
+      menuItems: [
+        {
+          label: "Update",
+          icon: "pi pi-refresh",
+          command: () => {
+            this.$toast.add({
+              severity: "success",
+              summary: "Updated",
+              detail: "Data Updated",
+              life: 3000,
+            });
+          },
+        },
+        {
+          label: "Delete",
+          icon: "pi pi-times",
+          command: () => {
+            this.$toast.add({
+              severity: "warn",
+              summary: "Delete",
+              detail: "Data Deleted",
+              life: 3000,
+            });
+          },
+        },
+      ],
+    };
+  },
   props: {
     review: {
       type: Object,
       required: true,
     },
-  },
-
-  data() {
-    return {
-      moment,
-    };
+    isAdmin: {
+      type: Boolean,
+      default: true,
+    },
   },
 };
 </script>

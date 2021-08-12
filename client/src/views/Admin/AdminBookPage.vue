@@ -101,23 +101,63 @@
         </admin-form>
       </div>
     </div>
+    <div>
+      <review-list :items="reviewsBook" />
+
+      <Button
+        label="New review"
+        icon="pi pi-plus"
+        class="p-button-success p-mr-2"
+        @click="openModal"
+        v-if="isLoggedIn"
+      />
+
+      <Dialog
+        v-model:visible="displayModal"
+        :style="{ width: '450px' }"
+        header="Add review"
+        :modal="true"
+        class="p-fluid"
+      >
+        <div class="p-field">
+          <label for="name">Text</label>
+          <Textarea v-model="data.text" :autoResize="true" rows="5" required />
+          <div>
+            <span>Your rating: </span
+            ><Rating v-model="data.rating" :readonly="false" />
+          </div>
+        </div>
+
+        <template #footer>
+          <Button
+            label="Save"
+            icon="pi pi-check"
+            class="p-button-text"
+            @click.prevent="onSave"
+          />
+        </template>
+      </Dialog>
+    </div>
   </div>
 </template>
 
 <script>
-import AdminForm from "@/components/Admin/Forms/AdminForm";
+import API from "@/utils/api";
 
+import AdminForm from "@/components/Admin/Forms/AdminForm";
+import ReviewList from "@/components/Reviews/ReviewList";
 import adminFormMixin from "@/mixins/adminFormMixin";
 import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
-  components: { AdminForm },
+  components: { AdminForm, ReviewList },
   mixins: [adminFormMixin, toggle, dataStore],
 
   data() {
     return {
       book: null,
+      reviewsBook: [],
       editForm: {
         _id: "",
         title: "",
@@ -131,6 +171,16 @@ export default {
   },
 
   methods: {
+    async getReviewsBook() {
+      try {
+        const reviewsBook = await API.get(
+          `books/reviewsBook/${this.$route.params.id}`
+        );
+        this.reviewsBook = reviewsBook.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     getBook() {
       try {
         const book = this.books.find(
@@ -153,6 +203,7 @@ export default {
   },
 
   created() {
+    this.getReviewsBook();
     this.getBook();
     this.getBooks();
     this.getAuthors();

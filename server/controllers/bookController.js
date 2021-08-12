@@ -142,41 +142,45 @@ class bookController {
 
       await review.save();
 
-      const data = await Review.aggregate([
-        {
-          $match: { rating: { $gte: 1 } },
-        },
-        {
-          $unwind: "$book",
-        },
-        {
-          $group: {
-            _id: "$book",
-            ratingAvg: { $avg: "$rating" },
-          },
-        },
-        {
-          $match: {
-            _id: new mongoose.Types.ObjectId(book._id),
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            ratingAvg: { $round: ["$ratingAvg"] },
-          },
-        },
-      ]);
+      // const data = await Review.aggregate([
+      //   {
+      //     $match: { rating: { $gte: 1 } },
+      //   },
+      //   {
+      //     $unwind: "$book",
+      //   },
+      //   {
+      //     $group: {
+      //       _id: "$book",
+      //       ratingAvg: { $avg: "$rating" },
+      //     },
+      //   },
+      //   {
+      //     $match: {
+      //       _id: new mongoose.Types.ObjectId(book._id),
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 0,
+      //       ratingAvg: { $round: ["$ratingAvg"] },
+      //     },
+      //   },
+      // ]);
 
-      await Book.findByIdAndUpdate(
-        { _id: book._id },
-        {
-          $set: {
-            rating: data[0].ratingAvg,
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
+      // await Book.findByIdAndUpdate(
+      //   { _id: book._id },
+      //   {
+      //     $set: {
+      //       rating: data[0].ratingAvg,
+      //     },
+      //   },
+      //   { new: true, useFindAndModify: false }
+      // );
+
+      return res.json({
+        message: `Review has created successfully!`,
+      });
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: "Create review error" });

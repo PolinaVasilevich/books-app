@@ -15,6 +15,7 @@ import Toolbar from "primevue/toolbar";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import ColumnGroup from "primevue/columngroup";
+import Menu from "primevue/menu";
 
 export default [
   Dialog,
@@ -34,4 +35,5 @@ export default [
   DataTable,
   Column,
   ColumnGroup,
+  Menu,
 ];

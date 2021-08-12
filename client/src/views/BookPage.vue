@@ -70,6 +70,7 @@
         icon="pi pi-plus"
         class="p-button-success p-mr-2"
         @click="openModal"
+        v-if="isLoggedIn && user.username !== 'admin'"
       />
 
       <Dialog
@@ -190,7 +191,7 @@ export default {
 
         this.getReviewsBook();
 
-        this.showMessage(`Your review has added`);
+        // this.showMessage(`Your review has added`);
       } catch (error) {
         console.log(error);
         this.showErrorMessage(error.response.data.message);
