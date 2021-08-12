@@ -2,8 +2,18 @@
   <form @submit.prevent="onSubmit" @reset.prevent="onReset">
     <slot name="input"></slot>
     <div class="btns" v-if="showButtons">
-      <button type="submit" class="btn btn-primary">Submit</button>
-      <button type="reset" class="btn btn-danger">Reset</button>
+      <Button
+        label="Save"
+        icon="pi pi-check"
+        class="p-button-text btn-form"
+        type="submit"
+      />
+      <Button
+        label="Reset"
+        icon="pi pi-times"
+        class="p-button-text btn-form"
+        type="reset"
+      />
     </div>
   </form>
 </template>
@@ -21,6 +31,11 @@ export default {
     showButtons: {
       type: Boolean,
       default: true,
+    },
+
+    isFormValid: {
+      type: Boolean,
+      default: false,
     },
   },
 

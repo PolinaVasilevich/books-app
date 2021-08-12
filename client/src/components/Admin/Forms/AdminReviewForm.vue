@@ -25,13 +25,20 @@
           {{ item.title }}
         </option>
       </select>
-
-      <input
-        type="datetime-local"
-        class="form-control select"
-        :value="moment(date_reserved).format('YYYY-MM-DDTHH:mm')"
-        @input="$emit('update:date_reserved', $event.target.value)"
-      />
+      <div class="p-field">
+        <label for="text">Text</label>
+        <Textarea
+          id="text"
+          :value="text"
+          @input="$emit('update:text', $event.target.value)"
+          :autoResize="true"
+          rows="5"
+          required
+        />
+        <div>
+          <span>Rating: </span><Rating v-model="ratingBook" :readonly="false" />
+        </div>
+      </div>
     </template>
   </admin-form>
 </template>
@@ -51,6 +58,16 @@ export default {
     return { moment };
   },
   props: {
+    users: {
+      type: Array,
+      required: true,
+    },
+
+    books: {
+      type: Array,
+      required: true,
+    },
+
     user: {
       type: Object,
       required: true,
@@ -61,17 +78,14 @@ export default {
       required: true,
     },
 
-    date_reserved: {
-      type: Date,
+    text: {
+      type: String,
       required: true,
     },
 
-    users: {
-      type: Array,
-    },
-
-    books: {
-      type: Array,
+    rating: {
+      type: Number,
+      required: true,
     },
   },
 
@@ -91,6 +105,15 @@ export default {
       },
       set(value) {
         this.$emit("update:book", value);
+      },
+    },
+
+    ratingBook: {
+      get() {
+        return this.rating;
+      },
+      set(value) {
+        this.$emit("update:rating", value);
       },
     },
   },

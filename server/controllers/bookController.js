@@ -235,6 +235,19 @@ class bookController {
     }
   }
 
+  async getReviewsBook(req, res) {
+    const { id } = req.params;
+    try {
+      const reviews = await Review.find({ book: id })
+        .populate("user")
+        .populate({ path: "book", populate: ["author", "genre"] });
+
+      res.json(reviews);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   ///END GET///
 
   ///BGN UPDATE///

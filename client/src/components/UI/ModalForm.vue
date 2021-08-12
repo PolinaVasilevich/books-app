@@ -1,7 +1,8 @@
 <template>
   <Dialog
     :visible="displayModal"
-    :style="{ width: '50vw' }"
+    :style="{ width: '45vw' }"
+    class="p-fluid"
     :modal="true"
     @update:visible="hideModal"
   >

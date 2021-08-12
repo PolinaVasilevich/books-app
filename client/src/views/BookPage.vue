@@ -64,9 +64,11 @@
     </div>
     <div>
       <review-list :items="reviewsBook" />
+
       <Button
-        label="Add review"
-        class="p-button-outlined p-button-success"
+        label="New review"
+        icon="pi pi-plus"
+        class="p-button-success p-mr-2"
         @click="openModal"
       />
 
@@ -91,7 +93,7 @@
             label="Save"
             icon="pi pi-check"
             class="p-button-text"
-            @click="onSave"
+            @click.prevent="onSave"
           />
         </template>
       </Dialog>
@@ -113,9 +115,9 @@ export default {
   mixins: [toggle, adminFormMixin, dataStore],
   data() {
     return {
-      reviewsBook: [],
-
       isReserved: false,
+      reviewsBook: [],
+      currentBook: {},
       data: {
         text: "",
       },
@@ -123,12 +125,25 @@ export default {
   },
 
   methods: {
-    getReviewsBook() {
-      const reviewsBook = this.reviews.filter(
-        (item) => item.book._id === this.currentBook._id
+    getCurrentBook() {
+      const book = this.books.find(
+        (book) => book._id === this.$route.params.id
       );
 
-      this.reviewsBook = reviewsBook;
+      if (book) {
+        this.currentBook = book;
+      }
+    },
+
+    async getReviewsBook() {
+      try {
+        const reviewsBook = await API.get(
+          `books/reviewsBook/${this.$route.params.id}`
+        );
+        this.reviewsBook = reviewsBook.data;
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     checkReserveBook(bookID, userID) {
@@ -172,7 +187,8 @@ export default {
           book: this.currentBook,
           user: this.user,
         });
-        this.getReviews();
+
+        this.getReviewsBook();
 
         this.showMessage(`Your review has added`);
       } catch (error) {
@@ -189,13 +205,9 @@ export default {
     },
   },
 
-  computed: {
-    currentBook() {
-      return this.books.find((book) => book._id === this.$route.params.id);
-    },
-  },
   created() {
-    this.getReviews();
+    this.getBooks();
+    this.getCurrentBook();
     this.getReviewsBook();
     this.getReservedBooks();
     this.checkReserveBook(this.currentBook._id, this.user._id);

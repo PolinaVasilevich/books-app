@@ -11,8 +11,9 @@
         }}</Message>
 
         <Button
-          label="Create new record"
-          class="p-button-outlined"
+          label="New book"
+          icon="pi pi-plus"
+          class="p-button-success p-mr-2"
           @click="openModal"
         />
 

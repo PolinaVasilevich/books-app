@@ -14,15 +14,17 @@ router.get("/allgenres", bookController.getGenres);
 router.get("/allreservedbooks", bookController.getReservedBooks);
 router.get("/allreviews", bookController.getReviews);
 
+router.get("/reviewsbook/:id", bookController.getReviewsBook);
+
 router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);
 router.put("/updategenre/:id", bookController.updateGenre);
-router.put("/updatereview/:id", bookController.updateReservedBook);
+router.put("/updatereview/:id", bookController.updateReview);
 
 router.delete("/deletebook/:id", bookController.deleteBook);
 router.delete("/deleteauthor/:id", bookController.deleteAuthor);
 router.delete("/deletegenre/:id", bookController.deleteGenre);
 router.delete("/deletereservedbook/:id", bookController.deleteReservedBook);
-router.delete("/deletereview/:id", bookController.deleteReservedBook);
+router.delete("/deletereview/:id", bookController.deleteReview);
 
 module.exports = router;

@@ -60,9 +60,7 @@
 <script>
 import adminFormData from "@/mixins/adminFormData.js";
 import toggle from "@/mixins/toggle.js";
-
 import AdminForm from "@/components/Admin/Forms/AdminForm";
-
 export default {
   name: "admin-books-form",
   components: { AdminForm },
@@ -72,36 +70,29 @@ export default {
       type: String,
       required: true,
     },
-
     author: {
       type: String,
       required: true,
     },
-
     genre: {
       type: String,
       required: true,
     },
-
     img: {
       type: String,
       required: true,
     },
-
     count: {
       type: [String, Number],
       required: true,
     },
-
     authors: {
       type: Object,
     },
-
     genres: {
       type: Object,
     },
   },
-
   computed: {
     selectAuthor: {
       get() {
@@ -111,7 +102,6 @@ export default {
         this.$emit("update:author", value);
       },
     },
-
     selectGenre: {
       get() {
         return this.genre;
