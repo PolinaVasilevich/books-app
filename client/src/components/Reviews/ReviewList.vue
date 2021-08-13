@@ -23,6 +23,9 @@ export default {
   components: {
     ReviewItem,
   },
+  data() {
+    return {};
+  },
 
   props: {
     items: {
