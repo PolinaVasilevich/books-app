@@ -17,6 +17,9 @@ import Column from "primevue/column";
 import ColumnGroup from "primevue/columngroup";
 import Menu from "primevue/menu";
 
+import ConfirmDialog from "primevue/confirmdialog";
+import Toast from "primevue/toast";
+
 export default [
   Dialog,
   Button,
@@ -36,4 +39,6 @@ export default [
   Column,
   ColumnGroup,
   Menu,
+  ConfirmDialog,
+  Toast,
 ];

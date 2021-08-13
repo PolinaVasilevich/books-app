@@ -14,7 +14,7 @@
             icon="pi pi-trash"
             class="p-button-danger"
             @click="confirmDeleteSelected"
-            :disabled="!selectedProducts || !selectedProducts.length"
+            :disabled="!selectedItems || !selectedItems.length"
           />
         </template>
 
@@ -38,8 +38,8 @@
 
       <DataTable
         ref="dt"
-        :value="items"
-        v-model:selection="selectedProducts"
+        :value="data"
+        v-model:selection="selectedItems"
         dataKey="id"
         :paginator="true"
         :rows="10"
@@ -70,82 +70,7 @@
           :exportable="false"
         ></Column>
 
-        <Column
-          field="title"
-          header="Title"
-          :sortable="true"
-          style="min-width: 16rem"
-        ></Column>
-
-        <Column header="Author" :sortable="true" style="min-width: 12rem">
-          <template #body="slotProps">{{
-            slotProps.data.author.first_name +
-            " " +
-            slotProps.data.author.last_name
-          }}</template>
-        </Column>
-
-        <Column
-          field="genre"
-          header="Genre"
-          :sortable="true"
-          style="min-width: 8rem"
-        >
-          <template #body="slotProps">{{ slotProps.data.genre.name }}</template>
-        </Column>
-
-        <Column header="Image">
-          <template #body="slotProps">
-            <img
-              src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png"
-              :alt="slotProps.data.image"
-              class="product-image"
-            />
-          </template>
-        </Column>
-        <Column
-          field="count"
-          header="Count"
-          :sortable="true"
-          style="min-width: 3rem"
-        >
-          <!-- <template #body="slotProps">
-            {{ formatCurrency(slotProps.data.price) }}
-          </template> -->
-        </Column>
-
-        <Column
-          field="rating"
-          header="Reviews"
-          :sortable="true"
-          style="min-width: 12rem"
-        >
-          <template #body="slotProps">
-            <Rating
-              :modelValue="slotProps.data.rating"
-              :readonly="true"
-              :cancel="false"
-            />
-          </template>
-        </Column>
-        <!-- <Column
-          field="inventoryStatus"
-          header="Status"
-          :sortable="true"
-          style="min-width: 12rem"
-          >>
-          <template #body="slotProps">
-            <span
-              :class="
-                'product-badge status-' +
-                (slotProps.data.inventoryStatus
-                  ? slotProps.data.inventoryStatus.toLowerCase()
-                  : '')
-              "
-              >{{ slotProps.data.inventoryStatus }}</span
-            >
-          </template>
-        </Column> -->
+        <slot name="content"></slot>
         <Column :exportable="false">
           <template #body="slotProps">
             <Button
@@ -156,25 +81,114 @@
             <Button
               icon="pi pi-trash"
               class="p-button-rounded p-button-warning"
-              @click="confirmDeleteProduct(slotProps.data)"
+              @click="confirmDeleteItem(slotProps.data)"
             />
           </template>
         </Column>
       </DataTable>
     </div>
+
+    <Dialog
+      v-model:visible="deleteItemDialog"
+      :style="{ width: '450px' }"
+      header="Confirm"
+      :modal="true"
+    >
+      <div class="confirmation-content">
+        <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+        <span v-if="item"
+          >Are you sure you want to delete <b>{{ item.title }}</b
+          >?</span
+        >
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="deleteItemDialog = false"
+        />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          class="p-button-text"
+          @click="deleteItem"
+        />
+      </template>
+    </Dialog>
+
+    <Dialog
+      v-model:visible="deleteItemsDialog"
+      :style="{ width: '450px' }"
+      header="Confirm"
+      :modal="true"
+    >
+      <div class="confirmation-content">
+        <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+        <span v-if="item"
+          >Are you sure you want to delete the selected entries?</span
+        >
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="deleteItemsDialog = false"
+        />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          class="p-button-text"
+          @click="deleteSelectedItems"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      selectedItems: null,
+      item: {},
+      items: null,
+      deleteItemDialog: false,
+      deleteItemsDialog: false,
+    };
+  },
   props: {
     title: {
       type: String,
       default: "Items",
     },
-    items: {
+    data: {
       type: Array,
       required: true,
+    },
+  },
+
+  methods: {
+    confirmDeleteItem(item) {
+      this.item = item;
+      this.deleteItemDialog = true;
+    },
+
+    confirmDeleteSelected() {
+      this.deleteItemsDialog = true;
+    },
+
+    deleteItem() {
+      this.products = this.products.filter((val) => val.id !== this.product.id);
+      this.deleteItemDialog = false;
+      this.product = {};
+      //   this.$toast.add({
+      //     severity: "success",
+      //     summary: "Successful",
+      //     detail: "Product Deleted",
+      //     life: 3000,
+      //   });
     },
   },
 };
