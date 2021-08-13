@@ -1,28 +1,77 @@
 <template>
   <div>
-    <admin-table titleTable="Books" :headers="headers" :data="books">
-      <template v-slot:modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
+    <Toast />
+    <admin-table
+      title="Books"
+      :data="books"
+      @openModal="openModal"
+      @openEditModal="editModal"
+      @deleteItem="onDeleteData"
+    >
+      <template #content>
+        <Column
+          field="title"
+          header="Title"
+          :sortable="true"
+          style="min-width: 10rem"
+        ></Column>
 
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
+        <Column field="author" header="Author" style="min-width: 8rem">
+          <template #body="slotProps">
+            {{
+              slotProps.data.author.first_name +
+              " " +
+              slotProps.data.author.last_name
+            }}
+          </template>
+        </Column>
 
-        <Button
-          label="New book"
-          icon="pi pi-plus"
-          class="p-button-success p-mr-2"
-          @click="openModal"
-        />
+        <Column field="genre" header="Genre">
+          <template #body="slotProps">
+            {{ slotProps.data.genre.name }}
+          </template>
+        </Column>
 
+        <Column header="Image">
+          <template #body="slotProps">
+            <img
+              style="width: 150px"
+              :src="
+                slotProps.data.img
+                  ? slotProps.data.img
+                  : 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'
+              "
+              :alt="slotProps.data.title"
+              class="product-image"
+            />
+          </template>
+        </Column>
+
+        <Column field="count" header="Count" :sortable="true"></Column>
+
+        <Column
+          field="rating"
+          header="Rating"
+          :sortable="true"
+          style="min-width: 12rem"
+        >
+          <template #body="slotProps">
+            <Rating
+              :modelValue="slotProps.data.rating"
+              :readonly="true"
+              :cancel="false"
+            />
+          </template>
+        </Column>
+      </template>
+
+      <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-books-form
               typeForm="create"
               v-model:title="data.title"
@@ -48,7 +97,7 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-books-form
               typeForm="update"
               v-model:title="editForm.title"
@@ -132,22 +181,18 @@ export default {
         img: "",
         count: 0,
       },
-
-      headers: ["Title", "Author", "Genre", "Count"],
     };
   },
 
   methods: {
-    onDeleteData(data) {
-      this.removeData(`/books/deletebook/${data._id}`, this.getBooks);
-      this.message = "Record has deleted";
-      this.openMessage();
-    },
-
-    editModal(item) {
-      this.editForm = item;
-      this.initialEditForm = { ...item };
-      this.openEditModal();
+    onDeleteData(value) {
+      this.removeData(`/books/deletebook/${value._id}`, this.getBooks);
+      this.$toast.add({
+        severity: "success",
+        summary: "Successful",
+        detail: `${value.username} Deleted`,
+        life: 3000,
+      });
     },
 
     goToPage(bookID) {
@@ -160,8 +205,6 @@ export default {
       this.data.genre = this.genres[0];
       this.data.img = "";
       this.data.count = 0;
-
-      console.log("--------------reset-----------------");
     },
 
     resetEditForm() {

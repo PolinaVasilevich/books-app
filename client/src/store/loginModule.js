@@ -77,6 +77,7 @@ export const loginModule = {
 
             commit("setUser", userInfo);
             commit("setToken", token);
+
             resolve(user);
           })
           .catch((error) => {

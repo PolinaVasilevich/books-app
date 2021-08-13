@@ -24,20 +24,12 @@
         ></Column>
       </template>
       <template #modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
-
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
-
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-author-form
               typeForm="create"
               v-model:first_name="data.first_name"
@@ -58,7 +50,7 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-author-form
               typeForm="update"
               v-model:first_name="editForm.first_name"

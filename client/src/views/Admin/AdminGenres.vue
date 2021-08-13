@@ -1,28 +1,28 @@
 <template>
   <div>
-    <admin-table titleTable="Genres" :headers="headers" :data="genres">
-      <template v-slot:modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
-
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
-
-        <Button
-          label="New genre"
-          icon="pi pi-plus"
-          class="p-button-success p-mr-2"
-          @click="openModal"
-        />
-
+    <Toast />
+    <admin-table
+      title="Genres"
+      :data="genres"
+      @openModal="openModal"
+      @openEditModal="editModal"
+      @deleteItem="onDeleteData"
+    >
+      <template #content>
+        <Column
+          field="name"
+          header="Name"
+          :sortable="true"
+          style="min-width: 8rem"
+        ></Column>
+      </template>
+      <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-genre-form
               typeForm="create"
               v-model:name="data.name"
@@ -42,7 +42,7 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-genre-form
               typeForm="update"
               v-model:name="editForm.name"
@@ -57,17 +57,6 @@
           </template>
         </modal-form>
       </template>
-      <template v-slot:data>
-        <tr v-for="genre in genres" :key="genre._id">
-          <td>{{ genre.name }}</td>
-          <td>
-            <admin-buttons
-              @showEditForm="editModal(genre)"
-              @delete="onDeleteData(genre)"
-            />
-          </td>
-        </tr>
-      </template>
     </admin-table>
   </div>
 </template>
@@ -77,7 +66,6 @@ import AdminTable from "@/components/Admin/AdminTable.vue";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminGenreForm from "@/components/Admin/Forms/AdminGenreForm";
-import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -90,7 +78,6 @@ export default {
     AdminTable,
     ModalForm,
     AdminGenreForm,
-    AdminButtons,
   },
 
   data() {
@@ -111,16 +98,14 @@ export default {
   },
 
   methods: {
-    onDeleteData(data) {
-      this.removeData(`/books/deletegenre/${data._id}`, this.getGenres);
-      this.message = "Record has deleted";
-      this.openMessage();
-    },
-
-    editModal(genre) {
-      this.editForm = genre;
-      this.initialEditForm = { ...genre };
-      this.openEditModal();
+    onDeleteData(value) {
+      this.removeData(`/books/deletegenre/${value._id}`, this.getGenres);
+      this.$toast.add({
+        severity: "success",
+        summary: "Successful",
+        detail: `${value.name} Deleted`,
+        life: 3000,
+      });
     },
 
     resetForm() {
