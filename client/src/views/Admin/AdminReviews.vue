@@ -1,28 +1,56 @@
 <template>
   <div>
-    <admin-table titleTable="Reviews" :headers="headers" :data="reviews">
-      <template v-slot:modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
+    <Toast />
+    <admin-table
+      title="Reviews"
+      :data="reviews"
+      @openModal="openModal"
+      @openEditModal="editModal"
+      @deleteItem="onDeleteData"
+      :disabledCreateButton="true"
+    >
+      <template #content>
+        <Column field="username" header="User" :sortable="true">
+          <template #body="slotProps">
+            {{ slotProps.data.user.username }}
+          </template>
+        </Column>
 
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
+        <Column field="book" header="Book" :sortable="true">
+          <template #body="slotProps">
+            {{ slotProps.data.book.title }}
+          </template>
+        </Column>
 
-        <Button
-          label="Reserve book"
-          icon="pi pi-plus"
-          class="p-button-success p-mr-2"
-          @click="openModal"
-        />
+        <Column field="text" header="Review"> </Column>
 
+        <Column field="created_date" header="Created date">
+          <template #body="slotProps">
+            {{ moment(slotProps.data.created_date).format("YYYY-MM-DD HH:mm") }}
+          </template>
+        </Column>
+        <Column
+          field="rating"
+          header="Rating"
+          :sortable="true"
+          style="min-width: 12rem"
+        >
+          <template #body="slotProps">
+            <Rating
+              :modelValue="slotProps.data.rating"
+              :readonly="true"
+              :cancel="false"
+            />
+          </template>
+        </Column>
+      </template>
+      <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-review-form
               typeForm="create"
               v-model:user="data.user"
@@ -48,7 +76,7 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-review-form
               typeForm="update"
               v-model:user="editForm.user"
@@ -69,25 +97,6 @@
           </template>
         </modal-form>
       </template>
-      <template v-slot:data>
-        <tr v-for="item in reviews" :key="item._id">
-          <td>{{ item.user.username }}</td>
-          <td>{{ item.book.title }}</td>
-          <td>{{ item.text }}</td>
-          <td>
-            <Rating v-model="item.rating" :readonly="true" :cancel="false" />
-          </td>
-          <td>
-            {{ moment(item.created_date).format("YYYY-MM-DD HH:mm") }}
-          </td>
-          <td>
-            <admin-buttons
-              @showEditForm="editModal(item)"
-              @delete="onDeleteData(item)"
-            />
-          </td>
-        </tr>
-      </template>
     </admin-table>
   </div>
 </template>
@@ -98,7 +107,6 @@ import moment from "moment";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import ModalForm from "@/components/UI/ModalForm";
 import AdminReviewForm from "@/components/Admin/Forms/AdminReviewForm.vue";
-import AdminButtons from "@/components/Admin/AdminButtons";
 
 import API from "@/utils/api";
 
@@ -113,7 +121,6 @@ export default {
     AdminTable,
     ModalForm,
     AdminReviewForm,
-    AdminButtons,
   },
 
   data() {
@@ -146,19 +153,23 @@ export default {
         await API.delete(`/books/deletereview/${record._id}`, {
           data: { book: record.book },
         });
-        this.message = "Record has deleted";
-        this.openMessage();
         this.getReviews();
+        this.$toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: `Review for book ${record.book.title} deleted`,
+          life: 3000,
+        });
       } catch (error) {
         console.log(error);
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: `${error.response.data.message}`,
+          life: 3000,
+        });
         this.getReviews();
       }
-    },
-
-    editModal(item) {
-      this.editForm = item;
-      this.initialEditForm = { ...item };
-      this.openEditModal();
     },
 
     resetForm() {

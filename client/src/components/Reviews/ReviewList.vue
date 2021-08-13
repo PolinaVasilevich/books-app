@@ -2,7 +2,13 @@
   <div class="review-list">
     <h2>Reviews</h2>
     <div v-if="items.length">
-      <review-item v-for="item in items" :key="item._id" :review="item" />
+      <review-item
+        v-for="item in items"
+        :key="item._id"
+        :review="item"
+        :text="item.text"
+        @editForm="$emit('editForm')"
+      />
     </div>
 
     <p v-else>There are no reviews yet.</p>

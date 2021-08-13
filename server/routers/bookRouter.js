@@ -20,6 +20,7 @@ router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);
 router.put("/updategenre/:id", bookController.updateGenre);
 router.put("/updatereview/:id", bookController.updateReview);
+router.put("/updatereservedbook/:id", bookController.updateReservedBook);
 
 router.delete("/deletebook/:id", bookController.deleteBook);
 router.delete("/deleteauthor/:id", bookController.deleteAuthor);

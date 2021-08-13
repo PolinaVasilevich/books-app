@@ -8,6 +8,7 @@
             icon="pi pi-plus"
             class="p-button-success p-mr-2"
             @click="openNew"
+            :disabled="disabledCreateButton"
           />
           <Button
             label="Delete"
@@ -167,6 +168,10 @@ export default {
     data: {
       type: Array,
       required: true,
+    },
+    disabledCreateButton: {
+      type: Boolean,
+      default: false,
     },
   },
 

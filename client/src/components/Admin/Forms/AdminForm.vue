@@ -51,11 +51,19 @@ export default {
         this.callback();
         // this.message = "New record has created";
         // this.$emit("showMessage", this.message);
+        this.$toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Item Created",
+          life: 3000,
+        });
       } catch (error) {
-        if (error.response.status === 400 && error.response.data.message) {
-          this.message = error.response.data.message;
-          this.$emit("showErrorMessage", this.message);
-        }
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: `${error.response.data.message}`,
+          life: 3000,
+        });
         console.log(error);
         this.callback();
       }
@@ -68,17 +76,21 @@ export default {
 
         // this.message = "Record has updated";
         // this.$emit("showMessage", this.message);
+
+        this.$toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Item Updated",
+          life: 3000,
+        });
       } catch (error) {
-        if (error.response.status === 400 && error.response.data.message) {
-          // this.message = error.response.data.message;
-          // this.$emit("showErrorMessage", this.message);
-          this.$toast.add({
-            severity: "error",
-            summary: "Error Message",
-            detail: `${error.response.data.message}`,
-            life: 3000,
-          });
-        }
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: `${error.response.data.message}`,
+          life: 3000,
+        });
+
         console.log(error);
         this.callback();
       }
@@ -87,23 +99,11 @@ export default {
     onSubmit() {
       if (this.typeForm === "create") {
         this.addNewRecord(this.path, this.dataForm);
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Created",
-          life: 3000,
-        });
         this.onReset();
         this.$emit("closeModal");
       } else if (this.typeForm === "update") {
         this.updateData(this.path, this.dataForm);
         this.onReset();
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Updated",
-          life: 3000,
-        });
       }
       this.$emit("closeModal");
       this.$emit("closeEditForm");

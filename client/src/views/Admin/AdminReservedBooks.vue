@@ -1,26 +1,47 @@
 <template>
   <div>
+    <Toast />
     <admin-table
       titleTable="Reserved books"
       :headers="headers"
       :data="reservedBooks"
+      @openModal="openModal"
+      @openEditModal="editModal"
+      @deleteItem="onDeleteData"
     >
-      <template v-slot:modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
+      <template #content>
+        <Column field="username" header="User" :sortable="true">
+          <template #body="slotProps">
+            {{ slotProps.data.user.username }}
+          </template>
+        </Column>
 
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
+        <Column field="book" header="Book" :sortable="true">
+          <template #body="slotProps">
+            {{ slotProps.data.book.title }}
+          </template>
+        </Column>
 
-        <Button
-          label="Reserve book"
-          icon="pi pi-plus"
-          class="p-button-success p-mr-2"
-          @click="openModal"
-        />
+        <Column field="date_reserved" header="Reserved date">
+          <template #body="slotProps">
+            {{
+              moment(slotProps.data.date_reserved).format("YYYY-MM-DD HH:mm")
+            }}
+          </template>
+        </Column>
 
+        <Column field="return_date" header="Return date">
+          <template #body="slotProps">
+            {{
+              slotProps.data.return_date
+                ? moment(slotProps.data.return_date).format("YYYY-MM-DD HH:mm")
+                : ""
+            }}
+          </template>
+        </Column>
+      </template>
+
+      <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
@@ -55,7 +76,7 @@
               typeForm="update"
               v-model:user="editForm.user"
               v-model:book="editForm.book"
-              v-model:date_reserved="editForm.date_reserved"
+              v-model:return_date="editForm.return_date"
               :dataForm="editForm"
               :books="books"
               :users="users"
@@ -69,34 +90,16 @@
           </template>
         </modal-form>
       </template>
-      <template v-slot:data>
-        <tr v-for="item in reservedBooks" :key="item._id">
-          <td>{{ item.user.username }}</td>
-          <td>{{ item.book.title }}</td>
-          <td>
-            {{ moment(item.date_reserved).format("YYYY-MM-DD HH:mm") }}
-          </td>
-          <td>
-            <admin-buttons
-              @showEditForm="editModal(item)"
-              @delete="onDeleteData(item)"
-            />
-          </td>
-        </tr>
-      </template>
     </admin-table>
   </div>
 </template>
 
 <script>
 import moment from "moment";
-
+import API from "@/utils/api";
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import ModalForm from "@/components/UI/ModalForm";
 import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
-import AdminButtons from "@/components/Admin/AdminButtons";
-
-import API from "@/utils/api";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -109,12 +112,11 @@ export default {
     AdminTable,
     ModalForm,
     AdminReservedBooksForm,
-    AdminButtons,
   },
 
   data() {
     return {
-      moment: moment,
+      moment,
       data: {
         user: "",
         book: "",
@@ -125,36 +127,41 @@ export default {
         _id: "",
         user: "",
         book: "",
-        date_reserved: "",
+        return_date: moment(new Date()).format("YYYY-MM-DDTHH:mm"),
       },
-
-      headers: ["User", "Book", "Reserved Date"],
     };
   },
 
   methods: {
-    async onDeleteData(record) {
+    async onDeleteData(value) {
       try {
-        await API.delete(`/books/deletereservedbook/${record._id}`, {
-          data: { book: record.book },
+        await API.delete(`/books/deletereservedbook/${value._id}`, {
+          data: { book: value.book },
         });
-        this.message = "Record has deleted";
-        this.openMessage();
+
         this.getReservedBooks();
         this.getBooks();
         this.getUsers();
+
+        this.$toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: `Reserve ${value.book.title} deleted`,
+          life: 3000,
+        });
       } catch (error) {
         console.log(error);
         this.getReservedBooks();
         this.getBooks();
         this.getUsers();
-      }
-    },
 
-    editModal(item) {
-      this.editForm = item;
-      this.initialEditForm = { ...item };
-      this.openEditModal();
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: `${error.response.data.message}`,
+          life: 3000,
+        });
+      }
     },
 
     resetForm() {

@@ -1,6 +1,6 @@
 <template>
   <div class="review-item">
-    <Panel :toggleable="true">
+    <Panel>
       <template #header>
         <div class="content">
           <Rating
@@ -18,15 +18,21 @@
       <template #icons>
         <button
           class="p-panel-header-icon p-link p-mr-2"
-          @click="this.$refs.menu.toggle($event)"
-          :v-if="isAdmin"
+          @click="$emit('editForm')"
         >
-          <span class="pi pi-cog"></span>
+          <span class="pi pi-pencil"></span>
         </button>
-        <Menu id="config_menu" ref="menu" :model="menuItems" :popup="true" />
       </template>
       <p>
-        {{ review?.text }}
+        <Textarea
+          :value="text"
+          @input="$emit('update:text', $event.target.value)"
+          :autoResize="true"
+          placeholder="Enter your review"
+          :class="{ 'disabled-form': !displayEditForm }"
+          required
+          style="width: 100%"
+        />
       </p>
     </Panel>
   </div>
@@ -40,32 +46,6 @@ export default {
   data() {
     return {
       moment,
-      menuItems: [
-        {
-          label: "Update",
-          icon: "pi pi-refresh",
-          command: () => {
-            this.$toast.add({
-              severity: "success",
-              summary: "Updated",
-              detail: "Data Updated",
-              life: 3000,
-            });
-          },
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-times",
-          command: () => {
-            this.$toast.add({
-              severity: "warn",
-              summary: "Delete",
-              detail: "Data Deleted",
-              life: 3000,
-            });
-          },
-        },
-      ],
     };
   },
   props: {
@@ -73,6 +53,7 @@ export default {
       type: Object,
       required: true,
     },
+    text: { type: Text, required: true },
     isAdmin: {
       type: Boolean,
       default: true,

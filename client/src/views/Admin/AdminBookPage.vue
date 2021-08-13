@@ -109,7 +109,7 @@
         icon="pi pi-plus"
         class="p-button-success p-mr-2"
         @click="openModal"
-        v-if="isLoggedIn"
+        v-if="isLoggedIn && !isAdmin"
       />
 
       <Dialog

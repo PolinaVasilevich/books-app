@@ -9,13 +9,21 @@
     @resetForm="$emit('resetForm')"
   >
     <template v-slot:input>
-      <select class="form-control select" v-model="selectUser">
+      <select
+        class="form-control select"
+        v-model="selectUser"
+        :disabled="typeForm === 'update'"
+      >
         <option v-for="item in users" :key="item._id" :value="item">
           {{ item.username }}
         </option>
       </select>
 
-      <select class="form-control select" v-model="selectBook">
+      <select
+        class="form-control select"
+        v-model="selectBook"
+        :disabled="typeForm === 'update'"
+      >
         <option
           v-for="item in books"
           :key="item._id"
@@ -36,7 +44,8 @@
           required
         />
         <div>
-          <span>Rating: </span><Rating v-model="ratingBook" :readonly="false" />
+          <span>Rating: </span
+          ><Rating v-model="ratingBook" :readonly="true" :cancel="false" />
         </div>
       </div>
     </template>

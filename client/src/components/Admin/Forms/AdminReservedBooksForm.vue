@@ -9,13 +9,21 @@
     @resetForm="$emit('resetForm')"
   >
     <template v-slot:input>
-      <select class="form-control select" v-model="selectUser">
+      <select
+        class="form-control select"
+        v-model="selectUser"
+        :disabled="typeForm === 'update'"
+      >
         <option v-for="item in users" :key="item._id" :value="item">
           {{ item.username }}
         </option>
       </select>
 
-      <select class="form-control select" v-model="selectBook">
+      <select
+        class="form-control select"
+        v-model="selectBook"
+        :disabled="typeForm === 'update'"
+      >
         <option
           v-for="item in books"
           :key="item._id"
@@ -26,12 +34,30 @@
         </option>
       </select>
 
-      <input
-        type="datetime-local"
-        class="form-control select"
-        :value="moment(date_reserved).format('YYYY-MM-DDTHH:mm')"
-        @input="$emit('update:date_reserved', $event.target.value)"
-      />
+      <div class="p-field" v-if="typeForm === 'create'">
+        <label for="date_reserved">Reserved date</label>
+        <input
+          id="date_reserved"
+          v-if="typeForm === 'create'"
+          type="datetime-local"
+          class="form-control"
+          :value="moment(date_reserved).format('YYYY-MM-DDTHH:mm')"
+          @input="$emit('update:date_reserved', $event.target.value)"
+        />
+      </div>
+
+      <div class="p-field" v-else>
+        <label for="return_date">Return date</label>
+        <input
+          id="return_date"
+          type="datetime-local"
+          :value="moment(return_date).format('YYYY-MM-DDTHH:mm')"
+          @input="$emit('update:return_date', $event.target.value)"
+          required="true"
+          class="form-control"
+          autofocus
+        />
+      </div>
     </template>
   </admin-form>
 </template>
@@ -63,7 +89,10 @@ export default {
 
     date_reserved: {
       type: Date,
-      required: true,
+    },
+
+    return_date: {
+      type: Date,
     },
 
     users: {
