@@ -1,6 +1,8 @@
 import { createApp } from "vue";
 import { VuelidatePlugin } from "@vuelidate/core";
 import PrimeVue from "primevue/config";
+import ConfirmationService from "primevue/confirmationservice";
+import ToastService from "primevue/toastservice";
 
 import App from "./App.vue";
 import router from "./router";
@@ -21,4 +23,11 @@ const app = createApp(App);
   app.component(component.name, component);
 });
 
-app.use(store).use(router).use(VuelidatePlugin).use(PrimeVue).mount("#app");
+app
+  .use(store)
+  .use(router)
+  .use(VuelidatePlugin)
+  .use(PrimeVue)
+  .use(ConfirmationService)
+  .use(ToastService)
+  .mount("#app");

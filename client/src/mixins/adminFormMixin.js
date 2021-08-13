@@ -37,6 +37,12 @@ export default {
       }
     },
 
+    editModal(value) {
+      this.editForm = value;
+      this.initialEditForm = { ...value };
+      this.openEditModal();
+    },
+
     async createRecord(path, payload) {
       try {
         await API.post(path, payload);

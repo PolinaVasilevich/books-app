@@ -1,6 +1,6 @@
 <template>
   <div class="review-item">
-    <Panel :toggleable="true">
+    <Panel>
       <template #header>
         <div class="content">
           <Rating
@@ -16,17 +16,23 @@
         </div>
       </template>
       <template #icons>
-        <!-- <button
+        <button
           class="p-panel-header-icon p-link p-mr-2"
-          @click="toggle"
-          v-if="isAdmin"
+          @click="$emit('editForm')"
         >
-          <span class="pi pi-cog"></span>
-        </button> -->
-        <!-- <Menu id="config_menu" ref="menu" :model="items" :popup="true" /> -->
+          <span class="pi pi-pencil"></span>
+        </button>
       </template>
       <p>
-        {{ review?.text }}
+        <Textarea
+          :value="text"
+          @input="$emit('update:text', $event.target.value)"
+          :autoResize="true"
+          placeholder="Enter your review"
+          :class="{ 'disabled-form': !displayEditForm }"
+          required
+          style="width: 100%"
+        />
       </p>
     </Panel>
   </div>
@@ -37,17 +43,21 @@ import moment from "moment";
 
 export default {
   name: "review-item",
+  data() {
+    return {
+      moment,
+    };
+  },
   props: {
     review: {
       type: Object,
       required: true,
     },
-  },
-
-  data() {
-    return {
-      moment,
-    };
+    text: { type: Text, required: true },
+    isAdmin: {
+      type: Boolean,
+      default: true,
+    },
   },
 };
 </script>

@@ -9,6 +9,7 @@ const BookInstanceSchema = new Schema({
     enum: ["Available", "Reserved"],
   },
   date_reserved: { type: Date, default: Date.now },
+  return_date: { type: Date },
 });
 
 BookInstanceSchema.virtual("url").get(function () {

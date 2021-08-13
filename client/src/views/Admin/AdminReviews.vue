@@ -2,12 +2,12 @@
   <div>
     <Toast />
     <admin-table
-      titleTable="Reserved books"
-      :headers="headers"
-      :data="reservedBooks"
+      title="Reviews"
+      :data="reviews"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      :disabledCreateButton="true"
     >
       <template #content>
         <Column field="username" header="User" :sortable="true">
@@ -22,42 +22,47 @@
           </template>
         </Column>
 
-        <Column field="date_reserved" header="Reserved date">
+        <Column field="text" header="Review"> </Column>
+
+        <Column field="created_date" header="Created date">
           <template #body="slotProps">
-            {{
-              moment(slotProps.data.date_reserved).format("YYYY-MM-DD HH:mm")
-            }}
+            {{ moment(slotProps.data.created_date).format("YYYY-MM-DD HH:mm") }}
           </template>
         </Column>
-
-        <Column field="return_date" header="Return date">
+        <Column
+          field="rating"
+          header="Rating"
+          :sortable="true"
+          style="min-width: 12rem"
+        >
           <template #body="slotProps">
-            {{
-              slotProps.data.return_date
-                ? moment(slotProps.data.return_date).format("YYYY-MM-DD HH:mm")
-                : ""
-            }}
+            <Rating
+              :modelValue="slotProps.data.rating"
+              :readonly="true"
+              :cancel="false"
+            />
           </template>
         </Column>
       </template>
-
       <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
-            <admin-reserved-books-form
+          <template #modal-content>
+            <admin-review-form
               typeForm="create"
               v-model:user="data.user"
               v-model:book="data.book"
-              v-model:date_reserved="data.date_reserved"
+              v-model:text="data.text"
+              v-model:created_date="data.created_date"
+              v-model:rating="data.rating"
               :dataForm="data"
               :books="books"
               :users="users"
-              path="books/reservebook"
-              :callback="this.getReservedBooks"
+              path="books/review"
+              :callback="this.getReviews"
               @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
@@ -71,17 +76,19 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
-            <admin-reserved-books-form
+          <template #modal-content>
+            <admin-review-form
               typeForm="update"
               v-model:user="editForm.user"
               v-model:book="editForm.book"
-              v-model:return_date="editForm.return_date"
+              v-model:text="editForm.text"
+              v-model:created_date="editForm.created_date"
+              v-model:rating="editForm.rating"
               :dataForm="editForm"
               :books="books"
               :users="users"
-              :path="`/books/updatereservedbook/${editForm._id}`"
-              :callback="this.getReservedBooks"
+              :path="`/books/updatereview/${editForm._id}`"
+              :callback="this.getReviews"
               @resetForm="resetEditForm"
               @closeModal="closeEditModal"
               @showMessage="showMessage"
@@ -96,10 +103,12 @@
 
 <script>
 import moment from "moment";
-import API from "@/utils/api";
+
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import ModalForm from "@/components/UI/ModalForm";
-import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
+import AdminReviewForm from "@/components/Admin/Forms/AdminReviewForm.vue";
+
+import API from "@/utils/api";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -111,76 +120,77 @@ export default {
   components: {
     AdminTable,
     ModalForm,
-    AdminReservedBooksForm,
+    AdminReviewForm,
   },
 
   data() {
     return {
-      moment,
+      moment: moment,
       data: {
         user: "",
         book: "",
-        date_reserved: "",
+        created_date: "",
+        text: "",
+        rating: 0,
       },
 
       editForm: {
         _id: "",
         user: "",
         book: "",
-        return_date: moment(new Date()).format("YYYY-MM-DDTHH:mm"),
+        created_date: "",
+        text: "",
+        rating: 0,
       },
+
+      headers: ["User", "Book", "Text", "Rating", "Created date"],
     };
   },
 
   methods: {
-    async onDeleteData(value) {
+    async onDeleteData(record) {
       try {
-        await API.delete(`/books/deletereservedbook/${value._id}`, {
-          data: { book: value.book },
+        await API.delete(`/books/deletereview/${record._id}`, {
+          data: { book: record.book },
         });
-
-        this.getReservedBooks();
-        this.getBooks();
-        this.getUsers();
-
+        this.getReviews();
         this.$toast.add({
           severity: "success",
           summary: "Successful",
-          detail: `Reserve ${value.book.title} deleted`,
+          detail: `Review for book ${record.book.title} deleted`,
           life: 3000,
         });
       } catch (error) {
         console.log(error);
-        this.getReservedBooks();
-        this.getBooks();
-        this.getUsers();
-
         this.$toast.add({
           severity: "error",
           summary: "Error Message",
           detail: `${error.response.data.message}`,
           life: 3000,
         });
+        this.getReviews();
       }
     },
 
     resetForm() {
       this.data.user = this.users[0];
       this.data.book = this.books[0];
-      this.data.date_reserved = moment(new Date()).format("YYYY-MM-DDTHH:mm");
+      this.data.text = "";
+      this.data.created_date = moment(new Date()).format("YYYY-MM-DDTHH:mm");
     },
 
     resetEditForm() {
-      this.editForm.user = this.initialEditForm.user;
-      this.editForm.book = this.initialEditForm.book;
-      this.editForm.date_reserved = moment(
-        this.initialEditForm.date_reserved
-      ).format("YYYY-MM-DDTHH:mm");
+      const { user, book, text, created_date } = this.initialEditForm;
+      this.editForm.user = user;
+      this.editForm.book = book;
+      this.editForm.text = text;
+      this.editForm.created_date =
+        moment(created_date).format("YYYY-MM-DDTHH:mm");
     },
   },
 
   created() {
-    this.getReservedBooks();
+    this.getReviews();
     this.getBooks();
     this.getUsers();
   },
@@ -188,7 +198,7 @@ export default {
   mounted() {
     this.data.user = this.users[0];
     this.data.book = this.books[0];
-    this.data.date_reserved = moment(new Date()).format("YYYY-MM-DDTHH:mm");
+    this.data.created_date = moment(new Date()).format("YYYY-MM-DDTHH:mm");
   },
 };
 </script>

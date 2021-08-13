@@ -15,8 +15,10 @@
         type="text"
         placeholder="Enter username"
         required
+        :disabled="typeForm === 'update'"
       />
       <input
+        v-if="typeForm === 'create'"
         :value="password"
         @input="$emit('update:last_name', $event.target.value)"
         class="form-control input"

@@ -1,27 +1,35 @@
 <template>
   <div>
-    <admin-table titleTable="Authors" :headers="headers" :data="authors">
-      <template v-slot:modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
+    <Toast />
+    <admin-table
+      title="Authors"
+      :data="authors"
+      @openModal="openModal"
+      @openEditModal="editModal"
+      @deleteItem="onDeleteData"
+    >
+      <template #content>
+        <Column
+          field="first_name"
+          header="First name"
+          :sortable="true"
+          style="min-width: 10rem"
+        ></Column>
 
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
-
-        <Button
-          label="Create new record"
-          class="p-button-outlined"
-          @click="openModal"
-        />
-
+        <Column
+          field="last_name"
+          header="Last name"
+          :sortable="true"
+          style="min-width: 10rem"
+        ></Column>
+      </template>
+      <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-author-form
               typeForm="create"
               v-model:first_name="data.first_name"
@@ -42,7 +50,7 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-author-form
               typeForm="update"
               v-model:first_name="editForm.first_name"
@@ -58,18 +66,6 @@
           </template>
         </modal-form>
       </template>
-      <template v-slot:data>
-        <tr v-for="author in authors" :key="author._id">
-          <td>{{ author.first_name }}</td>
-          <td>{{ author.last_name }}</td>
-          <td>
-            <admin-buttons
-              @showEditForm="editModal(author)"
-              @delete="onDeleteData(author)"
-            />
-          </td>
-        </tr>
-      </template>
     </admin-table>
   </div>
 </template>
@@ -79,7 +75,6 @@ import AdminTable from "@/components/Admin/AdminTable.vue";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
-import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -92,7 +87,6 @@ export default {
     AdminTable,
     ModalForm,
     AdminAuthorForm,
-    AdminButtons,
   },
 
   data() {
@@ -114,16 +108,14 @@ export default {
   },
 
   methods: {
-    onDeleteData(data) {
-      this.removeData(`/books/deleteauthor/${data._id}`, this.getAuthors);
-      this.message = "Record has deleted";
-      this.openMessage();
-    },
-
-    editModal(item) {
-      this.editForm = item;
-      this.initialEditForm = { ...item };
-      this.openEditModal();
+    onDeleteData(value) {
+      this.removeData(`/books/deleteauthor/${value._id}`, this.getAuthors);
+      this.$toast.add({
+        severity: "success",
+        summary: "Successful",
+        detail: `${value.first_name} ${value.last_name} Deleted`,
+        life: 3000,
+      });
     },
 
     resetForm() {

@@ -10,7 +10,7 @@
         ><router-link class="header__link" to="/">Home</router-link></my-button
       >
       <my-button v-if="isAdmin"
-        ><router-link class="header__link" to="/admin"
+        ><router-link class="header__link" to="/admin/adminbooks"
           >Admin</router-link
         ></my-button
       >

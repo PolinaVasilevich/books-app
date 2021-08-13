@@ -8,7 +8,6 @@
             icon="pi pi-plus"
             class="p-button-success p-mr-2"
             @click="openNew"
-            :disabled="disabledCreateButton"
           />
           <Button
             label="Delete"
@@ -41,7 +40,7 @@
         ref="dt"
         :value="data"
         v-model:selection="selectedItems"
-        dataKey="_id"
+        dataKey="id"
         :paginator="true"
         :rows="10"
         :filters="filters"
@@ -77,7 +76,7 @@
             <Button
               icon="pi pi-pencil"
               class="p-button-rounded p-button-success p-mr-2"
-              @click="editItem(slotProps.data)"
+              @click="editProduct(slotProps.data)"
             />
             <Button
               icon="pi pi-trash"
@@ -88,7 +87,7 @@
         </Column>
       </DataTable>
     </div>
-    <slot name="modal"></slot>
+
     <Dialog
       v-model:visible="deleteItemDialog"
       :style="{ width: '450px' }"
@@ -98,7 +97,7 @@
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
         <span v-if="item"
-          >Are you sure you want to delete entry with id <b>{{ item._id }}</b
+          >Are you sure you want to delete <b>{{ item.title }}</b
           >?</span
         >
       </div>
@@ -157,7 +156,6 @@ export default {
       items: null,
       deleteItemDialog: false,
       deleteItemsDialog: false,
-      submitted: false,
     };
   },
   props: {
@@ -168,10 +166,6 @@ export default {
     data: {
       type: Array,
       required: true,
-    },
-    disabledCreateButton: {
-      type: Boolean,
-      default: false,
     },
   },
 
@@ -186,29 +180,15 @@ export default {
     },
 
     deleteItem() {
-      this.$emit("deleteItem", this.item);
+      this.products = this.products.filter((val) => val.id !== this.product.id);
       this.deleteItemDialog = false;
       this.product = {};
-    },
-
-    openNew() {
-      this.item = {};
-      this.submitted = false;
-      this.$emit("openModal");
-    },
-
-    hideDialog() {
-      this.itemDialog = false;
-      this.submitted = false;
-    },
-
-    editItem(item) {
-      this.item = { ...item };
-      this.$emit("openEditModal", this.item);
-    },
-
-    exportCSV() {
-      this.$refs.dt.exportCSV();
+      //   this.$toast.add({
+      //     severity: "success",
+      //     summary: "Successful",
+      //     detail: "Product Deleted",
+      //     life: 3000,
+      //   });
     },
   },
 };

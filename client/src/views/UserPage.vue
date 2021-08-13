@@ -55,7 +55,8 @@ export default {
         this.getReservedBooks();
         this.userReservedBooks = [
           ...this.reservedBooks.filter(
-            (book) => book.user._id === this.user._id
+            (book) =>
+              book.user._id === this.user._id && book.status === "Reserved"
           ),
         ];
       } catch (error) {

@@ -5,6 +5,7 @@ const BookInstance = require("../models/bookinstance");
 const Review = require("../models/Review");
 
 const mongoose = require("mongoose");
+const { findById } = require("../models/bookinstance");
 
 class bookController {
   ///BGN CREATE///
@@ -82,6 +83,56 @@ class bookController {
     }
   }
 
+  async reserveBook(req, res) {
+    try {
+      const { user, book, date_reserved } = req.body;
+
+      if (!book.count) {
+        return res
+          .status(400)
+          .send({ message: "You can't book it. The book is out of stock. " });
+      }
+
+      const reservedBook = await BookInstance.findOne({
+        user: user._id,
+        book: book._id,
+      });
+
+      if (reservedBook && reservedBook.status === "Reserved") {
+        return res
+          .status(400)
+          .send({ message: "You have already reserved this book" });
+      }
+
+      const bookInstance = new BookInstance({
+        book: book._id,
+        user: user._id,
+        status: "Reserved",
+        date_reserved,
+      });
+
+      await Book.findOneAndUpdate(
+        { _id: book._id },
+        {
+          $set: {
+            count: book.count - 1,
+          },
+        },
+
+        { new: true, useFindAndModify: false }
+      );
+
+      await bookInstance.save();
+
+      return res.json({
+        message: `${bookInstance.book.title} has reserved successfully!`,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: `Cannot reserved book` });
+    }
+  }
+
   async createReview(req, res) {
     try {
       const { book, user, text, rating } = req.body;
@@ -95,39 +146,45 @@ class bookController {
 
       await review.save();
 
-      const data = await Review.aggregate([
-        {
-          $unwind: "$book",
-        },
-        {
-          $group: {
-            _id: "$book",
-            ratingAvg: { $avg: "$rating" },
-          },
-        },
-        {
-          $match: {
-            _id: new mongoose.Types.ObjectId(book._id),
-          },
-        },
-        {
-          $project: {
-            _id: 0,
+      // const data = await Review.aggregate([
+      //   {
+      //     $match: { rating: { $gte: 1 } },
+      //   },
+      //   {
+      //     $unwind: "$book",
+      //   },
+      //   {
+      //     $group: {
+      //       _id: "$book",
+      //       ratingAvg: { $avg: "$rating" },
+      //     },
+      //   },
+      //   {
+      //     $match: {
+      //       _id: new mongoose.Types.ObjectId(book._id),
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 0,
+      //       ratingAvg: { $round: ["$ratingAvg"] },
+      //     },
+      //   },
+      // ]);
 
-            ratingAvg: { $round: ["$ratingAvg"] },
-          },
-        },
-      ]);
+      // await Book.findByIdAndUpdate(
+      //   { _id: book._id },
+      //   {
+      //     $set: {
+      //       rating: data[0].ratingAvg,
+      //     },
+      //   },
+      //   { new: true, useFindAndModify: false }
+      // );
 
-      await Book.findByIdAndUpdate(
-        { _id: book._id },
-        {
-          $set: {
-            rating: data[0].ratingAvg,
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
+      return res.json({
+        message: `Review has created successfully!`,
+      });
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: "Create review error" });
@@ -177,10 +234,23 @@ class bookController {
 
   async getReviews(req, res) {
     try {
-      const Reviews = await Review.find()
+      const reviews = await Review.find()
         .populate("user")
         .populate({ path: "book", populate: ["author", "genre"] });
-      res.json(Reviews);
+      res.json(reviews);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getReviewsBook(req, res) {
+    const { id } = req.params;
+    try {
+      const reviews = await Review.find({ book: id })
+        .populate("user")
+        .populate({ path: "book", populate: ["author", "genre"] });
+
+      res.json(reviews);
     } catch (error) {
       console.log(error);
     }
@@ -237,22 +307,26 @@ class bookController {
   async updateReservedBook(req, res) {
     const { id } = req.params;
     try {
-      const { user, book } = req.body;
-
-      const reservedBook = await BookInstance.findOne({
-        user: user._id,
-        book: book._id,
-      });
-
-      if (reservedBook) {
-        return res
-          .status(400)
-          .send({ message: "You have already reserved this book" });
-      }
+      const { book, return_date } = req.body;
 
       await BookInstance.findOneAndUpdate(
         { _id: id },
-        { ...req.body, user: user._id, book: [book._id] },
+        {
+          $set: {
+            return_date,
+            status: "Available",
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+
+      await Book.findByIdAndUpdate(
+        { _id: book._id },
+        {
+          $set: {
+            count: book.count + 1,
+          },
+        },
         { new: true, useFindAndModify: false }
       );
 
@@ -264,6 +338,28 @@ class bookController {
       res
         .status(400)
         .json({ message: `Cannot update reserved book with id: ${id}` });
+    }
+  }
+
+  async updateReview(req, res) {
+    const { id } = req.params;
+    try {
+      const { user, book } = req.body;
+
+      await Review.findOneAndUpdate(
+        { _id: id },
+        { ...req.body, user: user._id, book: [book._id] },
+        { new: true, useFindAndModify: false }
+      );
+
+      res.json({
+        message: "Review book was updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json({ message: `Cannot update review book with id: ${id}` });
     }
   }
 
@@ -309,60 +405,39 @@ class bookController {
     }
   }
 
-  ///END DELETE///
-
-  async reserveBook(req, res) {
-    try {
-      const { user, book, date_reserved } = req.body;
-
-      if (book) {
-        const reservedBook = await BookInstance.findOne({
-          user: user._id,
-          book: book._id,
-        });
-
-        if (reservedBook) {
-          return res
-            .status(400)
-            .send({ message: "You can't book it. The book is out of stock. " });
-        }
-
-        if (!book.count) {
-          return res
-            .status(400)
-            .send({ message: "You have already reserved this book" });
-        }
-
-        const bookInstance = new BookInstance({
-          book: book._id,
-          user: user._id,
-          status: "Reserved",
-          date_reserved,
-        });
-
-        await Book.findOneAndUpdate(
-          { _id: book._id },
-          { ...book, count: book.count - 1 },
-          { new: true, useFindAndModify: false }
-        );
-
-        await bookInstance.save();
-
-        return res.json({
-          message: `${bookInstance.book.title} has reserved successfully!`,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({ message: `Cannot reserved book` });
-    }
-  }
-
   async deleteReservedBook(req, res) {
     const { id } = req.params;
     try {
       const { book } = req.body;
       const reservedBook = await BookInstance.findByIdAndDelete({ _id: id });
+
+      await Book.findOneAndUpdate(
+        { _id: book._id },
+        {
+          $set: {
+            count: book.count + 1,
+          },
+        },
+
+        { new: true, useFindAndModify: false }
+      );
+
+      return res.json({
+        message: `${reservedBook.book.title} - Reserved book were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res
+        .status(400)
+        .json({ message: `Cannot delete reserved book with id ${id}` });
+    }
+  }
+
+  async deleteReview(req, res) {
+    const { id } = req.params;
+    try {
+      const { book } = req.body;
+      const reservedBook = await Review.findByIdAndDelete({ _id: id });
 
       await Book.findOneAndUpdate(
         { _id: book._id },
@@ -381,5 +456,7 @@ class bookController {
     }
   }
 }
+
+///END DELETE///
 
 module.exports = new bookController();

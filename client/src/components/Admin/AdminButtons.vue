@@ -1,13 +1,13 @@
 <template>
   <div>
     <Button
-      label="Update"
-      class="p-button-warning p-button-sm"
+      icon="pi pi-pencil"
+      class="p-button-rounded p-button-success p-mr-2"
       @click="$emit('showEditForm')"
     />
     <Button
-      label="Delete"
-      class="p-button-danger p-button-sm"
+      icon="pi pi-trash"
+      class="p-button-rounded p-button-warning"
       @click="$emit('delete')"
     />
   </div>

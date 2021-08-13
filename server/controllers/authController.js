@@ -18,7 +18,8 @@ class authController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ message: "Registration error", errors });
       }
-      const { username, password, isAdmin } = req.body;
+      const { username, password, isAdmin, created_date, last_logon } =
+        req.body;
       const candidate = await User.findOne({ username });
       if (candidate) {
         return res
@@ -31,6 +32,8 @@ class authController {
         username,
         password: hashPassword,
         isAdmin,
+        created_date: Date.now(),
+        last_logon,
       });
       await user.save();
       return res.json({ message: "User registered successfully" });
@@ -50,10 +53,23 @@ class authController {
           .json({ message: `User ${username} is not found` });
       }
       const validPassword = bcrypt.compareSync(password, user.password);
+
       if (!validPassword) {
         return res.status(400).json({ message: `Wrong password entered` });
       }
+
       const token = generateAccessToken(user._id);
+
+      await User.findOneAndUpdate(
+        { username },
+        {
+          $set: {
+            last_logon: Date.now(),
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
+
       return res.json({ token, user });
     } catch (e) {
       console.log(e);

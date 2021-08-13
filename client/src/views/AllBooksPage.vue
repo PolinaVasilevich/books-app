@@ -3,14 +3,15 @@
     <Message v-if="displayMessage" severity="success">{{ message }}</Message>
 
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
+
     <Button
       v-if="user.username === 'admin'"
-      label="Add book"
-      class="p-button-outlined"
+      label="New book"
+      icon="pi pi-plus"
+      class="p-button-success p-mr-2"
       @click="openModal"
       style="margin-bottom: 30px; align-self: flex-end"
     />
-
     <modal-form
       modal-title="Create new record"
       :displayModal="displayModal"
@@ -24,6 +25,8 @@
           v-model:genre="data.genre"
           v-model:img="data.img"
           v-model:count="data.count"
+          v-model:authors="authors"
+          v-model:genres="genres"
           :dataForm="data"
           path="books/book"
           @resetForm="data = initialForm"
@@ -217,6 +220,8 @@ export default {
 
   created() {
     this.getBooks();
+    this.getUsers();
+    this.getAuthors();
   },
 
   methods: {

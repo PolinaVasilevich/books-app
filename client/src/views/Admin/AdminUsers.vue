@@ -1,27 +1,58 @@
 <template>
   <div>
-    <admin-table titleTable="Users" :headers="headers" :data="users">
-      <template v-slot:modal>
-        <Message v-if="displayMessage" severity="success">{{
-          message
-        }}</Message>
+    <Toast />
+    <admin-table
+      titleTable="Users"
+      :data="users"
+      @openModal="openModal"
+      @openEditModal="editModal"
+      @deleteItem="onDeleteData"
+    >
+      <template #content>
+        <Column
+          field="username"
+          header="Username"
+          :sortable="true"
+          style="min-width: 10rem"
+        ></Column>
 
-        <Message v-if="displayErrorMessage" severity="error">{{
-          message
-        }}</Message>
-
-        <Button
-          label="Create new record"
-          class="p-button-outlined"
-          @click="openModal"
-        />
-
+        <Column field="isAdmin" header="Admin" style="min-width: 5rem"></Column>
+        <Column
+          field="created_date"
+          header="Registration Date"
+          style="min-width: 10rem"
+          :sortable="true"
+        >
+          <template #body="slotProps">
+            {{
+              slotProps.data.created_date
+                ? moment(slotProps.data.created_date).format("YYYY-MM-DD HH:mm")
+                : ""
+            }}
+          </template>
+        </Column>
+        <Column
+          field="last_logon"
+          header="Last logon"
+          style="min-width: 10rem"
+          :sortable="true"
+        >
+          <template #body="slotProps">
+            {{
+              slotProps.data.last_logon
+                ? moment(slotProps.data.last_logon).format("YYYY-MM-DD HH:mm")
+                : "User has not logged in yet"
+            }}
+          </template></Column
+        >
+      </template>
+      <template #modal>
         <modal-form
           modal-title="Create new record"
           :displayModal="displayModal"
           @close="closeModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-user-form
               typeForm="create"
               v-model:username="data.username"
@@ -43,7 +74,7 @@
           :displayModal="displayEditModal"
           @close="closeEditModal"
         >
-          <template v-slot:modal-content>
+          <template #modal-content>
             <admin-user-form
               typeForm="update"
               v-model:username="editForm.username"
@@ -60,29 +91,16 @@
           </template>
         </modal-form>
       </template>
-      <template v-slot:data>
-        <tr v-for="item in users" :key="item._id">
-          <td>{{ item.username }}</td>
-          <td>{{ item.password }}</td>
-          <td>{{ item.isAdmin }}</td>
-          <td>
-            <admin-buttons
-              @showEditForm="editModal(item)"
-              @delete="onDeleteData(item)"
-            />
-          </td>
-        </tr>
-      </template>
     </admin-table>
   </div>
 </template>
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
+import moment from "moment";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminUserForm from "@/components/Admin/Forms/AdminUserForm";
-import AdminButtons from "@/components/Admin/AdminButtons";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -93,17 +111,15 @@ export default {
   mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
-
     ModalForm,
     AdminUserForm,
-    AdminButtons,
   },
 
   data() {
     return {
+      moment,
       initialEditForm: {
         username: "",
-        password: "",
         isAdmin: false,
       },
 
@@ -116,7 +132,6 @@ export default {
       editForm: {
         _id: "",
         username: "",
-        password: "",
         isAdmin: false,
       },
 
@@ -125,16 +140,14 @@ export default {
   },
 
   methods: {
-    onDeleteData(data) {
-      this.removeData(`/auth/deleteuser/${data._id}`, this.getUsers);
-      this.message = "Record has deleted";
-      this.openMessage();
-    },
-
-    editModal(item) {
-      this.editForm = item;
-      this.initialEditForm = { ...item };
-      this.openEditModal();
+    onDeleteData(value) {
+      this.removeData(`/auth/deleteuser/${value._id}`, this.getUsers);
+      this.$toast.add({
+        severity: "success",
+        summary: "Successful",
+        detail: `${value.username} Deleted`,
+        life: 3000,
+      });
     },
 
     resetForm() {

@@ -33,30 +33,20 @@
           {{ item.title }}
         </option>
       </select>
-
-      <div class="p-field" v-if="typeForm === 'create'">
-        <label for="date_reserved">Reserved date</label>
-        <input
-          id="date_reserved"
-          v-if="typeForm === 'create'"
-          type="datetime-local"
-          class="form-control"
-          :value="moment(date_reserved).format('YYYY-MM-DDTHH:mm')"
-          @input="$emit('update:date_reserved', $event.target.value)"
+      <div class="p-field">
+        <label for="text">Text</label>
+        <Textarea
+          id="text"
+          :value="text"
+          @input="$emit('update:text', $event.target.value)"
+          :autoResize="true"
+          rows="5"
+          required
         />
-      </div>
-
-      <div class="p-field" v-else>
-        <label for="return_date">Return date</label>
-        <input
-          id="return_date"
-          type="datetime-local"
-          :value="moment(return_date).format('YYYY-MM-DDTHH:mm')"
-          @input="$emit('update:return_date', $event.target.value)"
-          required="true"
-          class="form-control"
-          autofocus
-        />
+        <div>
+          <span>Rating: </span
+          ><Rating v-model="ratingBook" :readonly="true" :cancel="false" />
+        </div>
       </div>
     </template>
   </admin-form>
@@ -77,6 +67,16 @@ export default {
     return { moment };
   },
   props: {
+    users: {
+      type: Array,
+      required: true,
+    },
+
+    books: {
+      type: Array,
+      required: true,
+    },
+
     user: {
       type: Object,
       required: true,
@@ -87,20 +87,14 @@ export default {
       required: true,
     },
 
-    date_reserved: {
-      type: Date,
+    text: {
+      type: String,
+      required: true,
     },
 
-    return_date: {
-      type: Date,
-    },
-
-    users: {
-      type: Array,
-    },
-
-    books: {
-      type: Array,
+    rating: {
+      type: Number,
+      required: true,
     },
   },
 
@@ -120,6 +114,15 @@ export default {
       },
       set(value) {
         this.$emit("update:book", value);
+      },
+    },
+
+    ratingBook: {
+      get() {
+        return this.rating;
+      },
+      set(value) {
+        this.$emit("update:rating", value);
       },
     },
   },
