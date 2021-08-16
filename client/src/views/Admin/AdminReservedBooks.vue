@@ -3,8 +3,8 @@
     <Toast />
     <admin-table
       titleTable="Reserved books"
-      :headers="headers"
-      :data="reservedBooks"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -107,6 +107,7 @@ import toggle from "@/mixins/toggle.js";
 
 export default {
   name: "admin-users",
+  props: ["reservedBookTitle"],
   mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
@@ -179,10 +180,29 @@ export default {
     },
   },
 
+  computed: {
+    searchedItems() {
+      return this.reservedBooks.filter((item) => {
+        return (
+          item.book.title
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.user.username
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase())
+        );
+      });
+    },
+  },
+
   created() {
     this.getReservedBooks();
     this.getBooks();
     this.getUsers();
+
+    if (this.reservedBookTitle) {
+      this.searchQuery = this.reservedBookTitle;
+    }
   },
 
   mounted() {

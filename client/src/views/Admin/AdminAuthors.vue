@@ -3,7 +3,8 @@
     <Toast />
     <admin-table
       title="Authors"
-      :data="authors"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -102,8 +103,6 @@ export default {
         first_name: "",
         last_name: "",
       },
-
-      headers: ["First name", "Last name"],
     };
   },
 
@@ -129,7 +128,20 @@ export default {
     },
   },
 
-  created() {
+  computed: {
+    searchedItems() {
+      return this.authors.filter((item) => {
+        return (
+          item.first_name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.last_name?.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      });
+    },
+  },
+
+  mounted() {
     this.getAuthors();
   },
 };

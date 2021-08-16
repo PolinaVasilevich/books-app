@@ -4,6 +4,7 @@ export default {
   data() {
     return {
       message: "",
+      searchQuery: "",
     };
   },
   methods: {
@@ -41,14 +42,6 @@ export default {
       this.editForm = value;
       this.initialEditForm = { ...value };
       this.openEditModal();
-    },
-
-    async createRecord(path, payload) {
-      try {
-        await API.post(path, payload);
-      } catch (error) {
-        console.log(error);
-      }
     },
   },
 };

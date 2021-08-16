@@ -3,7 +3,8 @@
     <Toast />
     <admin-table
       titleTable="Users"
-      :data="users"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -160,6 +161,16 @@ export default {
       this.editForm.username = this.initialEditForm.username;
       this.editForm.password = this.initialEditForm.password;
       this.editForm.isAdmin = this.initialEditForm.isAdmin;
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.users.filter((item) => {
+        return item.username
+          ?.toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
+      });
     },
   },
 

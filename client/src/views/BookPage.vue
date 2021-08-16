@@ -63,7 +63,12 @@
       </div>
     </div>
     <div>
-      <review-list :items="reviewsBook" />
+      <review-list
+        :items="reviewsBook"
+        :currentUser="user"
+        :displayEditForm="displayEditForm"
+        @editForm="showEditForm"
+      />
 
       <Button
         label="New review"
@@ -203,6 +208,10 @@ export default {
       this.saveReview();
       this.getReviewsBook();
       this.closeModal();
+    },
+
+    showEditForm(value) {
+      this.displayEditForm = value;
     },
   },
 

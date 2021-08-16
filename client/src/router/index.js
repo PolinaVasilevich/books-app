@@ -82,6 +82,7 @@ const routes = [
           requiresAuth: true,
           isAdmin: true,
         },
+        props: true,
       },
 
       {

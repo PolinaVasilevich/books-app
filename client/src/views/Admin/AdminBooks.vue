@@ -3,7 +3,8 @@
     <Toast />
     <admin-table
       title="Books"
-      :data="books"
+      :data="searchedItems"
+      v-model:searchQuery="searchQuery"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -34,16 +35,21 @@
 
         <Column header="Image">
           <template #body="slotProps">
-            <img
-              style="width: 150px"
-              :src="
-                slotProps.data.img
-                  ? slotProps.data.img
-                  : 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'
-              "
-              :alt="slotProps.data.title"
-              class="product-image"
-            />
+            <router-link
+              :to="{
+                name: 'adminBookPage',
+                params: { id: slotProps.data._id },
+              }"
+              ><img
+                style="width: 150px"
+                :src="
+                  slotProps.data.img
+                    ? slotProps.data.img
+                    : 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'
+                "
+                :alt="slotProps.data.title"
+                class="product-image"
+            /></router-link>
           </template>
         </Column>
 
@@ -190,7 +196,7 @@ export default {
       this.$toast.add({
         severity: "success",
         summary: "Successful",
-        detail: `${value.username} Deleted`,
+        detail: `${value.title} Deleted`,
         life: 3000,
       });
     },
@@ -213,6 +219,25 @@ export default {
       this.editForm.genre = this.initialEditForm.genre;
       this.editForm.img = this.initialEditForm.img;
       this.editForm.count = this.initialEditForm.count;
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.books.filter((item) => {
+        return (
+          item.title?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          item.author.first_name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.author.last_name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.genre.name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase())
+        );
+      });
     },
   },
 

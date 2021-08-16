@@ -94,49 +94,28 @@
             </p>
             <Rating
               v-model="editForm.rating"
-              :cancel="displayEditForm"
-              :readonly="!displayEditForm"
+              :cancel="false"
+              :readonly="true"
             />
+            <router-link
+              :to="{
+                name: 'reservedBooks',
+                params: { reservedBookTitle: book.title },
+              }"
+              class="header__link"
+              >Users who reserved this book</router-link
+            >
           </template>
         </admin-form>
       </div>
     </div>
+
     <div>
-      <review-list :items="reviewsBook" />
-
-      <Button
-        label="New review"
-        icon="pi pi-plus"
-        class="p-button-success p-mr-2"
-        @click="openModal"
-        v-if="isLoggedIn && !isAdmin"
+      <review-list
+        :items="reviewsBook"
+        :currentUser="user"
+        @hideReview="hideReview"
       />
-
-      <Dialog
-        v-model:visible="displayModal"
-        :style="{ width: '450px' }"
-        header="Add review"
-        :modal="true"
-        class="p-fluid"
-      >
-        <div class="p-field">
-          <label for="name">Text</label>
-          <Textarea v-model="data.text" :autoResize="true" rows="5" required />
-          <div>
-            <span>Your rating: </span
-            ><Rating v-model="data.rating" :readonly="false" />
-          </div>
-        </div>
-
-        <template #footer>
-          <Button
-            label="Save"
-            icon="pi pi-check"
-            class="p-button-text"
-            @click.prevent="onSave"
-          />
-        </template>
-      </Dialog>
     </div>
   </div>
 </template>

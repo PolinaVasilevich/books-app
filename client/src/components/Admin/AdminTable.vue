@@ -44,7 +44,6 @@
         dataKey="_id"
         :paginator="true"
         :rows="10"
-        :filters="filters"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
@@ -60,7 +59,7 @@
             <h5 class="p-mb-2 p-m-md-0 p-as-md-center">{{ title }}</h5>
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." />
+              <InputText placeholder="Search..." v-model.trim="search" />
             </span>
           </div>
         </template>
@@ -172,6 +171,21 @@ export default {
     disabledCreateButton: {
       type: Boolean,
       default: false,
+    },
+
+    searchQuery: {
+      type: String,
+    },
+  },
+
+  computed: {
+    search: {
+      get() {
+        return this.searchQuery;
+      },
+      set(value) {
+        this.$emit("update:searchQuery", value);
+      },
     },
   },
 

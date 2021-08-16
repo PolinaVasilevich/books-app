@@ -4,11 +4,12 @@
       <template #header>
         <div class="content">
           <Rating
-            :modelValue="review?.rating"
-            :cancel="false"
-            :readonly="true"
+            v-model="ratingBook"
+            :cancel="displayEditForm"
+            :readonly="!displayEditForm"
             class="margin"
           />
+          {{ displayEditForm }}
           <span class="margin">{{ review?.user?.username }}</span>
           <span class="margin">{{
             moment(review?.created_date).format("YYYY-MM-DD HH:mm")
@@ -18,9 +19,26 @@
       <template #icons>
         <button
           class="p-panel-header-icon p-link p-mr-2"
-          @click="$emit('editForm')"
+          @click="$emit('editForm', review._id)"
+          v-if="review?.user?.username === currentUser?.username"
         >
           <span class="pi pi-pencil"></span>
+        </button>
+
+        <button
+          v-if="isAdmin && !hideReview"
+          class="p-panel-header-icon p-link p-mr-2"
+          @click="$emit('hideReview')"
+        >
+          <span class="pi pi-eye-slash"></span>
+        </button>
+
+        <button
+          v-if="isAdmin && hideReview"
+          class="p-panel-header-icon p-link p-mr-2"
+          @click="$emit('showReview')"
+        >
+          <span class="pi pi-eye"></span>
         </button>
       </template>
       <p>
@@ -46,6 +64,7 @@ export default {
   data() {
     return {
       moment,
+      hideReview: false,
     };
   },
   props: {
@@ -54,9 +73,25 @@ export default {
       required: true,
     },
     text: { type: Text, required: true },
+    rating: { type: Number },
+    currentUser: { type: Object, required: true },
     isAdmin: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    displayEditForm: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  computed: {
+    ratingBook: {
+      get() {
+        return this.rating;
+      },
+      set(value) {
+        this.$emit("update:rating", value);
+      },
     },
   },
 };

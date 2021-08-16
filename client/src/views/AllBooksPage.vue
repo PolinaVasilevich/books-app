@@ -1,9 +1,6 @@
 <template>
   <div class="card">
-    <Message v-if="displayMessage" severity="success">{{ message }}</Message>
-
-    <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
-
+    <Toast />
     <Button
       v-if="user.username === 'admin'"
       label="New book"
@@ -29,56 +26,34 @@
           v-model:genres="genres"
           :dataForm="data"
           path="books/book"
-          @resetForm="data = initialForm"
+          :callback="this.getBooks"
+          @resetForm="resetForm"
           @closeModal="closeModal"
           @showMessage="showMessage"
           @showErrorMessage="showErrorMessage"
         />
       </template>
     </modal-form>
-    <DataView
-      :value="filteredData"
-      :layout="layout"
-      :paginator="true"
-      :rows="6"
-    >
+    <DataView :value="sortedBooks" :layout="layout" :paginator="true" :rows="6">
       <template #header>
         <div class="p-grid p-nogutter">
           <div class="p-col-6" style="text-align: left">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." v-model="filter" />
+              <InputText placeholder="Search..." v-model="searchQuery" />
             </span>
           </div>
           <div class="p-col-6" style="text-align: right">
             <DataViewLayoutOptions v-model="layout" />
-            <div>
-              <Dropdown
-                v-model="sortKey"
-                :options="sortOptions"
-                optionLabel="label"
-                placeholder="Sort By..."
-                @change="onSortChangeOption($event)"
-                style="text-align: left; margin: 10px 10px 0 0"
-              />
 
-              <span
-                class="p-sortable-column-icon pi pi-fw pi-sort-alt"
-                style="cursor: pointer"
-                @click="isSort = !isSort"
-                v-if="!isSort"
-              ></span>
-
-              <span
-                class="p-sortable-column-icon pi pi-fw p-highlight"
-                :class="[
-                  isSortUp ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down',
-                ]"
-                style="cursor: pointer"
-                @click="onSortChange"
-                v-else
-              ></span>
-            </div>
+            <Dropdown
+              v-model="selectedSort"
+              :options="sortOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Sort By..."
+              style="text-align: left; margin-top: 10px"
+            />
           </div>
         </div>
       </template>
@@ -189,12 +164,14 @@ import toggle from "@/mixins/toggle.js";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminBooksForm from "@/components/Admin/Forms/AdminBooksForm";
+
 export default {
   components: {
     ModalForm,
     AdminBooksForm,
   },
   mixins: [adminFormMixin, toggle, dataStore],
+
   data() {
     return {
       layout: "grid",
@@ -207,21 +184,15 @@ export default {
       },
       isSort: false,
       isSortUp: false,
-      sortKey: { label: "Sort By Title", value: "title" },
+      sortKey: null,
       sortOrder: null,
-      sortField: null,
+      selectedSort: null,
       sortOptions: [
         { label: "Sort By Title", value: "title" },
         { label: "Sort By Rating", value: "rating" },
       ],
-      filter: "",
+      searchQuery: "",
     };
-  },
-
-  created() {
-    this.getBooks();
-    this.getUsers();
-    this.getAuthors();
   },
 
   methods: {
@@ -231,44 +202,43 @@ export default {
       else return "INSTOCK";
     },
 
-    onSortChangeOption(event) {
-      this.sortField = event.value.value;
-    },
-
-    onSortChange() {
-      this.isSortUp = !this.isSortUp;
-      if (typeof this.books[0][this.sortField] === "string") {
-        this.books.sort((firstField, secondField) => {
-          if (this.isSortUp) {
-            return firstField[this.sortField].toLowerCase() >
-              secondField[this.sortField].toLowerCase()
-              ? 1
-              : -1;
-          } else {
-            return firstField[this.sortField].toLowerCase() <
-              secondField[this.sortField].toLowerCase()
-              ? 1
-              : -1;
-          }
-        });
-      } else if (typeof this.books[0][this.sortField] === "number") {
-        this.books.sort((firstField, secondField) => {
-          if (this.isSortUp) {
-            return firstField[this.sortField] - secondField[this.sortField];
-          } else {
-            return secondField[this.sortField] - firstField[this.sortField];
-          }
-        });
-      }
+    mounted() {
+      this.getBooks();
+      this.getUsers();
+      this.getAuthors();
     },
   },
 
   computed: {
-    filteredData() {
-      return this.books.filter((elem) => {
-        if (this.filter === "") return true;
-        else return elem.title.toLowerCase().includes(this.filter);
+    searchedBooks() {
+      return this.books.filter((book) => {
+        return (
+          book.title?.toLowerCase().includes(this.searchQuery) ||
+          book.author.first_name?.toLowerCase().includes(this.searchQuery) ||
+          book.author.last_name?.toLowerCase().includes(this.searchQuery)
+        );
       });
+    },
+
+    sortedBooks() {
+      const typeItems = typeof this.searchedBooks[0][this.selectedSort];
+      switch (typeItems) {
+        case "string": {
+          return [...this.searchedBooks].sort((firstItem, secondItem) =>
+            firstItem[this.selectedSort]?.localeCompare(
+              secondItem[this.selectedSort]
+            )
+          );
+        }
+        case "number": {
+          return [...this.searchedBooks].sort(
+            (firstItem, secondItem) =>
+              firstItem[this.selectedSort] - secondItem[this.selectedSort]
+          );
+        }
+        default:
+          return [...this.searchedBooks];
+      }
     },
   },
 };

@@ -3,7 +3,8 @@
     <Toast />
     <admin-table
       title="Reviews"
-      :data="reviews"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -142,8 +143,6 @@ export default {
         text: "",
         rating: 0,
       },
-
-      headers: ["User", "Book", "Text", "Rating", "Created date"],
     };
   },
 
@@ -186,6 +185,21 @@ export default {
       this.editForm.text = text;
       this.editForm.created_date =
         moment(created_date).format("YYYY-MM-DDTHH:mm");
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.reviews.filter((item) => {
+        return (
+          item.book.title
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.user.username
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase())
+        );
+      });
     },
   },
 

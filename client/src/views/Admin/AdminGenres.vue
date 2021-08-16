@@ -3,7 +3,8 @@
     <Toast />
     <admin-table
       title="Genres"
-      :data="genres"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -114,6 +115,16 @@ export default {
 
     resetEditForm() {
       this.editForm.name = this.initialEditForm.name;
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.genres.filter((item) => {
+        return item.name
+          ?.toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
+      });
     },
   },
 
