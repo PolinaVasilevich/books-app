@@ -4,12 +4,12 @@
       <template #header>
         <div class="content">
           <Rating
-            v-model="ratingBook"
-            :cancel="displayEditForm"
+            v-model="editDataForm.rating"
+            :cancel="false"
             :readonly="!displayEditForm"
             class="margin"
           />
-          {{ displayEditForm }}
+
           <span class="margin">{{ review?.user?.username }}</span>
           <span class="margin">{{
             moment(review?.created_date).format("YYYY-MM-DD HH:mm")
@@ -19,7 +19,7 @@
       <template #icons>
         <button
           class="p-panel-header-icon p-link p-mr-2"
-          @click="$emit('editForm', review._id)"
+          @click="displayEditForm = !displayEditForm"
           v-if="review?.user?.username === currentUser?.username"
         >
           <span class="pi pi-pencil"></span>
@@ -41,17 +41,25 @@
           <span class="pi pi-eye"></span>
         </button>
       </template>
-      <p>
-        <Textarea
-          :value="text"
-          @input="$emit('update:text', $event.target.value)"
-          :autoResize="true"
-          placeholder="Enter your review"
-          :class="{ 'disabled-form': !displayEditForm }"
-          required
-          style="width: 100%"
-        />
-      </p>
+      <admin-form
+        :typeForm="typeForm"
+        :dataForm="editDataForm"
+        :path="`/books/updatereview/${editDataForm._id}`"
+        :callback="callback"
+        :showButtons="displayEditForm"
+        @closeEditForm="displayEditForm = false"
+      >
+        <template #input>
+          <Textarea
+            v-model="editDataForm.text"
+            :autoResize="true"
+            placeholder="Enter your review"
+            :class="{ 'disabled-form': !displayEditForm }"
+            required
+            style="width: 100%"
+          />
+        </template>
+      </admin-form>
     </Panel>
   </div>
 </template>
@@ -59,12 +67,23 @@
 <script>
 import moment from "moment";
 
+import AdminForm from "@/components/Admin/Forms/AdminForm";
+import adminFormData from "@/mixins/adminFormData.js";
+
 export default {
   name: "review-item",
+  components: { AdminForm },
+  mixins: [adminFormData],
   data() {
     return {
       moment,
-      hideReview: false,
+      displayEditForm: false,
+      editDataForm: {
+        _id: "",
+        text: "",
+        rating: null,
+      },
+      initialEditDataForm: {},
     };
   },
   props: {
@@ -72,27 +91,23 @@ export default {
       type: Object,
       required: true,
     },
-    text: { type: Text, required: true },
-    rating: { type: Number },
+
     currentUser: { type: Object, required: true },
     isAdmin: {
       type: Boolean,
       default: false,
     },
-    displayEditForm: {
-      type: Boolean,
-      default: false,
+  },
+
+  methods: {
+    fillInEditForm() {
+      this.editDataForm = { ...this.review };
+      this.initialEditDataForm = { ...this.review };
     },
   },
-  computed: {
-    ratingBook: {
-      get() {
-        return this.rating;
-      },
-      set(value) {
-        this.$emit("update:rating", value);
-      },
-    },
+
+  created() {
+    this.fillInEditForm();
   },
 };
 </script>

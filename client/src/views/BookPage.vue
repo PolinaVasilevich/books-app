@@ -1,108 +1,119 @@
 <template>
-  <div class="alerts">
-    <Message v-if="!currentBook.count && !isReserved" severity="warn"
-      >Sorry, but now books out of stock</Message
-    >
-
-    <Message v-if="isReserved && !displayMessage" severity="info"
-      >You have already reserved this book</Message
-    >
-
-    <Message :message="message" v-if="displayMessage" severity="success"
-      >You have reserved this book</Message
-    >
-  </div>
-
-  <div class="book-page">
-    <div class="book-page__content">
-      <div>
-        <img
-          :src="currentBook.img"
-          :alt="currentBook.title"
-          class="book-page__content__img"
-        />
-      </div>
-      <div class="book-page__content__info">
-        <h2 class="book-page__content__info__title">{{ currentBook.title }}</h2>
-        <p class="book-page__content__info__text">
-          <strong>Author: </strong>
-          {{
-            currentBook.author?.first_name + " " + currentBook.author?.last_name
-          }}
-        </p>
-        <p class="book-page__content__info__text">
-          <strong>Genre: </strong>
-          {{ currentBook.genre?.name }}
-        </p>
-        <p class="book-page__content__info__text">
-          <strong>Count: </strong>
-          {{ currentBook?.count }}
-        </p>
-
-        <Rating
-          :modelValue="currentBook.rating"
-          :cancel="false"
-          :readonly="true"
-          v-if="currentBook.rating"
-        />
-
-        <button
-          v-if="isLoggedIn && user.username !== 'admin'"
-          class="book-page__content__btn btn"
-          @click="onReserveBook(currentBook, user)"
-          :disabled="!currentBook.count"
-          :class="{ disabled: !currentBook.count || isReserved }"
-        >
-          <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
-            Reserve book</i
-          >
-          <i v-else class="bi bi-book-fill book-page__content__icon">
-            Reserved</i
-          >
-        </button>
-      </div>
-    </div>
-    <div>
-      <review-list
-        :items="reviewsBook"
-        :currentUser="user"
-        :displayEditForm="displayEditForm"
-        @editForm="showEditForm"
-      />
-
-      <Button
-        label="New review"
-        icon="pi pi-plus"
-        class="p-button-success p-mr-2"
-        @click="openModal"
-        v-if="isLoggedIn && user.username !== 'admin'"
-      />
-
-      <Dialog
-        v-model:visible="displayModal"
-        :style="{ width: '450px' }"
-        header="Add review"
-        :modal="true"
-        class="p-fluid"
+  <div>
+    <div class="alerts">
+      <Message v-if="!currentBook.count && !isReserved" severity="warn"
+        >Sorry, but now books out of stock</Message
       >
-        <div class="p-field">
-          <label for="name">Text</label>
-          <Textarea v-model="data.text" :autoResize="true" rows="5" required />
-          <div>
-            <span>Your rating: </span
-            ><Rating v-model="data.rating" :readonly="false" />
-          </div>
-        </div>
 
-        <template #footer>
-          <Button
-            label="Save"
-            icon="pi pi-check"
-            class="p-button-text"
-            @click.prevent="onSave"
+      <Message v-if="isReserved && !displayMessage" severity="info"
+        >You have already reserved this book</Message
+      >
+
+      <Message :message="message" v-if="displayMessage" severity="success"
+        >You have reserved this book</Message
+      >
+    </div>
+
+    <div class="book-page">
+      <div class="book-page__content">
+        <div>
+          <img
+            :src="currentBook.img"
+            :alt="currentBook.title"
+            class="book-page__content__img"
           />
-        </template>
-      </Dialog>
+        </div>
+        <div class="book-page__content__info">
+          <h2 class="book-page__content__info__title">
+            {{ currentBook.title }}
+          </h2>
+          <p class="book-page__content__info__text">
+            <strong>Author: </strong>
+            {{
+              currentBook.author?.first_name +
+              " " +
+              currentBook.author?.last_name
+            }}
+          </p>
+          <p class="book-page__content__info__text">
+            <strong>Genre: </strong>
+            {{ currentBook.genre?.name }}
+          </p>
+          <p class="book-page__content__info__text">
+            <strong>Count: </strong>
+            {{ currentBook?.count }}
+          </p>
+
+          <Rating
+            :modelValue="currentBook.rating"
+            :cancel="false"
+            :readonly="true"
+            v-if="currentBook.rating"
+          />
+
+          <button
+            v-if="isLoggedIn && user.username !== 'admin'"
+            class="book-page__content__btn btn"
+            @click="onReserveBook(currentBook, user)"
+            :disabled="!currentBook.count"
+            :class="{ disabled: !currentBook.count || isReserved }"
+          >
+            <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
+              Reserve book</i
+            >
+            <i v-else class="bi bi-book-fill book-page__content__icon">
+              Reserved</i
+            >
+          </button>
+        </div>
+      </div>
+      <div>
+        <review-list
+          :items="reviewsBook"
+          :currentUser="user"
+          typeForm="update"
+          :callback="this.getReviewsBook"
+        />
+
+        <Button
+          label="New review"
+          icon="pi pi-plus"
+          class="p-button-success p-mr-2"
+          @click="openModal"
+          v-if="isLoggedIn && user.username !== 'admin'"
+        />
+
+        <Dialog
+          v-model:visible="displayModal"
+          :style="{ width: '450px' }"
+          header="Add review"
+          :modal="true"
+          class="p-fluid"
+        >
+          <div class="p-field">
+            <label for="name">Text</label>
+            <Textarea
+              v-model="data.text"
+              :autoResize="true"
+              rows="5"
+              required
+            />
+            <div>
+              <span>Your rating: </span
+              ><Rating v-model="data.rating" :readonly="false" />
+            </div>
+          </div>
+
+          <template #footer>
+            <Button
+              label="Save"
+              icon="pi pi-check"
+              class="p-button-text"
+              @click.prevent="onSave"
+            />
+          </template>
+        </Dialog>
+      </div>
     </div>
   </div>
 </template>
@@ -122,6 +133,7 @@ export default {
   data() {
     return {
       isReserved: false,
+      editDataFormID: null,
       reviewsBook: [],
       currentBook: {},
       data: {
@@ -155,7 +167,10 @@ export default {
     checkReserveBook(bookID, userID) {
       try {
         const books = JSON.parse(JSON.stringify(this.reservedBooks)).filter(
-          (book) => book.book._id === bookID && book.user._id === userID
+          (book) =>
+            book.book._id === bookID &&
+            book.user._id === userID &&
+            book.status === "Reserved"
         );
         this.isReserved = !!books.length;
       } catch (error) {
@@ -208,10 +223,6 @@ export default {
       this.saveReview();
       this.getReviewsBook();
       this.closeModal();
-    },
-
-    showEditForm(value) {
-      this.displayEditForm = value;
     },
   },
 

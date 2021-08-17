@@ -7,11 +7,9 @@
         v-for="item in items"
         :key="item._id"
         :review="item"
-        :text="item.text"
-        v-model:rating="item.rating"
         :currentUser="currentUser"
-        :displayEditForm="displayEditForm"
-        @editForm="showEditForm($event, item._id)"
+        :typeForm="typeForm"
+        :callback="callback"
       />
     </div>
 
@@ -21,9 +19,11 @@
 
 <script>
 import ReviewItem from "@/components/Reviews/ReviewItem";
+import adminFormData from "@/mixins/adminFormData.js";
 
 export default {
   name: "review-list",
+  mixins: [adminFormData],
   components: {
     ReviewItem,
   },
@@ -35,12 +35,6 @@ export default {
       required: true,
     },
     currentUser: { type: Object, required: true },
-  },
-
-  methods: {
-    showEditForm(value, reviewID) {
-      this.displayEditForm = value === reviewID;
-    },
   },
 };
 </script>
