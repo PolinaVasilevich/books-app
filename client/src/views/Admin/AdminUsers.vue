@@ -121,6 +121,7 @@ export default {
       moment,
       initialEditForm: {
         username: "",
+        password: "",
         isAdmin: false,
       },
 
@@ -133,6 +134,7 @@ export default {
       editForm: {
         _id: "",
         username: "",
+        password: "",
         isAdmin: false,
       },
 

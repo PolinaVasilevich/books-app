@@ -20,7 +20,7 @@
       <input
         v-if="typeForm === 'create'"
         :value="password"
-        @input="$emit('update:last_name', $event.target.value)"
+        @input="$emit('update:password', $event.target.value)"
         class="form-control input"
         type="text"
         placeholder="Enter password"

@@ -175,6 +175,33 @@ export default {
       }
     },
 
+    async hideReview(value) {
+      try {
+        await API.put(`/books/updatereview/${value._id}`, {
+          ...value,
+          isHidden: !value.isHidden,
+        });
+
+        this.getReviewsBook();
+
+        this.$toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Item Updated",
+          life: 3000,
+        });
+      } catch (error) {
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: `${error.response.data.message}`,
+          life: 3000,
+        });
+
+        console.log(error);
+      }
+    },
+
     resetForm() {
       this.getBooks();
       this.getBook();

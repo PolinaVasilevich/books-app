@@ -10,6 +10,7 @@
         :currentUser="currentUser"
         :typeForm="typeForm"
         :callback="callback"
+        @hideReview="hideReview"
       />
     </div>
 
@@ -35,6 +36,12 @@ export default {
       required: true,
     },
     currentUser: { type: Object, required: true },
+  },
+
+  methods: {
+    hideReview(value) {
+      this.$emit("hideReview", value);
+    },
   },
 };
 </script>

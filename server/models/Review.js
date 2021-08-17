@@ -7,6 +7,7 @@ const ReviewSchema = new Schema({
   created_date: { type: Date, default: Date.now },
   edit_date: { type: Date },
   rating: { type: Number },
+  isHidden: { type: Boolean, default: false },
 });
 
 module.exports = model("Review", ReviewSchema);

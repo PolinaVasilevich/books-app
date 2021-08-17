@@ -11,32 +11,39 @@
           />
 
           <span class="margin">{{ review?.user?.username }}</span>
-          <span class="margin">{{
-            moment(review?.created_date).format("YYYY-MM-DD HH:mm")
-          }}</span>
+          <span class="margin"
+            >Created:
+            {{ moment(review?.created_date).format("YYYY-MM-DD HH:mm") }}</span
+          >
+          <span class="margin" v-if="review.edit_date"
+            >Edited:
+            {{ moment(review?.edit_date).format("YYYY-MM-DD HH:mm") }}</span
+          >
         </div>
       </template>
       <template #icons>
         <button
           class="p-panel-header-icon p-link p-mr-2"
           @click="displayEditForm = !displayEditForm"
-          v-if="review?.user?.username === currentUser?.username"
+          v-if="
+            review?.user?.username === currentUser?.username && !review.isHidden
+          "
         >
           <span class="pi pi-pencil"></span>
         </button>
 
         <button
-          v-if="isAdmin && !hideReview"
+          v-if="currentUser.isAdmin && !review.isHidden"
           class="p-panel-header-icon p-link p-mr-2"
-          @click="$emit('hideReview')"
+          @click="$emit('hideReview', review)"
         >
           <span class="pi pi-eye-slash"></span>
         </button>
 
         <button
-          v-if="isAdmin && hideReview"
+          v-if="currentUser.isAdmin && review.isHidden"
           class="p-panel-header-icon p-link p-mr-2"
-          @click="$emit('showReview')"
+          @click="$emit('hideReview', review)"
         >
           <span class="pi pi-eye"></span>
         </button>
@@ -51,6 +58,7 @@
       >
         <template #input>
           <Textarea
+            v-if="!review.isHidden"
             v-model="editDataForm.text"
             :autoResize="true"
             placeholder="Enter your review"
@@ -58,6 +66,7 @@
             required
             style="width: 100%"
           />
+          <p v-else>This comment is hidden by the administrator</p>
         </template>
       </admin-form>
     </Panel>
@@ -91,12 +100,7 @@ export default {
       type: Object,
       required: true,
     },
-
     currentUser: { type: Object, required: true },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
   },
 
   methods: {

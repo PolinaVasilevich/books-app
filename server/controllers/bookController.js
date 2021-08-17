@@ -348,7 +348,12 @@ class bookController {
 
       await Review.findOneAndUpdate(
         { _id: id },
-        { ...req.body, user: user._id, book: [book._id] },
+        {
+          ...req.body,
+          user: user._id,
+          book: [book._id],
+          edit_date: Date.now(),
+        },
         { new: true, useFindAndModify: false }
       );
 
