@@ -210,8 +210,6 @@ export default {
         });
 
         this.getReviewsBook();
-
-        // this.showMessage(`Your review has added`);
       } catch (error) {
         console.log(error);
         this.showErrorMessage(error.response.data.message);
