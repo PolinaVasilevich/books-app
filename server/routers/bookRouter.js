@@ -5,8 +5,13 @@ const bookController = require("../controllers/bookController");
 router.post("/book", bookController.createBook);
 router.post("/author", bookController.createAuthor);
 router.post("/genre", bookController.createGenre);
-router.post("/reservebook", bookController.reserveBook);
+
 router.post("/review", bookController.createReview);
+
+router.post("/reservebook", bookController.reserveBook);
+router.post("/giveoutbook", bookController.giveOutBook);
+router.post("/returnbook", bookController.returnBook);
+router.post("/cancelbook", bookController.cancelBook);
 
 router.get("/allbooks", bookController.getBooks);
 router.get("/allauthors", bookController.getAuthors);
@@ -15,6 +20,8 @@ router.get("/allreservedbooks", bookController.getReservedBooks);
 router.get("/allreviews", bookController.getReviews);
 
 router.get("/reviewsbook/:id", bookController.getReviewsBook);
+
+router.get("/bookactions/:id", bookController.getBookActions);
 
 router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);

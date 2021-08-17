@@ -2,17 +2,21 @@
   padding: 10px 100px;
   &__content {
     margin-top: 20px;
+    padding: 30px;
     display: flex;
     &__img {
       margin-right: 20px;
-      width: 200px;
-      height: 250px;
+      width: 300px !important;
+      height: 350px;
       object-fit: cover;
     }
     &__title {
       margin: 0;
     }
     &__info {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
   }
 }

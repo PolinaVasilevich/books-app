@@ -2,7 +2,7 @@
   <div>
     <Toast />
     <admin-table
-      titleTable="Reserved books"
+      titleTable="Book actions"
       v-model:searchQuery="searchQuery"
       :data="searchedItems"
       @openModal="openModal"
@@ -26,7 +26,11 @@
 
         <Column field="action_date" header="Action date" :sortable="true">
           <template #body="slotProps">
-            {{ moment(slotProps.data.action_date).format("YYYY-MM-DD HH:mm") }}
+            {{
+              slotProps.data.action_date
+                ? moment(slotProps.data.action_date).format("YYYY-MM-DD HH:mm")
+                : ""
+            }}
           </template>
         </Column>
       </template>
