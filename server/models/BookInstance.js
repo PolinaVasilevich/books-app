@@ -6,10 +6,12 @@ const BookInstanceSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ["Available", "Reserved"],
+
+    enum: ["Available", "Reserved", "OnHand", "Canceled"],
   },
   date_reserved: { type: Date, default: Date.now },
   return_date: { type: Date },
+  last_action_date: { type: Date },
 });
 
 BookInstanceSchema.virtual("url").get(function () {
