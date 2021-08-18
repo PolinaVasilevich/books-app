@@ -2,15 +2,21 @@
   <div>
     <Toast />
     <admin-table
-      titleTable="Book actions"
+      titleTable="Books history"
       v-model:searchQuery="searchQuery"
-      :data="searchedItems"
+      :data="bookActions"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
     >
       <template #content>
-        <Column field="username" header="User" :sortable="true">
+        <Column field="userAction" header="User action" :sortable="true">
+          <template #body="slotProps">
+            {{ slotProps.data?.userAction?.username }}
+          </template>
+        </Column>
+
+        <Column field="user" header="User" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.user.username }}
           </template>
@@ -18,11 +24,11 @@
 
         <Column field="book" header="Book" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.data.book.title }}
+            {{ slotProps.data.book?.title }}
           </template>
         </Column>
 
-        <Column field="action" header="Action" :sortable="true"> </Column>
+        <Column field="status" header="Status" :sortable="true"> </Column>
 
         <Column field="action_date" header="Action date" :sortable="true">
           <template #body="slotProps">
@@ -176,27 +182,12 @@ export default {
 
   computed: {
     searchedItems() {
-      return this.reservedBooks.filter((item) => {
-        return (
-          item.book.title
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item.user.username
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase())
-        );
-      });
+      return this.bookActions;
     },
   },
 
   created() {
-    this.getReservedBooks();
-    this.getBooks();
-    this.getUsers();
-
-    if (this.reservedBookTitle) {
-      this.searchQuery = this.reservedBookTitle;
-    }
+    this.getAllBookActions();
   },
 
   mounted() {

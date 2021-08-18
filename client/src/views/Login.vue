@@ -17,7 +17,7 @@ export default {
           if (user.username === "admin") {
             this.$router.push(`/admin/adminbooks`);
           } else {
-            this.$router.push(`/user/${user.username}`);
+            this.$router.push(`/`);
           }
         })
         .catch((err) => console.log(err));

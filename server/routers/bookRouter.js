@@ -17,11 +17,10 @@ router.get("/allbooks", bookController.getBooks);
 router.get("/allauthors", bookController.getAuthors);
 router.get("/allgenres", bookController.getGenres);
 router.get("/allreservedbooks", bookController.getReservedBooks);
+router.get("/reservedbooks/:id", bookController.getUserReservedBooks);
 router.get("/allreviews", bookController.getReviews);
-
+router.get("/allbookactions", bookController.getAllBookActions);
 router.get("/reviewsbook/:id", bookController.getReviewsBook);
-
-router.get("/bookactions/:id", bookController.getBookActions);
 
 router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);

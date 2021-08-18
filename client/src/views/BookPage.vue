@@ -1,20 +1,23 @@
 <template>
-  <div>
+  <div class="book-page">
+    <Toast />
     <div class="alerts">
-      <Message v-if="!currentBook.count && !isReserved" severity="warn"
+      <Message
+        v-if="!currentBook.count && !isReserved"
+        severity="warn"
+        class="message"
         >Sorry, but now books out of stock</Message
       >
 
-      <Message v-if="isReserved && !displayMessage" severity="info"
+      <Message
+        v-if="isReserved && !displayMessage"
+        severity="info"
+        class="message"
         >You have already reserved this book</Message
-      >
-
-      <Message :message="message" v-if="displayMessage" severity="success"
-        >You have reserved this book</Message
       >
     </div>
 
-    <div class="book-page">
+    <div>
       <div class="book-page__content">
         <div>
           <img
@@ -49,22 +52,17 @@
             :cancel="false"
             :readonly="true"
             v-if="currentBook.rating"
+            class="book-page__content__info__text"
           />
 
-          <button
-            v-if="isLoggedIn && user.username !== 'admin'"
-            class="book-page__content__btn btn"
+          <Button
+            v-if="isLoggedIn && !user.isAdmin"
+            :label="!isReserved ? 'Reserve book' : 'Reserved'"
+            class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
-            :disabled="!currentBook.count"
-            :class="{ disabled: !currentBook.count || isReserved }"
-          >
-            <i v-if="!isReserved" class="bi bi-book book-page__content__icon">
-              Reserve book</i
-            >
-            <i v-else class="bi bi-book-fill book-page__content__icon">
-              Reserved</i
-            >
-          </button>
+            :disabled="!currentBook.count || !currentBook.count || isReserved"
+            icon="pi pi-book"
+          />
         </div>
       </div>
       <div>
@@ -143,6 +141,14 @@ export default {
   },
 
   methods: {
+    async getReservedBooks(userID) {
+      try {
+        await this.$store.dispatch("books/getUserReservedBooks", userID);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     getCurrentBook() {
       const book = this.books.find(
         (book) => book._id === this.$route.params.id
@@ -166,12 +172,16 @@ export default {
 
     checkReserveBook(bookID, userID) {
       try {
-        const books = JSON.parse(JSON.stringify(this.reservedBooks)).filter(
-          (book) =>
-            book.book._id === bookID &&
-            book.user._id === userID &&
-            book.status === "Reserved"
-        );
+        const books = this.userReservedBooks.filter((item) => {
+          return (
+            item.book._id === bookID &&
+            item.user._id === userID &&
+            item.details.filter(
+              (detail) => detail.isActual && detail.status === " Reserved"
+            )
+          );
+        });
+
         this.isReserved = !!books.length;
       } catch (error) {
         console.log(error);
@@ -186,14 +196,23 @@ export default {
             book: this.currentBook,
           });
 
-          this.showMessage(`Book "${this.currentBook.title}" has reserved`);
           this.isReserved = true;
-
+          this.$toast.add({
+            severity: "success",
+            summary: "Successful",
+            detail: "Book reserved",
+            life: 3000,
+          });
           this.getBooks();
           this.getReservedBooks();
         } catch (error) {
           console.log(error);
-          this.showErrorMessage(error.response.data.message);
+          this.$toast.add({
+            severity: "error",
+            summary: "Error Message",
+            detail: `${error.response.data.message}`,
+            life: 3000,
+          });
 
           this.getBooks();
           this.getReservedBooks();
@@ -210,9 +229,21 @@ export default {
         });
 
         this.getReviewsBook();
+        this.isReserved = true;
+        this.$toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Your review added",
+          life: 3000,
+        });
       } catch (error) {
         console.log(error);
-        this.showErrorMessage(error.response.data.message);
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: `${error.response.data.message}`,
+          life: 3000,
+        });
         this.getReviewsBook();
       }
     },
@@ -228,7 +259,7 @@ export default {
     this.getBooks();
     this.getCurrentBook();
     this.getReviewsBook();
-    this.getReservedBooks();
+    this.getReservedBooks(this.user._id);
     this.checkReserveBook(this.currentBook._id, this.user._id);
   },
 };

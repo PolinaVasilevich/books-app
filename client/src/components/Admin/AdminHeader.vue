@@ -38,7 +38,9 @@
         </my-button>
 
         <my-button type="button">
-          <router-link class="router-link" to="/bookactions"></router-link>
+          <router-link class="router-link" to="/admin/allbookactions">
+            All book actions</router-link
+          >
         </my-button>
       </div>
     </div>

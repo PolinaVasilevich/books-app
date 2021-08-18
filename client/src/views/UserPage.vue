@@ -6,7 +6,7 @@
       <div>
         <Card
           v-for="item in userReservedBooks"
-          :key="item._id"
+          :key="item.book_id"
           class="user-page__content"
         >
           <template #header>
@@ -23,20 +23,12 @@
             {{ item.book.author.first_name + " " + item.book.author.last_name }}
           </template>
           <template #content>
-            <book-actions-user-page
-              :data="getData(item.book._id)"
-              :icons="icons"
-            />
+            <book-actions-user-page :data="item.details" :icons="icons" />
           </template>
 
           <template #footer>
             <Button
-              v-if="
-                getData(item.book._id)
-                  ? [...getData(item.book._id)].reverse()[0].action !==
-                    'Canceled'
-                  : ''
-              "
+              v-if="item.details"
               icon="pi pi-times"
               label="Cancel reserve"
               class="p-button-warning"
@@ -45,6 +37,9 @@
           </template>
         </Card>
       </div>
+      <p v-if="!userReservedBooks?.length">
+        You have not reserved any books yet.
+      </p>
     </div>
   </div>
 </template>
@@ -60,26 +55,25 @@ export default {
   data() {
     return {
       moment: moment,
-      userReservedBooks: null,
       bookActions: [],
       icons: [
         {
-          action: "Reserved",
+          status: "Reserved",
           icon: "pi pi-book",
           color: "#0288D1",
         },
         {
-          action: "Received",
+          status: "Received",
           icon: "pi pi-user",
           color: "#689F38",
         },
         {
-          action: "Returned",
+          status: "Returned",
           icon: "pi pi-shopping-cart",
           color: "#FF9800",
         },
         {
-          action: "Canceled",
+          status: "Canceled",
           icon: "pi pi-times",
           color: "#D32F2F",
         },
@@ -88,32 +82,12 @@ export default {
   },
 
   methods: {
-    async getUserReservedBook() {
+    async getReservedBooks(userID) {
       try {
-        this.getReservedBooks();
-        this.userReservedBooks = [
-          ...this.reservedBooks.filter(
-            (book) =>
-              book.user._id === this.user._id && book.action === "Reserved"
-          ),
-        ];
+        await this.$store.dispatch("books/getUserReservedBooks", userID);
       } catch (error) {
         console.log(error);
       }
-    },
-
-    async getBookActions() {
-      try {
-        const bookActions = await API.get(`books/bookactions/${this.user._id}`);
-        this.bookActions = bookActions.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
-    getData(bookID) {
-      const data = this.bookActions.find((item) => item._id === bookID);
-      return data?.details;
     },
 
     async cancelReserve(book) {
@@ -122,7 +96,7 @@ export default {
           user: this.user,
           book,
         });
-        this.getBookActions();
+        this.getReservedBooks(this.$route.params.id);
 
         this.$toast.add({
           severity: "success",
@@ -143,8 +117,7 @@ export default {
   },
 
   created() {
-    this.getBookActions();
-    this.getUserReservedBook();
+    this.getReservedBooks(this.$route.params.id);
   },
 };
 </script>

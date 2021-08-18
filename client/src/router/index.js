@@ -87,7 +87,7 @@ const routes = [
       },
 
       {
-        path: "bookactions/:id",
+        path: "allbookactions",
         name: "bookactions",
         component: AdminBookActions,
         meta: {

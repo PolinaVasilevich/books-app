@@ -4,7 +4,7 @@
       style="padding: 0; margin: 0"
       @click="displayActions = !displayActions"
     >
-      <h5>Books actions</h5></my-button
+      <h5 class="button-title">Books actions</h5></my-button
     >
     <Timeline
       :value="data"
@@ -26,19 +26,19 @@
           class="custom-marker p-shadow-2"
           :style="{
             backgroundColor: icons.find(
-              (item) => item.action === slotProps.item.action
+              (item) => item.status === slotProps.item.status
             )?.color,
           }"
         >
           <i
             :class="
-              icons.find((item) => item.action === slotProps.item.action)?.icon
+              icons.find((item) => item.status === slotProps.item.status)?.icon
             "
           ></i>
         </span>
       </template>
       <template #content="slotProps">
-        {{ slotProps.item.action }}
+        {{ slotProps.item.status }}
       </template>
     </Timeline>
   </div>
@@ -51,7 +51,7 @@ export default {
   data() {
     return {
       moment,
-      displayActions: false,
+      displayActions: true,
     };
   },
   props: {
@@ -77,6 +77,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.button-title:hover {
+  color: #f66e5e;
+}
+
 .custom-marker {
   display: flex;
   width: 2rem;

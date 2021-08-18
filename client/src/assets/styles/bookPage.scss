@@ -1,9 +1,11 @@
+$margin-bottom-field: 10px;
+
 .book-page {
   padding: 70px 100px;
   &__content {
     display: flex;
     align-items: flex-start;
-
+    margin-top: 50px;
     &__img {
       margin-right: 30px;
       display: block;
@@ -34,6 +36,7 @@
       &__text {
         font-size: 1.2em;
         margin: 0;
+        margin-bottom: $margin-bottom-field;
       }
     }
   }
@@ -41,5 +44,9 @@
 
 .alerts {
   margin: 0;
-  margin-top: 75px;
+  padding: 0;
+
+  .message {
+    margin: 0 -100px 50px -100px;
+  }
 }

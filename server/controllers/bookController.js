@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
 const Book = require("../models/Book");
+const User = require("../models/User/User");
+
 const Author = require("../models/Author");
 const Genre = require("../models/Genre");
 const BookInstance = require("../models/bookinstance");
@@ -84,55 +86,6 @@ class bookController {
     }
   }
 
-  // async reserveBook(req, res) {
-  //   try {
-  //     const { user, book, date_reserved } = req.body;
-
-  //     if (!book.count) {
-  //       return res
-  //         .status(400)
-  //         .send({ message: "You can't book it. The book is out of stock. " });
-  //     }
-
-  //     const reservedBook = await BookInstance.findOne({
-  //       user: user._id,
-  //       book: book._id,
-  //     });
-
-  //     if (reservedBook && reservedBook.status === "Reserved") {
-  //       return res
-  //         .status(400)
-  //         .send({ message: "You have already reserved this book" });
-  //     }
-
-  //     const bookInstance = new BookInstance({
-  //       book: book._id,
-  //       user: user._id,
-  //       status: "Reserved",
-  //       date_reserved,
-  //     });
-
-  //     await Book.findOneAndUpdate(
-  //       { _id: book._id },
-  //       {
-  //         $set: {
-  //           count: book.count - 1,
-  //         },
-  //       },
-
-  //       { new: true, useFindAndModify: false }
-  //     );
-
-  //     await bookInstance.save();
-
-  //     return res.json({
-  //       message: `${bookInstance.book.title} has reserved successfully!`,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.status(400).json({ message: `Cannot reserved book` });
-  //   }
-  // }
   //////////////////////////////////////////////////////////////////////////////
   async reserveBook(req, res) {
     try {
@@ -154,9 +107,11 @@ class bookController {
       // }
 
       const bookAction = new BookActions({
-        book: book._id,
-        user: user._id,
-        action: "Reserved",
+        book,
+        user,
+        userAction: user,
+
+        status: "Reserved",
         action_date: Date.now(),
       });
 
@@ -181,15 +136,16 @@ class bookController {
       res.status(400).json({ message: `Cannot reserved book` });
     }
   }
-  /////////////////////////////////////////////////////////////////////////////////////
+
   async giveOutBook(req, res) {
     try {
-      const { user, book } = req.body;
+      const { user, book, userAction } = req.body;
 
       const bookAction = new BookActions({
-        book: book._id,
-        user: user._id,
-        action: "Received",
+        book,
+        user,
+        userAction,
+        status: "Received",
         action_date: Date.now(),
       });
 
@@ -206,14 +162,23 @@ class bookController {
 
   async returnBook(req, res) {
     try {
-      const { user, book } = req.body;
+      const { user, book, userAction } = req.body;
 
       const bookAction = new BookActions({
-        book: book._id,
-        user: user._id,
-        action: "Returned",
+        book: book,
+        user: user,
+        userAction: userAction,
+        status: "Returned",
         action_date: Date.now(),
       });
+
+      await BookActions.updateMany(
+        { book: book._id, user: user._id, isActual: true },
+        {
+          $set: { isActual: false },
+          $currentDate: { lastModified: true },
+        }
+      );
 
       await Book.findOneAndUpdate(
         { _id: book._id },
@@ -239,17 +204,27 @@ class bookController {
 
   async cancelBook(req, res) {
     try {
-      const { user, book } = req.body;
+      const { user, book, userAction } = req.body;
 
       const bookAction = new BookActions({
-        book: book._id,
-        user: user._id,
-        action: "Canceled",
+        book,
+        user,
+        userAction: userAction,
+        status: "Canceled",
+        isActual: false,
         action_date: Date.now(),
       });
 
+      await BookActions.updateMany(
+        { book: book._id, user: user._id, isActual: true },
+        {
+          $set: { isActual: false },
+          $currentDate: { lastModified: true },
+        }
+      );
+
       await Book.findOneAndUpdate(
-        { _id: book._id },
+        { _id: new mongoose.Types.ObjectId(book._id) },
         {
           $set: {
             count: book.count + 1,
@@ -369,6 +344,130 @@ class bookController {
     }
   }
 
+  async getUserReservedBooks(req, res) {
+    const { id } = req.params;
+    try {
+      const reservedBooks = await BookActions.aggregate([
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId(id),
+            isActual: true,
+          },
+        },
+        {
+          $group: {
+            _id: "$book",
+            book: { $first: "$book" },
+            user: { $first: "$user" },
+            details: {
+              $push: {
+                status: "$status",
+                action_date: "$action_date",
+                isActual: "$isActual",
+              },
+            },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        {
+          $lookup: {
+            from: "genres",
+            localField: "book.genre",
+            foreignField: "_id",
+            as: "book.genre",
+          },
+        },
+
+        { $unwind: "$book.genre" },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+      ]);
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getAllBookActions(req, res) {
+    try {
+      const bookActions = await BookActions.find()
+        .populate("user")
+        .populate("userAction")
+        .populate({ path: "book", populate: ["author", "genre"] });
+
+      res.json(bookActions);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // async getUserBookActions(req, res) {
+  //   const { id } = req.params;
+  //   try {
+  //     const bookActions = await BookActions.aggregate([
+  //       {
+  //         $match: { user: new mongoose.Types.ObjectId(id) },
+  //       },
+  //       {
+  //         $group: {
+  //           _id: "$book",
+  //           details: {
+  //             $push: { action: "$action", action_date: "$action_date" },
+  //           },
+  //         },
+  //       },
+  //     ]);
+  //     res.json(bookActions);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+
+  // async getLastBookAction(req, res) {
+  //   const { id } = req.params;
+  //   try {
+  //     const lastBookAction = await BookActions.find({ book: id })
+  //       .populate("user")
+  //       .populate({ path: "book", populate: ["author", "genre"] })
+  //       .limit(1)
+  //       .sort($natural - 1);
+  //     res.json(lastBookAction);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+
   async getReviews(req, res) {
     try {
       const reviews = await Review.find()
@@ -388,32 +487,6 @@ class bookController {
         .populate({ path: "book", populate: ["author", "genre"] });
 
       res.json(reviews);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getBookActions(req, res) {
-    const { id } = req.params;
-    try {
-      // const bookActions = await BookActions.find({ user: id })
-      //   .populate("user")
-      //   .populate({ path: "book", populate: ["author", "genre"] });
-
-      const bookActions = await BookActions.aggregate([
-        {
-          $match: { user: new mongoose.Types.ObjectId(id) },
-        },
-        {
-          $group: {
-            _id: "$book",
-            details: {
-              $push: { action: "$action", action_date: "$action_date" },
-            },
-          },
-        },
-      ]);
-      res.json(bookActions);
     } catch (error) {
       console.log(error);
     }

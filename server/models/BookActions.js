@@ -3,7 +3,8 @@ const { Schema, model } = require("mongoose");
 const BookActionsSchema = new Schema({
   book: { type: Schema.ObjectId, ref: "Book", required: true },
   user: { type: Schema.ObjectId, ref: "User", require: true },
-  action: {
+  userAction: { type: Schema.ObjectId, ref: "User", require: true },
+  status: {
     type: String,
     required: true,
     default: "",
@@ -13,6 +14,7 @@ const BookActionsSchema = new Schema({
     type: Date,
     required: true,
   },
+  isActual: { type: Boolean, default: true },
 });
 
 module.exports = model("BookActions", BookActionsSchema);

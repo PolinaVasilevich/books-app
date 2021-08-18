@@ -7,6 +7,10 @@ export const booksModule = {
     genres: JSON.parse(localStorage.getItem("genres")) || [],
     reservedBooks: JSON.parse(localStorage.getItem("reservedBooks")) || [],
     reviews: JSON.parse(localStorage.getItem("reviews")) || [],
+    userReservedBooks:
+      JSON.parse(localStorage.getItem("userReservedBooks")) || [],
+
+    bookActions: JSON.parse(localStorage.getItem("bookActions")) || [],
   }),
 
   getters: {
@@ -26,8 +30,16 @@ export const booksModule = {
       return state.reservedBooks;
     },
 
+    userReservedBooks(state) {
+      return state.userReservedBooks;
+    },
+
     reviews(state) {
       return state.reviews;
+    },
+
+    bookActions(state) {
+      return state.bookActions;
     },
   },
 
@@ -48,8 +60,16 @@ export const booksModule = {
       state.reservedBooks = reservedBooks;
     },
 
+    setUserReservedBooks(state, userReservedBooks) {
+      state.userReservedBooks = userReservedBooks;
+    },
+
     setReviews(state, reviews) {
       state.reviews = reviews;
+    },
+
+    setBookActions(state, bookActions) {
+      state.bookActions = bookActions;
     },
   },
 
@@ -96,11 +116,37 @@ export const booksModule = {
         console.log(error);
       }
     },
+
+    async getUserReservedBooks({ commit }, userID) {
+      try {
+        const userReservedBooks = await API.get(
+          `books/reservedbooks/${userID}`
+        );
+        localStorage.setItem(
+          "userReservedBooks",
+          JSON.stringify(userReservedBooks.data)
+        );
+        commit("setUserReservedBooks", userReservedBooks.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     async getReviews({ commit }) {
       try {
         const reviews = await API.get("books/allreviews");
         localStorage.setItem("reviews", JSON.stringify(reviews.data));
         commit("setReviews", reviews.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getAllBookActions({ commit }) {
+      try {
+        const bookActions = await API.get("books/allbookactions");
+        localStorage.setItem("bookActions", JSON.stringify(bookActions.data));
+        commit("setBookActions", bookActions.data);
       } catch (error) {
         console.log(error);
       }

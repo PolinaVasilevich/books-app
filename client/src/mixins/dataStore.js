@@ -7,9 +7,11 @@ export default {
       getAuthors: "books/getAuthors",
       getGenres: "books/getGenres",
       getReservedBooks: "books/getReservedBooks",
+      getUserReservedBooks: "books/getUserReservedBooks",
       getReviews: "books/getReviews",
       getUsers: "login/getUsers",
       getReviewsBook: "books/getReviewsBook",
+      getAllBookActions: "books/getAllBookActions",
     }),
   },
 
@@ -24,8 +26,9 @@ export default {
       authors: "books/authors",
       genres: "books/genres",
       reservedBooks: "books/reservedBooks",
+      userReservedBooks: "books/userReservedBooks",
       reviews: "books/reviews",
-
+      bookActions: "books/bookActions",
       reviewsBook: "books/reviewsBook",
     }),
   },
