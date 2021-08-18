@@ -333,16 +333,16 @@ class bookController {
     }
   }
 
-  async getReservedBooks(req, res) {
-    try {
-      const reservedBooks = await BookActions.find({ action: "Reserved" })
-        .populate("user")
-        .populate({ path: "book", populate: ["author", "genre"] });
-      res.json(reservedBooks);
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  // async getReservedBooks(req, res) {
+  //   try {
+  //     const reservedBooks = await BookActions.find({ action: "Reserved" })
+  //       .populate("user")
+  //       .populate({ path: "book", populate: ["author", "genre"] });
+  //     res.json(reservedBooks);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
   async getUserReservedBooks(req, res) {
     const { id } = req.params;
@@ -454,19 +454,32 @@ class bookController {
   //   }
   // }
 
-  // async getLastBookAction(req, res) {
-  //   const { id } = req.params;
-  //   try {
-  //     const lastBookAction = await BookActions.find({ book: id })
-  //       .populate("user")
-  //       .populate({ path: "book", populate: ["author", "genre"] })
-  //       .limit(1)
-  //       .sort($natural - 1);
-  //     res.json(lastBookAction);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
+  async getReservedBooks(req, res) {
+    try {
+      const { bookID, userID } = req.body;
+      const reservedBooks = await BookActions.aggregate([
+        {
+          $match: {
+            isActual: true,
+          },
+        },
+        {
+          $group: {
+            _id: "$user",
+            books: {
+              $push: {
+                book: "$book",
+              },
+            },
+          },
+        },
+      ]);
+      console.log(reservedBooks);
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   async getReviews(req, res) {
     try {

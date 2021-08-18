@@ -28,6 +28,10 @@
       >
 
       <my-button v-else @click="logout" class="header__link">Logout</my-button>
+
+      <!-- <span>
+        <i class="pi pi-user"></i>
+      </span> -->
     </my-header>
 
     <router-view class="app__content" />

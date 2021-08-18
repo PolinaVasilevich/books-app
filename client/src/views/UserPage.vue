@@ -94,6 +94,7 @@ export default {
       try {
         await API.post(`books/cancelbook`, {
           user: this.user,
+          userAction: this.user,
           book,
         });
         this.getReservedBooks(this.$route.params.id);

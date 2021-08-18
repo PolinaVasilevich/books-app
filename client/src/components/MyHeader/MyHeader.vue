@@ -8,7 +8,7 @@
       </h1>
     </div>
     <nav class="header__nav">
-      <div style="display: flex">
+      <div style="display: flex; align-items: center">
         <slot></slot>
       </div>
     </nav>
