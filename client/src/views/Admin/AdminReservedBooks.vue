@@ -12,41 +12,46 @@
           label="Expand All"
           @click="expandAll"
           style="margin-right: 1em"
+          class="p-button-text"
         />
         <Button
           type="button"
           icon="pi pi-minus"
           label="Collapse All"
           @click="collapseAll"
+          class="p-button-text"
         />
       </div>
 
-      <TreeTable :value="reservedBooks" :expandedKeys="expandedKeys">
-        <Column field="node.user.username" header="User" :sortable="true"
-          >>
+      <TreeTable
+        :value="dataTable"
+        :expandedKeys="expandedKeys"
+        sortMode="single"
+      >
+        <Column
+          field="user.username"
+          header="User"
+          :sortable="true"
+          :expander="true"
+        >
           <template #body="slotProps">
-            {{ slotProps.node.user.username }}
+            {{ slotProps.node.data.user.username }}
           </template>
         </Column>
 
-        <Column field="node.data.book.title" header="Book" :sortable="true">
+        <Column field="book.title" header="Book" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.node.reserved_books }}
+            {{ slotProps.node.data.book.title }}
           </template>
         </Column>
 
-        <!--
-        <Column field="node.data.status" header="Status" :sortable="true">
+        <Column field="status" header="Status" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.node.data.status }}
           </template>
         </Column>
 
-        <Column
-          field="node.data.action_date"
-          header="Action date"
-          :sortable="true"
-        >
+        <Column field="action_date" header="Action date" :sortable="true">
           <template #body="slotProps">
             {{
               moment(slotProps.node.data.action_date).format("YYYY-MM-DD HH:mm")
@@ -57,7 +62,10 @@
         <Column :exportable="false">
           <template #body="slotProps">
             <Button
-              v-if="slotProps.node.data.status?.toLowerCase() === 'reserved'"
+              v-if="
+                slotProps.node.children &&
+                slotProps.node.data.status?.toLowerCase() === 'reserved'
+              "
               label="Give out book"
               icon="pi pi-user"
               class="p-button-rounded p-button-success p-mr-2"
@@ -71,7 +79,10 @@
             />
 
             <Button
-              v-if="slotProps.node.data.status?.toLowerCase() === 'received'"
+              v-if="
+                slotProps.node.children &&
+                slotProps.node.data.status?.toLowerCase() === 'received'
+              "
               label="Return book"
               icon="pi pi-book"
               class="p-button-rounded p-button-warning p-mr-2"
@@ -84,7 +95,7 @@
               "
             />
           </template>
-        </Column> -->
+        </Column>
       </TreeTable>
     </div>
 
@@ -136,6 +147,8 @@ export default {
   data() {
     return {
       moment,
+      dataTable: [],
+      expandedKeys: {},
       showDialog: false,
       textDialog: "",
       action: "",
@@ -222,6 +235,56 @@ export default {
 
       this.showDialog = false;
     },
+
+    getDataTable() {
+      const dataTable = [];
+      let item = {};
+      let children = {};
+      this.reservedBooks.forEach((elem1, index) => {
+        item.key = index;
+        item.user = elem1._id.user;
+        item.data = elem1.data[0];
+        item.data.user = elem1._id.user;
+        item.data.book = elem1._id.book;
+        item.children = [];
+
+        elem1.data.slice(1).forEach((elem2, index) => {
+          children.key = index;
+          children.data = elem2;
+          children.data.user = elem1._id.user;
+          children.data.book = elem1._id.book;
+          item.children.push(children);
+          children = {};
+        });
+
+        dataTable.push(item);
+        item = {};
+      });
+
+      this.dataTable = dataTable;
+    },
+
+    expandAll() {
+      for (let node of this.dataTable) {
+        this.expandNode(node);
+      }
+
+      this.expandedKeys = { ...this.expandedKeys };
+    },
+
+    collapseAll() {
+      this.expandedKeys = {};
+    },
+
+    expandNode(node) {
+      if (node.children && node.children.length) {
+        this.expandedKeys[node.key] = true;
+
+        for (let child of node.children) {
+          this.expandNode(child);
+        }
+      }
+    },
   },
 
   computed: {
@@ -244,7 +307,7 @@ export default {
 
   created() {
     this.getReservedBooks();
-
+    this.getDataTable();
     this.getBooks();
     this.getUsers();
 
@@ -254,3 +317,20 @@ export default {
   },
 };
 </script>
+
+<style scoped lang="scss">
+.sm-visible {
+  display: none;
+}
+
+@media screen and (max-width: 40em) {
+  ::v-deep(.sm-invisible) {
+    display: none;
+  }
+
+  ::v-deep(.sm-visible) {
+    display: inline;
+    margin-right: 0.5rem;
+  }
+}
+</style>

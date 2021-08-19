@@ -11,13 +11,13 @@
       :disabledCreateButton="true"
     >
       <template #content>
-        <Column field="username" header="User" :sortable="true">
+        <Column field="user.username" header="User" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.user.username }}
           </template>
         </Column>
 
-        <Column field="book" header="Book" :sortable="true">
+        <Column field="book.title" header="Book" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.book.title }}
           </template>
@@ -25,9 +25,19 @@
 
         <Column field="text" header="Review"> </Column>
 
-        <Column field="created_date" header="Created date">
+        <Column field="created_date" header="Created date" :sortable="true">
           <template #body="slotProps">
             {{ moment(slotProps.data.created_date).format("YYYY-MM-DD HH:mm") }}
+          </template>
+        </Column>
+
+        <Column field="edit_date" header="Edit date" :sortable="true">
+          <template #body="slotProps">
+            {{
+              slotProps.data.edit_date
+                ? moment(slotProps.data.edit_date).format("YYYY-MM-DD HH:mm")
+                : ""
+            }}
           </template>
         </Column>
         <Column

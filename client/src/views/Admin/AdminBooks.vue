@@ -17,7 +17,12 @@
           style="min-width: 10rem"
         ></Column>
 
-        <Column field="author" header="Author" style="min-width: 8rem">
+        <Column
+          field="author.first_name"
+          header="Author"
+          :sortable="true"
+          style="min-width: 8rem"
+        >
           <template #body="slotProps">
             {{
               slotProps.data.author.first_name +
@@ -27,7 +32,7 @@
           </template>
         </Column>
 
-        <Column field="genre" header="Genre">
+        <Column field="genre.name" header="Genre" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.genre.name }}
           </template>

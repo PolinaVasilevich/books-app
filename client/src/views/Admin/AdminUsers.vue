@@ -17,7 +17,12 @@
           style="min-width: 10rem"
         ></Column>
 
-        <Column field="isAdmin" header="Admin" style="min-width: 5rem"></Column>
+        <Column
+          field="isAdmin"
+          header="Admin"
+          style="min-width: 5rem"
+          :sortable="true"
+        ></Column>
         <Column
           field="created_date"
           header="Registration Date"

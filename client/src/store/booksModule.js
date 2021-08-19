@@ -5,8 +5,8 @@ export const booksModule = {
     books: JSON.parse(localStorage.getItem("books")) || [],
     authors: JSON.parse(localStorage.getItem("authors")) || [],
     genres: JSON.parse(localStorage.getItem("genres")) || [],
-    // reservedBooks: JSON.parse(localStorage.getItem("reservedBooks")) || [],
-    reservedBooks: [],
+    reservedBooks: JSON.parse(localStorage.getItem("reservedBooks")) || [],
+
     reviews: JSON.parse(localStorage.getItem("reviews")) || [],
     userReservedBooks:
       JSON.parse(localStorage.getItem("userReservedBooks")) || [],
@@ -108,15 +108,10 @@ export const booksModule = {
     async getReservedBooks({ commit }) {
       try {
         const reservedBooks = await API.get("books/allreservedbooks");
-
-        reservedBooks.data.forEach((book) => {
-          book.reserved_books.forEach((item) => {
-            item.data.sort(
-              (a, b) => new Date(b.action_date) - new Date(a.action_date)
-            );
-          });
-        });
-        console.log(reservedBooks.data);
+        localStorage.setItem(
+          "reservedBooks",
+          JSON.stringify(reservedBooks.data)
+        );
         commit("setReservedBooks", reservedBooks.data);
       } catch (error) {
         console.log(error);

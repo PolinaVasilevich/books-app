@@ -463,36 +463,21 @@ class bookController {
         },
 
         { $unwind: "$book" },
+
+        { $sort: { action_date: -1 } },
         {
           $group: {
             _id: { user: "$user", book: "$book" },
-            root_data: {
-              $push: "$$ROOT",
-            },
-          },
-        },
-
-        {
-          $group: {
-            _id: "$_id.user",
-            user: { $first: "$_id.user" },
-            reserved_books: {
+            data: {
               $push: {
-                book: "$_id.book",
-                data: "$$ROOT.root_data",
+                status: "$status",
+                action_date: "$action_date",
+                userAction: "$userAction",
               },
             },
           },
         },
       ]);
-
-      console.log("-----------");
-      console.log("-----------");
-      console.log("-----------");
-      console.log(reservedBooks);
-      console.log("-----------");
-      console.log("-----------");
-      console.log("-----------");
 
       res.json(reservedBooks);
     } catch (e) {

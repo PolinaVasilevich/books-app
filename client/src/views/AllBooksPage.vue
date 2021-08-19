@@ -2,7 +2,7 @@
   <div class="card">
     <Toast />
     <Button
-      v-if="user.username === 'admin'"
+      v-if="user.isAdmin"
       label="New book"
       icon="pi pi-plus"
       class="p-button-success p-mr-2"
@@ -34,12 +34,7 @@
         />
       </template>
     </modal-form>
-    <DataView
-      :value="searchedBooks"
-      :layout="layout"
-      :paginator="true"
-      :rows="6"
-    >
+    <DataView :value="sortedBooks" :layout="layout" :paginator="true" :rows="6">
       <template #header>
         <div class="p-grid p-nogutter">
           <div class="p-col-6" style="text-align: left">
@@ -192,6 +187,7 @@ export default {
       sortKey: null,
       sortOrder: null,
       selectedSort: null,
+      typeDataSort: "",
       sortOptions: [
         { label: "Sort By Title", value: "title" },
         { label: "Sort By Rating", value: "rating" },
@@ -219,26 +215,29 @@ export default {
       });
     },
 
-    // sortedBooks() {
-    //   const typeItems = typeof this.searchedBooks[0][this.selectedSort];
-    //   switch (typeItems) {
-    //     case "string": {
-    //       return [...this.searchedBooks].sort((firstItem, secondItem) =>
-    //         firstItem[this.selectedSort]?.localeCompare(
-    //           secondItem[this.selectedSort]
-    //         )
-    //       );
-    //     }
-    //     case "number": {
-    //       return [...this.searchedBooks].sort(
-    //         (firstItem, secondItem) =>
-    //           firstItem[this.selectedSort] - secondItem[this.selectedSort]
-    //       );
-    //     }
-    //     default:
-    //       return [...this.searchedBooks];
-    //   }
-    // },
+    sortedBooks() {
+      const typeDataSort = this.searchedBooks
+        ? typeof this.searchedBooks[0][this.selectedSort]
+        : "";
+
+      switch (typeDataSort) {
+        case "string": {
+          return [...this.searchedBooks].sort((firstItem, secondItem) =>
+            firstItem[this.selectedSort]?.localeCompare(
+              secondItem[this.selectedSort]
+            )
+          );
+        }
+        case "number": {
+          return [...this.searchedBooks].sort(
+            (firstItem, secondItem) =>
+              secondItem[this.selectedSort] - firstItem[this.selectedSort]
+          );
+        }
+        default:
+          return [...this.searchedBooks];
+      }
+    },
   },
   created() {
     this.getBooks();
