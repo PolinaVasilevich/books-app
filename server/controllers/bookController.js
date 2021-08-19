@@ -443,6 +443,27 @@ class bookController {
           },
         },
         {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+
+        {
+          $lookup: {
+            from: "books",
+            localField: "book",
+            foreignField: "_id",
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+        {
           $group: {
             _id: { user: "$user", book: "$book" },
             root_data: {
@@ -454,6 +475,7 @@ class bookController {
         {
           $group: {
             _id: "$_id.user",
+            user: { $first: "$_id.user" },
             reserved_books: {
               $push: {
                 book: "$_id.book",

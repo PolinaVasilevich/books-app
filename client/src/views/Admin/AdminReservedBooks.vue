@@ -4,7 +4,7 @@
 
     <div class="card">
       <h2>Reserved books</h2>
-      {{ reservedBooks }}
+
       <div style="margin-bottom: 1em">
         <Button
           type="button"
@@ -20,20 +20,22 @@
           @click="collapseAll"
         />
       </div>
-      <TreeTable :value="searchedItems" :expandedKeys="expandedKeys">
-        <Column field="node.data.user.username" header="User" :sortable="true"
+
+      <TreeTable :value="reservedBooks" :expandedKeys="expandedKeys">
+        <Column field="node.user.username" header="User" :sortable="true"
           >>
           <template #body="slotProps">
-            {{ slotProps.node.data.user.username }}
+            {{ slotProps.node.user.username }}
           </template>
         </Column>
 
         <Column field="node.data.book.title" header="Book" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.node.data.book.title }}
+            {{ slotProps.node.reserved_books }}
           </template>
         </Column>
 
+        <!--
         <Column field="node.data.status" header="Status" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.node.data.status }}
@@ -82,7 +84,7 @@
               "
             />
           </template>
-        </Column>
+        </Column> -->
       </TreeTable>
     </div>
 

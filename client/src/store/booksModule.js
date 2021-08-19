@@ -108,10 +108,15 @@ export const booksModule = {
     async getReservedBooks({ commit }) {
       try {
         const reservedBooks = await API.get("books/allreservedbooks");
-        // localStorage.setItem(
-        //   "reservedBooks",
-        //   JSON.stringify(reservedBooks.data)
-        // );
+
+        reservedBooks.data.forEach((book) => {
+          book.reserved_books.forEach((item) => {
+            item.data.sort(
+              (a, b) => new Date(b.action_date) - new Date(a.action_date)
+            );
+          });
+        });
+        console.log(reservedBooks.data);
         commit("setReservedBooks", reservedBooks.data);
       } catch (error) {
         console.log(error);
