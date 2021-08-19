@@ -434,6 +434,8 @@ class bookController {
 
   async getReservedBooks(req, res) {
     try {
+      // const reservedBooks = await BookActions.find({ isActual: true });
+
       const reservedBooks = await BookActions.aggregate([
         {
           $match: {
@@ -441,57 +443,34 @@ class bookController {
           },
         },
         {
-          $lookup: {
-            from: "books",
-            localField: "book",
-            foreignField: "_id",
-            as: "book",
-          },
-        },
-        {
-          $unwind: "$book",
-        },
-
-        {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "user",
-          },
-        },
-        {
-          $unwind: "$user",
-        },
-
-        {
-          $lookup: {
-            from: "users",
-            localField: "userAction",
-            foreignField: "_id",
-            as: "userAction",
-          },
-        },
-        {
-          $unwind: "$userAction",
-        },
-        {
           $group: {
-            _id: "$user._id",
-            data: {
-              $push: {
-                book: "$book",
-                user: "$user",
-                userAction: "$userAction",
-                status: "$status",
-                action_date: "$action_date",
-              },
+            _id: { user: "$user", book: "$book" },
+            root_data: {
+              $push: "$$ROOT",
             },
           },
         },
 
-        { $unwind: "$data" },
+        {
+          $group: {
+            _id: "$_id.user",
+            reserved_books: {
+              $push: {
+                book: "$_id.book",
+                data: "$$ROOT.root_data",
+              },
+            },
+          },
+        },
       ]);
+
+      console.log("-----------");
+      console.log("-----------");
+      console.log("-----------");
+      console.log(reservedBooks);
+      console.log("-----------");
+      console.log("-----------");
+      console.log("-----------");
 
       res.json(reservedBooks);
     } catch (e) {

@@ -1,9 +1,10 @@
 <template>
   <div>
     <Toast />
+
     <div class="card">
       <h2>Reserved books</h2>
-
+      {{ reservedBooks }}
       <div style="margin-bottom: 1em">
         <Button
           type="button"
@@ -222,25 +223,26 @@ export default {
   },
 
   computed: {
-    searchedItems() {
-      return this.reservedBooks.filter((item) => {
-        return (
-          item.data.book.title
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item.data.user.username
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item.data.status
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase())
-        );
-      });
-    },
+    // searchedItems() {
+    //   return this.reservedBooks.filter((item) => {
+    //     return (
+    //       item.data.book.title
+    //         ?.toLowerCase()
+    //         .includes(this.searchQuery.toLowerCase()) ||
+    //       item.data.user.username
+    //         ?.toLowerCase()
+    //         .includes(this.searchQuery.toLowerCase()) ||
+    //       item.data.status
+    //         ?.toLowerCase()
+    //         .includes(this.searchQuery.toLowerCase())
+    //     );
+    //   });
+    // },
   },
 
   created() {
     this.getReservedBooks();
+
     this.getBooks();
     this.getUsers();
 
