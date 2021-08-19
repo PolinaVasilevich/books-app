@@ -2,7 +2,7 @@
   <div>
     <div class="card">
       <Toolbar class="p-mb-4">
-        <template #left>
+        <template #left v-if="showHeaderButtons">
           <Button
             label="New"
             icon="pi pi-plus"
@@ -71,7 +71,7 @@
         ></Column>
 
         <slot name="content"></slot>
-        <Column :exportable="false">
+        <Column :exportable="false" v-if="showTableButtons">
           <template #body="slotProps">
             <Button
               icon="pi pi-pencil"
@@ -174,6 +174,20 @@ export default {
     },
 
     searchQuery: {
+      type: String,
+    },
+
+    showTableButtons: {
+      type: Boolean,
+      default: true,
+    },
+
+    showHeaderButtons: {
+      type: Boolean,
+      default: true,
+    },
+
+    typeTableButton: {
       type: String,
     },
   },

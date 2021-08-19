@@ -5,6 +5,8 @@
       titleTable="Books history"
       v-model:searchQuery="searchQuery"
       :data="bookActions"
+      :showTableButtons="false"
+      :showHeaderButtons="false"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -39,6 +41,8 @@
             }}
           </template>
         </Column>
+
+        <Column field="isActual" header="Status" :sortable="true"> </Column>
       </template>
 
       <template #modal>

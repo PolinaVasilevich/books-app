@@ -1,52 +1,39 @@
 <template>
   <div>
     <Toast />
-    <div class="card">
-      <h2>Reserved books</h2>
-
-      <div style="margin-bottom: 1em">
-        <Button
-          type="button"
-          icon="pi pi-plus"
-          label="Expand All"
-          @click="expandAll"
-          style="margin-right: 1em"
-        />
-        <Button
-          type="button"
-          icon="pi pi-minus"
-          label="Collapse All"
-          @click="collapseAll"
-        />
-      </div>
-      <TreeTable :value="searchedItems" :expandedKeys="expandedKeys">
-        <Column field="node.data.user.username" header="User" :sortable="true"
-          >>
+    <admin-table
+      titleTable="Reserved books"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
+      :showTableButtons="false"
+      :showHeaderButtons="false"
+      typeTableButton="received"
+      @openModal="openModal"
+      @openEditModal="editModal"
+    >
+      <template #content>
+        <Column field="data.user.username" header="User" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.node.data.user.username }}
+            {{ slotProps.data.data.user.username }}
           </template>
         </Column>
 
-        <Column field="node.data.book.title" header="Book" :sortable="true">
+        <Column field="data.book.title" header="Book" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.node.data.book.title }}
+            {{ slotProps.data.data.book.title }}
           </template>
         </Column>
 
-        <Column field="node.data.status" header="Status" :sortable="true">
+        <Column field="data.status" header="Status" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.node.data.status }}
+            {{ slotProps.data.data.status }}
           </template>
         </Column>
 
-        <Column
-          field="node.data.action_date"
-          header="Action date"
-          :sortable="true"
-        >
+        <Column field="data.action_date" header="Action date" :sortable="true">
           <template #body="slotProps">
             {{
-              moment(slotProps.node.data.action_date).format("YYYY-MM-DD HH:mm")
+              moment(slotProps.data.data.action_date).format("YYYY-MM-DD HH:mm")
             }}
           </template>
         </Column>
@@ -54,37 +41,36 @@
         <Column :exportable="false">
           <template #body="slotProps">
             <Button
-              v-if="slotProps.node.data.status?.toLowerCase() === 'reserved'"
+              v-if="slotProps.data.data.status?.toLowerCase() === 'reserved'"
               label="Give out book"
               icon="pi pi-user"
               class="p-button-rounded p-button-success p-mr-2"
               @click="
                 confirm(
-                  slotProps.node.data.book,
-                  slotProps.node.data.user,
-                  slotProps.node.data.status
+                  slotProps.data.data.book,
+                  slotProps.data.data.user,
+                  slotProps.data.data.status
                 )
               "
             />
 
             <Button
-              v-if="slotProps.node.data.status?.toLowerCase() === 'received'"
+              v-if="slotProps.data.data.status?.toLowerCase() === 'received'"
               label="Return book"
               icon="pi pi-book"
               class="p-button-rounded p-button-warning p-mr-2"
               @click="
                 confirm(
-                  slotProps.node.data.book,
-                  slotProps.node.data.user,
-                  slotProps.node.data.status
+                  slotProps.data.data.book,
+                  slotProps.data.data.user,
+                  slotProps.data.data.status
                 )
               "
             />
           </template>
         </Column>
-      </TreeTable>
-    </div>
-
+      </template>
+    </admin-table>
     <Dialog
       v-model:visible="showDialog"
       :style="{ width: '450px' }"
@@ -120,6 +106,7 @@
 <script>
 import moment from "moment";
 import API from "@/utils/api";
+import AdminTable from "@/components/Admin/AdminTable.vue";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -129,6 +116,9 @@ export default {
   name: "admin-users",
   props: ["reservedBookTitle"],
   mixins: [toggle, adminFormMixin, dataStore],
+  components: {
+    AdminTable,
+  },
 
   data() {
     return {

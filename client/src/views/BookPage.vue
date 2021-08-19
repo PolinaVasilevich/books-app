@@ -141,9 +141,9 @@ export default {
   },
 
   methods: {
-    async getReservedBooks(userID) {
+    async getReservedBooks() {
       try {
-        await this.$store.dispatch("books/getUserReservedBooks", userID);
+        await this.$store.dispatch("books/getUserReservedBooks", this.user._id);
       } catch (error) {
         console.log(error);
       }
@@ -259,7 +259,7 @@ export default {
     this.getBooks();
     this.getCurrentBook();
     this.getReviewsBook();
-    this.getReservedBooks(this.user._id);
+    this.getReservedBooks();
     this.checkReserveBook(this.currentBook._id, this.user._id);
   },
 };

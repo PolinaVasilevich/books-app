@@ -34,7 +34,12 @@
         />
       </template>
     </modal-form>
-    <DataView :value="sortedBooks" :layout="layout" :paginator="true" :rows="6">
+    <DataView
+      :value="searchedBooks"
+      :layout="layout"
+      :paginator="true"
+      :rows="6"
+    >
       <template #header>
         <div class="p-grid p-nogutter">
           <div class="p-col-6" style="text-align: left">
@@ -201,12 +206,6 @@ export default {
       if (count < 5) return "LOWSTOCK";
       else return "INSTOCK";
     },
-
-    mounted() {
-      this.getBooks();
-      this.getUsers();
-      this.getAuthors();
-    },
   },
 
   computed: {
@@ -220,26 +219,31 @@ export default {
       });
     },
 
-    sortedBooks() {
-      const typeItems = typeof this.searchedBooks[0][this.selectedSort];
-      switch (typeItems) {
-        case "string": {
-          return [...this.searchedBooks].sort((firstItem, secondItem) =>
-            firstItem[this.selectedSort]?.localeCompare(
-              secondItem[this.selectedSort]
-            )
-          );
-        }
-        case "number": {
-          return [...this.searchedBooks].sort(
-            (firstItem, secondItem) =>
-              firstItem[this.selectedSort] - secondItem[this.selectedSort]
-          );
-        }
-        default:
-          return [...this.searchedBooks];
-      }
-    },
+    // sortedBooks() {
+    //   const typeItems = typeof this.searchedBooks[0][this.selectedSort];
+    //   switch (typeItems) {
+    //     case "string": {
+    //       return [...this.searchedBooks].sort((firstItem, secondItem) =>
+    //         firstItem[this.selectedSort]?.localeCompare(
+    //           secondItem[this.selectedSort]
+    //         )
+    //       );
+    //     }
+    //     case "number": {
+    //       return [...this.searchedBooks].sort(
+    //         (firstItem, secondItem) =>
+    //           firstItem[this.selectedSort] - secondItem[this.selectedSort]
+    //       );
+    //     }
+    //     default:
+    //       return [...this.searchedBooks];
+    //   }
+    // },
+  },
+  created() {
+    this.getBooks();
+    this.getUsers();
+    this.getAuthors();
   },
 };
 </script>

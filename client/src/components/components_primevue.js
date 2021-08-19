@@ -20,6 +20,7 @@ import Menu from "primevue/menu";
 import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
 import Timeline from "primevue/timeline";
+import TreeTable from "primevue/treetable";
 
 export default [
   Dialog,
@@ -43,4 +44,5 @@ export default [
   ConfirmDialog,
   Toast,
   Timeline,
+  TreeTable,
 ];

@@ -43,5 +43,23 @@ export default {
       this.initialEditForm = { ...value };
       this.openEditModal();
     },
+
+    showMessage(text) {
+      this.$toast.add({
+        severity: "success",
+        summary: "Successful",
+        detail: text,
+        life: 3000,
+      });
+    },
+
+    showErrorMessage(error) {
+      this.$toast.add({
+        severity: "error",
+        summary: "Error Message",
+        detail: error,
+        life: 3000,
+      });
+    },
   },
 };

@@ -140,7 +140,6 @@ class bookController {
   async giveOutBook(req, res) {
     try {
       const { user, book, userAction } = req.body;
-
       const bookAction = new BookActions({
         book,
         user,
@@ -169,6 +168,7 @@ class bookController {
         user: user,
         userAction: userAction,
         status: "Returned",
+        isActual: false,
         action_date: Date.now(),
       });
 
@@ -432,31 +432,8 @@ class bookController {
     }
   }
 
-  // async getUserBookActions(req, res) {
-  //   const { id } = req.params;
-  //   try {
-  //     const bookActions = await BookActions.aggregate([
-  //       {
-  //         $match: { user: new mongoose.Types.ObjectId(id) },
-  //       },
-  //       {
-  //         $group: {
-  //           _id: "$book",
-  //           details: {
-  //             $push: { action: "$action", action_date: "$action_date" },
-  //           },
-  //         },
-  //       },
-  //     ]);
-  //     res.json(bookActions);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
-
   async getReservedBooks(req, res) {
     try {
-      const { bookID, userID } = req.body;
       const reservedBooks = await BookActions.aggregate([
         {
           $match: {
@@ -464,17 +441,58 @@ class bookController {
           },
         },
         {
+          $lookup: {
+            from: "books",
+            localField: "book",
+            foreignField: "_id",
+            as: "book",
+          },
+        },
+        {
+          $unwind: "$book",
+        },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "userAction",
+            foreignField: "_id",
+            as: "userAction",
+          },
+        },
+        {
+          $unwind: "$userAction",
+        },
+        {
           $group: {
-            _id: "$user",
-            books: {
+            _id: "$user._id",
+            data: {
               $push: {
                 book: "$book",
+                user: "$user",
+                userAction: "$userAction",
+                status: "$status",
+                action_date: "$action_date",
               },
             },
           },
         },
+
+        { $unwind: "$data" },
       ]);
-      console.log(reservedBooks);
+
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);

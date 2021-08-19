@@ -28,7 +28,7 @@
 
           <template #footer>
             <Button
-              v-if="item.details"
+              v-if="getLastActionBook(item) === 'Reserved'"
               icon="pi pi-times"
               label="Cancel reserve"
               class="p-button-warning"
@@ -48,14 +48,16 @@
 import moment from "moment";
 import API from "@/utils/api";
 import dataStore from "@/mixins/dataStore.js";
+import adminFormMixin from "@/mixins/adminFormMixin.js";
 import BookActionsUserPage from "@/components/BookActionsUserPage";
 export default {
   components: { BookActionsUserPage },
-  mixins: [dataStore],
+  mixins: [dataStore, adminFormMixin],
   data() {
     return {
       moment: moment,
       bookActions: [],
+
       icons: [
         {
           status: "Reserved",
@@ -82,9 +84,12 @@ export default {
   },
 
   methods: {
-    async getReservedBooks(userID) {
+    async getReservedBooks() {
       try {
-        await this.$store.dispatch("books/getUserReservedBooks", userID);
+        await this.$store.dispatch(
+          "books/getUserReservedBooks",
+          this.$route.params.id
+        );
       } catch (error) {
         console.log(error);
       }
@@ -97,28 +102,28 @@ export default {
           userAction: this.user,
           book,
         });
-        this.getReservedBooks(this.$route.params.id);
+        this.getReservedBooks();
 
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Book reservation canceled",
-          life: 3000,
-        });
+        this.showMessage("Book reservation canceled");
       } catch (error) {
         console.log(error);
-        this.$toast.add({
-          severity: "error",
-          summary: "Error Message",
-          detail: `${error.response.data.message}`,
-          life: 3000,
-        });
+        this.showErrorMessage(error.response.data.message);
       }
+    },
+
+    getLastActionBook(data) {
+      const lastActionBook = JSON.parse(JSON.stringify(data)).details.sort(
+        (a, b) => {
+          return new Date(b?.action_date) - new Date(a?.action_date);
+        }
+      )[0]?.status;
+
+      return lastActionBook;
     },
   },
 
   created() {
-    this.getReservedBooks(this.$route.params.id);
+    this.getReservedBooks();
   },
 };
 </script>
