@@ -4,7 +4,7 @@
     <div class="user-page">
       <h1>My reserved books</h1>
 
-      <div style="margin-top: 15px">
+      <div v-if="userReservedBooks?.length" style="margin-top: 15px">
         <span
           class="p-input-icon-left"
           style="display: inline-block; width: 100%"
@@ -39,9 +39,13 @@
           </template>
 
           <template #content>
-            <p v-if="item.reservation_number">
-              Reservation number: {{ item.reservation_number }}
-            </p>
+            <h5>
+              Reservation number:
+              <span style="font-weight: normal">{{
+                item.reservation_number
+              }}</span>
+            </h5>
+
             <book-actions-user-page :data="item.details" :icons="icons" />
           </template>
 

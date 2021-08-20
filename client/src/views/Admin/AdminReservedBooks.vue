@@ -4,7 +4,19 @@
 
     <div class="card">
       <h2>Reserved books</h2>
-
+      <div style="margin: 15px 0">
+        <span
+          class="p-input-icon-left"
+          style="display: inline-block; width: 100%"
+        >
+          <i class="pi pi-search" />
+          <InputText
+            placeholder="Search..."
+            v-model="searchQuery"
+            style="width: 100%"
+          />
+        </span>
+      </div>
       <div style="margin-bottom: 1em">
         <Button
           type="button"
@@ -24,7 +36,7 @@
       </div>
 
       <TreeTable
-        :value="dataTable"
+        :value="searchedItems"
         :expandedKeys="expandedKeys"
         sortMode="single"
       >
@@ -45,9 +57,24 @@
           </template>
         </Column>
 
+        <Column
+          field="reservation_number"
+          header="Reservation number"
+          :sortable="true"
+        >
+          <template #body="slotProps">
+            {{ slotProps.node.data.reservation_number }}
+          </template>
+        </Column>
+
         <Column field="status" header="Status" :sortable="true">
           <template #body="slotProps">
-            {{ slotProps.node.data.status }}
+            <span
+              :class="'status-' + slotProps.node.data.status.toLowerCase()"
+              style="padding: 5px 10px"
+            >
+              {{ slotProps.node.data.status }}
+            </span>
           </template>
         </Column>
 
@@ -66,13 +93,13 @@
                 slotProps.node.children &&
                 slotProps.node.data.status?.toLowerCase() === 'reserved'
               "
-              label="Give out book"
               icon="pi pi-user"
               class="p-button-rounded p-button-success p-mr-2"
               @click="
-                confirm(
+                confirmGiveOutBook(
                   slotProps.node.data.book,
                   slotProps.node.data.user,
+                  slotProps.node.data.reservation_number,
                   slotProps.node.data.status
                 )
               "
@@ -83,13 +110,13 @@
                 slotProps.node.children &&
                 slotProps.node.data.status?.toLowerCase() === 'received'
               "
-              label="Return book"
               icon="pi pi-book"
               class="p-button-rounded p-button-warning p-mr-2"
               @click="
                 confirm(
                   slotProps.node.data.book,
                   slotProps.node.data.user,
+                  slotProps.node.data.reservation_number,
                   slotProps.node.data.status
                 )
               "
@@ -99,32 +126,43 @@
       </TreeTable>
     </div>
 
+    <confirm-dialog
+      :text="textDialog"
+      :displayConfirmDialog="displayConfirmDialog"
+      @hideConfirmDialog="displayConfirmDialog = false"
+      @action="returnBook"
+    />
+
     <Dialog
-      v-model:visible="showDialog"
+      v-model:visible="displayMainDialog"
       :style="{ width: '450px' }"
-      header="Confirm"
+      header="Give out the book"
       :modal="true"
+      class="p-fluid"
     >
-      <div class="confirmation-content">
-        <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
-        <span v-if="data?.book">
-          Are you sure you want to {{ textDialog }} the book
-          <b>{{ data?.book?.title }}</b
-          >?</span
-        >
+      <div class="p-field">
+        <label for="return_date">Return date</label>
+        <input
+          id="return_date"
+          type="datetime-local"
+          v-model="data.return_date"
+          required="true"
+          class="form-control"
+          autofocus
+        />
       </div>
       <template #footer>
         <Button
-          label="No"
+          label="Cancel"
           icon="pi pi-times"
           class="p-button-text"
-          @click="showDialog = false"
+          @click="displayMainDialog = false"
         />
         <Button
-          label="Yes"
+          label="Save"
           icon="pi pi-check"
           class="p-button-text"
-          @click="getActionBook"
+          @click="onGiveOutBook"
         />
       </template>
     </Dialog>
@@ -139,8 +177,11 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
+import ConfirmDialog from "@/components/UI/ConfirmDialog";
+
 export default {
   name: "admin-users",
+  components: { ConfirmDialog },
   props: ["reservedBookTitle"],
   mixins: [toggle, adminFormMixin, dataStore],
 
@@ -149,12 +190,14 @@ export default {
       moment,
       dataTable: [],
       expandedKeys: {},
-      showDialog: false,
+      displayConfirmDialog: false,
+      displayMainDialog: false,
       textDialog: "",
       action: "",
       data: {
         user: "",
         book: "",
+        return_date: "",
       },
 
       icons: [
@@ -186,18 +229,19 @@ export default {
   },
 
   methods: {
-    getActionBook() {
-      if (this.action?.toLowerCase() === "reserved") {
-        this.giveOutBook();
-      } else if (this.action?.toLowerCase() === "received") {
-        this.returnBook();
-      }
+    confirmGiveOutBook(book, user, reservation_number) {
+      this.data = {
+        book,
+        user,
+        reservation_number,
+        return_date: moment(new Date()).format("YYYY-MM-DDTHH:mm"),
+      };
+      this.displayMainDialog = true;
     },
 
-    confirm(book, user, action) {
-      this.data = { book, user };
-      this.showDialog = true;
-      this.action = action;
+    onGiveOutBook() {
+      this.displayMainDialog = false;
+      this.giveOutBook();
     },
 
     async giveOutBook() {
@@ -206,7 +250,10 @@ export default {
           book: this.data.book,
           user: this.data.user,
           userAction: this.user,
+          reservation_number: this.data.reservation_number,
+          return_date: this.data.return_date,
         });
+
         this.getReservedBooks();
         this.showMessage("Book received");
       } catch (error) {
@@ -216,6 +263,12 @@ export default {
       }
 
       this.showDialog = false;
+    },
+
+    confirmReturnBook(book, user) {
+      this.data = { book, user };
+      this.textDialog = `return the book ${book.title}`;
+      this.displayConfirmDialog = true;
     },
 
     async returnBook() {
@@ -288,21 +341,21 @@ export default {
   },
 
   computed: {
-    // searchedItems() {
-    //   return this.reservedBooks.filter((item) => {
-    //     return (
-    //       item.data.book.title
-    //         ?.toLowerCase()
-    //         .includes(this.searchQuery.toLowerCase()) ||
-    //       item.data.user.username
-    //         ?.toLowerCase()
-    //         .includes(this.searchQuery.toLowerCase()) ||
-    //       item.data.status
-    //         ?.toLowerCase()
-    //         .includes(this.searchQuery.toLowerCase())
-    //     );
-    //   });
-    // },
+    searchedItems() {
+      return this.dataTable.filter((item) => {
+        return (
+          item?.book?.title
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item?.user?.username
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item?.data?.reservation_number
+            ?.toLowerCase()
+            ?.includes(this.searchQuery.toLowerCase())
+        );
+      });
+    },
   },
 
   created() {

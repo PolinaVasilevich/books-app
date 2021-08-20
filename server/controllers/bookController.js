@@ -142,11 +142,14 @@ class bookController {
 
   async giveOutBook(req, res) {
     try {
-      const { user, book, userAction } = req.body;
+      const { user, book, userAction, return_date, reservation_number } =
+        req.body;
       const bookAction = new BookActions({
         book,
         user,
         userAction,
+        return_date,
+        reservation_number,
         status: "Received",
         action_date: Date.now(),
       });
@@ -477,6 +480,7 @@ class bookController {
                 status: "$status",
                 action_date: "$action_date",
                 userAction: "$userAction",
+                reservation_number: "$reservation_number",
               },
             },
           },
