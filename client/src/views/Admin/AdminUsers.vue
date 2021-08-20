@@ -2,7 +2,7 @@
   <div>
     <Toast />
     <admin-table
-      titleTable="Users"
+      title="Users"
       v-model:searchQuery="searchQuery"
       :data="searchedItems"
       @openModal="openModal"

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 const Book = require("../models/Book");
 const User = require("../models/User/User");
@@ -106,11 +107,13 @@ class bookController {
       //     .send({ message: "You have already reserved this book" });
       // }
 
+      const reservation_number = crypto.randomBytes(8).toString("hex");
+
       const bookAction = new BookActions({
         book,
         user,
         userAction: user,
-
+        reservation_number,
         status: "Reserved",
         action_date: Date.now(),
       });
@@ -359,6 +362,7 @@ class bookController {
             _id: "$book",
             book: { $first: "$book" },
             user: { $first: "$user" },
+            reservation_number: { $first: "$reservation_number" },
             details: {
               $push: {
                 status: "$status",

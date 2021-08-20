@@ -5,7 +5,7 @@ const cors = require("cors");
 const bookRouter = require("./routers/bookRouter");
 const authRouter = require("./routers/authRouter");
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 

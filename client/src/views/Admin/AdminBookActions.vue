@@ -2,9 +2,9 @@
   <div>
     <Toast />
     <admin-table
-      titleTable="Books history"
+      title="Books history"
       v-model:searchQuery="searchQuery"
-      :data="bookActions"
+      :data="searchedItems"
       :showTableButtons="false"
       :showHeaderButtons="false"
       @openModal="openModal"
@@ -12,19 +12,23 @@
       @deleteItem="onDeleteData"
     >
       <template #content>
-        <Column field="userAction" header="User action" :sortable="true">
+        <Column
+          field="userAction.username"
+          header="User action"
+          :sortable="true"
+        >
           <template #body="slotProps">
             {{ slotProps.data?.userAction?.username }}
           </template>
         </Column>
 
-        <Column field="user" header="User" :sortable="true">
+        <Column field="user.username" header="User" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.user.username }}
           </template>
         </Column>
 
-        <Column field="book" header="Book" :sortable="true">
+        <Column field="book.title" header="Book" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.book?.title }}
           </template>
@@ -41,58 +45,6 @@
             }}
           </template>
         </Column>
-
-        <Column field="isActual" header="Status" :sortable="true"> </Column>
-      </template>
-
-      <template #modal>
-        <modal-form
-          modal-title="Create new record"
-          :displayModal="displayModal"
-          @close="closeModal"
-        >
-          <template v-slot:modal-content>
-            <admin-reserved-books-form
-              typeForm="create"
-              v-model:user="data.user"
-              v-model:book="data.book"
-              v-model:date_reserved="data.date_reserved"
-              :dataForm="data"
-              :books="books"
-              :users="users"
-              path="books/reservebook"
-              :callback="this.getReservedBooks"
-              @resetForm="resetForm"
-              @closeModal="closeModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-            />
-          </template>
-        </modal-form>
-
-        <modal-form
-          modal-title="Update record"
-          :displayModal="displayEditModal"
-          @close="closeEditModal"
-        >
-          <template v-slot:modal-content>
-            <admin-reserved-books-form
-              typeForm="update"
-              v-model:user="editForm.user"
-              v-model:book="editForm.book"
-              v-model:return_date="editForm.return_date"
-              :dataForm="editForm"
-              :books="books"
-              :users="users"
-              :path="`/books/updatereservedbook/${editForm._id}`"
-              :callback="this.getReservedBooks"
-              @resetForm="resetEditForm"
-              @closeModal="closeEditModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-            />
-          </template>
-        </modal-form>
       </template>
     </admin-table>
   </div>
@@ -102,21 +54,17 @@
 import moment from "moment";
 import API from "@/utils/api";
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import ModalForm from "@/components/UI/ModalForm";
-import AdminReservedBooksForm from "@/components/Admin/Forms/AdminReservedBooksForm.vue";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 export default {
-  name: "admin-users",
-  props: ["reservedBookTitle"],
+  name: "admin-book-actions",
+
   mixins: [toggle, adminFormMixin, dataStore],
   components: {
     AdminTable,
-    ModalForm,
-    AdminReservedBooksForm,
   },
 
   data() {
@@ -186,18 +134,22 @@ export default {
 
   computed: {
     searchedItems() {
-      return this.bookActions;
+      return this.bookActions.filter((item) => {
+        return (
+          item.book.title
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item?.user.username
+            ?.toLowerCase()
+            ?.includes(this.searchQuery.toLowerCase()) ||
+          item?.status?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
+        );
+      });
     },
   },
 
   created() {
     this.getAllBookActions();
-  },
-
-  mounted() {
-    this.data.user = this.users[0];
-    this.data.book = this.books[0];
-    this.data.date_reserved = moment(new Date()).format("YYYY-MM-DDTHH:mm");
   },
 };
 </script>
