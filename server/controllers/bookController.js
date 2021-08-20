@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ObjectId = require("mongodb").ObjectID;
 const crypto = require("crypto");
 
 const Book = require("../models/Book");
@@ -339,17 +340,6 @@ class bookController {
     }
   }
 
-  // async getReservedBooks(req, res) {
-  //   try {
-  //     const reservedBooks = await BookActions.find({ action: "Reserved" })
-  //       .populate("user")
-  //       .populate({ path: "book", populate: ["author", "genre"] });
-  //     res.json(reservedBooks);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
-
   async getUserReservedBooks(req, res) {
     const { id } = req.params;
     try {
@@ -360,17 +350,22 @@ class bookController {
             isActual: true,
           },
         },
+
+        { $sort: { action_date: 1 } },
+
         {
           $group: {
             _id: "$book",
             book: { $first: "$book" },
             user: { $first: "$user" },
+            last_action: { $last: "$action_date" },
             reservation_number: { $first: "$reservation_number" },
             details: {
               $push: {
                 status: "$status",
                 action_date: "$action_date",
                 isActual: "$isActual",
+                return_date: "$return_date",
               },
             },
           },
@@ -419,7 +414,10 @@ class bookController {
         },
 
         { $unwind: "$user" },
+
+        { $sort: { last_action: -1 } },
       ]);
+
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);
@@ -441,8 +439,6 @@ class bookController {
 
   async getReservedBooks(req, res) {
     try {
-      // const reservedBooks = await BookActions.find({ isActual: true });
-
       const reservedBooks = await BookActions.aggregate([
         {
           $match: {
@@ -475,17 +471,22 @@ class bookController {
         {
           $group: {
             _id: { user: "$user", book: "$book" },
+            last_action: { $first: "$action_date" },
             data: {
               $push: {
                 status: "$status",
                 action_date: "$action_date",
                 userAction: "$userAction",
                 reservation_number: "$reservation_number",
+                return_date: "$return_date",
               },
             },
           },
         },
+        { $sort: { last_action: -1 } },
       ]);
+
+      console.log(reservedBooks);
 
       res.json(reservedBooks);
     } catch (e) {
@@ -637,11 +638,27 @@ class bookController {
     try {
       const book = await Book.findByIdAndDelete({ _id: id });
       return res.json({
-        message: `${book.title}- Author were deleted successfully!`,
+        message: `${book.title}- Book were deleted successfully!`,
       });
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete book with id ${id}` });
+    }
+  }
+
+  async deleteManyBooks(req, res) {
+    try {
+      const { ids } = req.body;
+
+      await Book.deleteMany({
+        _id: { $in: ids },
+      });
+      return res.json({
+        message: `Books with ids [${ids}] were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete books` });
     }
   }
 
@@ -658,6 +675,22 @@ class bookController {
     }
   }
 
+  async deleteManyAuthors(req, res) {
+    try {
+      const { ids } = req.body;
+
+      await Author.deleteMany({
+        _id: { $in: ids },
+      });
+      return res.json({
+        message: `Authors with ids [${ids}] were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete authors` });
+    }
+  }
+
   async deleteGenre(req, res) {
     const { id } = req.params;
     try {
@@ -668,6 +701,22 @@ class bookController {
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete genre with id ${id}` });
+    }
+  }
+
+  async deleteManyGenres(req, res) {
+    try {
+      const { ids } = req.body;
+
+      await Genre.deleteMany({
+        _id: { $in: ids },
+      });
+      return res.json({
+        message: `Genres with ids [${ids}] were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete genres` });
     }
   }
 

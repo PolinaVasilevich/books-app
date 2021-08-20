@@ -16,6 +16,7 @@ const BookActionsSchema = new Schema({
   },
   isActual: { type: Boolean, default: true },
   reservation_number: { type: String },
+  return_date: { type: Date },
 });
 
 module.exports = model("BookActions", BookActionsSchema);

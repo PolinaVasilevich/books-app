@@ -30,8 +30,11 @@ router.put("/updatereview/:id", bookController.updateReview);
 router.put("/updatereservedbook/:id", bookController.updateReservedBook);
 
 router.delete("/deletebook/:id", bookController.deleteBook);
+router.delete("/deletemanybooks", bookController.deleteManyBooks);
 router.delete("/deleteauthor/:id", bookController.deleteAuthor);
+router.delete("/deletemanyauthors", bookController.deleteManyAuthors);
 router.delete("/deletegenre/:id", bookController.deleteGenre);
+router.delete("/deletemanygenres", bookController.deleteManyGenres);
 router.delete("/deletereservedbook/:id", bookController.deleteReservedBook);
 router.delete("/deletereview/:id", bookController.deleteReview);
 

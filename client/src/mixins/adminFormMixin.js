@@ -28,6 +28,16 @@ export default {
       }
     },
 
+    async removeManyEntries(path, body, callback) {
+      try {
+        await API.delete(path, { data: { ids: body } });
+        callback();
+      } catch (error) {
+        console.log(error);
+        callback();
+      }
+    },
+
     async updateData(path, payload, callback) {
       try {
         await API.put(path, payload);
@@ -36,6 +46,16 @@ export default {
         console.log(error);
         callback();
       }
+    },
+
+    deleteItems(items, path, callback) {
+      const ids = [];
+      items.forEach((elem) => {
+        ids.push(elem._id);
+      });
+
+      this.removeManyEntries(path, ids, callback);
+      this.showMessage("Items deleted");
     },
 
     editModal(value) {

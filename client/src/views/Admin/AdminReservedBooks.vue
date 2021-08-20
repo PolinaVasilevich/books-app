@@ -86,6 +86,18 @@
           </template>
         </Column>
 
+        <Column field="return_date" header="Return date" :sortable="true">
+          <template #body="slotProps">
+            {{
+              slotProps.node.data.return_date
+                ? moment(slotProps.node.data.return_date).format(
+                    "YYYY-MM-DD HH:mm"
+                  )
+                : ""
+            }}
+          </template>
+        </Column>
+
         <Column :exportable="false">
           <template #body="slotProps">
             <Button
@@ -113,7 +125,7 @@
               icon="pi pi-book"
               class="p-button-rounded p-button-warning p-mr-2"
               @click="
-                confirm(
+                confirmReturnBook(
                   slotProps.node.data.book,
                   slotProps.node.data.user,
                   slotProps.node.data.reservation_number,
@@ -261,8 +273,6 @@ export default {
         this.getReservedBooks();
         this.showErrorMessage(error.response.data.message);
       }
-
-      this.showDialog = false;
     },
 
     confirmReturnBook(book, user) {
@@ -286,7 +296,7 @@ export default {
         this.showErrorMessage(error.response.data.message);
       }
 
-      this.showDialog = false;
+      this.displayConfirmDialog = false;
     },
 
     getDataTable() {

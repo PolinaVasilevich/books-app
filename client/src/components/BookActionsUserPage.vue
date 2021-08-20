@@ -15,7 +15,7 @@
       <template #opposite="slotProps">
         <small
           class="p-text-secondary"
-          style="display: block; width: max-content"
+          style="display: block; width: max-content; margin: 0"
           >{{
             moment(slotProps.item.action_date).format("YYYY-MM-DD HH:mm")
           }}</small
@@ -37,8 +37,23 @@
           ></i>
         </span>
       </template>
+
       <template #content="slotProps">
-        {{ slotProps.item.status }}
+        <div style="width: max-content">
+          <p>{{ slotProps.item.status }}</p>
+          <p
+            v-if="
+              slotProps.item.status === 'Received' && slotProps.item.return_date
+            "
+          >
+            <b>Book must be returned on:</b>
+            {{
+              slotProps.item.return_date
+                ? moment(slotProps.item.return_date).format("YYYY-MM-DD")
+                : ""
+            }}
+          </p>
+        </div>
       </template>
     </Timeline>
   </div>

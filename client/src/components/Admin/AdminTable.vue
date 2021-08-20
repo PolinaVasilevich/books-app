@@ -216,7 +216,13 @@ export default {
     deleteItem() {
       this.$emit("deleteItem", this.item);
       this.deleteItemDialog = false;
-      this.product = {};
+      this.item = {};
+    },
+
+    deleteSelectedItems() {
+      this.$emit("deleteItems", this.selectedItems);
+      this.deleteItemsDialog = false;
+      this.selectedItems = null;
     },
 
     openNew() {
