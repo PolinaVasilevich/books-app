@@ -1,28 +1,22 @@
 <template>
   <div class="form">
-    <Toast />
-    <my-form @submitForm="onLogin" />
-    <p><router-link to="/registration">Registration </router-link></p>
+    <my-form @submitForm="onRegistration" typeForm="registration" />
   </div>
 </template>
 
 <script>
 import MyForm from "@/components/MyForm/MyForm";
+import toggle from "@/mixins/toggle.js";
 
 export default {
   components: {
     MyForm,
   },
-
+  mixins: [toggle],
   methods: {
-    async onLogin(user) {
+    async onRegistration(user) {
       try {
-        await this.$store.dispatch("login/login", user);
-        if (user.username === "admin") {
-          this.$router.push(`/admin/adminbooks`);
-        } else {
-          this.$router.push(`/`);
-        }
+        await this.$store.dispatch("login/registration", user);
       } catch (error) {
         console.log(error);
         this.$toast.add({

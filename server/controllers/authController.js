@@ -21,8 +21,8 @@ class authController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ message: "Registration error", errors });
       }
-      const { username, password, isAdmin, created_date, last_logon } =
-        req.body;
+      const { username, password, isAdmin } = req.body;
+
       const candidate = await User.findOne({ username });
       if (candidate) {
         return res
@@ -36,7 +36,6 @@ class authController {
         password: hashPassword,
         isAdmin,
         created_date: Date.now(),
-        last_logon,
       });
       await user.save();
       return res.json({ message: "User registered successfully" });

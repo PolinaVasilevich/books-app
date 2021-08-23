@@ -21,6 +21,8 @@ import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
 import Timeline from "primevue/timeline";
 import TreeTable from "primevue/treetable";
+import Password from "primevue/password";
+import Divider from "primevue/divider";
 
 export default [
   Dialog,
@@ -45,4 +47,6 @@ export default [
   Toast,
   Timeline,
   TreeTable,
+  Password,
+  Divider,
 ];
