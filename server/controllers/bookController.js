@@ -265,41 +265,38 @@ class bookController {
 
       await review.save();
 
-      // const data = await Review.aggregate([
-      //   {
-      //     $match: { rating: { $gte: 1 } },
-      //   },
-      //   {
-      //     $unwind: "$book",
-      //   },
-      //   {
-      //     $group: {
-      //       _id: "$book",
-      //       ratingAvg: { $avg: "$rating" },
-      //     },
-      //   },
-      //   {
-      //     $match: {
-      //       _id: new mongoose.Types.ObjectId(book._id),
-      //     },
-      //   },
-      //   {
-      //     $project: {
-      //       _id: 0,
-      //       ratingAvg: { $round: ["$ratingAvg"] },
-      //     },
-      //   },
-      // ]);
+      const data = await Review.aggregate([
+        {
+          $match: {
+            book: new mongoose.Types.ObjectId(book._id),
+            rating: { $gte: 1 },
+          },
+        },
 
-      // await Book.findByIdAndUpdate(
-      //   { _id: book._id },
-      //   {
-      //     $set: {
-      //       rating: data[0].ratingAvg,
-      //     },
-      //   },
-      //   { new: true, useFindAndModify: false }
-      // );
+        {
+          $group: {
+            _id: "$book",
+            ratingAvg: { $avg: "$rating" },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            ratingAvg: { $ceil: "$ratingAvg" },
+          },
+        },
+      ]);
+
+      await Book.findByIdAndUpdate(
+        { _id: book._id },
+        {
+          $set: {
+            rating: data[0].ratingAvg,
+          },
+        },
+        { new: true, useFindAndModify: false }
+      );
 
       return res.json({
         message: `Review has created successfully!`,

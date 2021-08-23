@@ -136,6 +136,7 @@ export default {
       currentBook: {},
       data: {
         text: "",
+        rating: 0,
       },
     };
   },
@@ -197,25 +198,14 @@ export default {
           });
 
           this.isReserved = true;
-          this.$toast.add({
-            severity: "success",
-            summary: "Successful",
-            detail: "Book reserved",
-            life: 3000,
-          });
           this.getBooks();
           this.getReservedBooks();
+          this.showMessage("Book reserved");
         } catch (error) {
           console.log(error);
-          this.$toast.add({
-            severity: "error",
-            summary: "Error Message",
-            detail: `${error.response.data.message}`,
-            life: 3000,
-          });
-
           this.getBooks();
           this.getReservedBooks();
+          this.showErrorMessage(error.response.data.message);
         }
       }
     },
@@ -227,31 +217,27 @@ export default {
           book: this.currentBook,
           user: this.user,
         });
-
+        this.getBooks();
         this.getReviewsBook();
-        this.isReserved = true;
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Your review added",
-          life: 3000,
-        });
+
+        this.showMessage("Your review added");
       } catch (error) {
         console.log(error);
-        this.$toast.add({
-          severity: "error",
-          summary: "Error Message",
-          detail: `${error.response.data.message}`,
-          life: 3000,
-        });
+        this.showErrorMessage(error.response.data.message);
+        this.getBooks();
         this.getReviewsBook();
       }
     },
 
     onSave() {
       this.saveReview();
-      this.getReviewsBook();
+      this.resetForm();
       this.closeModal();
+    },
+
+    resetForm() {
+      this.data.text = "";
+      this.data.rating = 0;
     },
   },
 
