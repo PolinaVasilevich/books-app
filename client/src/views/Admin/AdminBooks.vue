@@ -8,6 +8,9 @@
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      @deleteItems="
+        deleteItems($event, '/books/deletemanybooks', this.getBooks)
+      "
     >
       <template #content>
         <Column
@@ -197,13 +200,11 @@ export default {
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/books/deletebook/${value._id}`, this.getBooks);
-      this.$toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: `${value.title} Deleted`,
-        life: 3000,
-      });
+      this.removeData(
+        `/books/deletebook/${value._id}`,
+        this.getBooks,
+        `${value.title} deleted`
+      );
     },
 
     goToPage(bookID) {

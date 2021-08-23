@@ -1,16 +1,32 @@
 <template>
   <div>
     <Toast />
-    <admin-table
-      title="Reviews"
-      v-model:searchQuery="searchQuery"
-      :data="searchedItems"
-      @openModal="openModal"
-      @openEditModal="editModal"
-      @deleteItem="onDeleteData"
-      :disabledCreateButton="true"
-    >
-      <template #content>
+    <div class="card">
+      <DataTable
+        :value="searchedItems"
+        :paginator="true"
+        :rows="10"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        :rowsPerPageOptions="[5, 10, 25]"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+        responsiveLayout="scroll"
+      >
+        <template #header>
+          <div
+            class="
+              table-header
+              p-d-flex p-flex-column p-flex-md-row p-jc-md-between
+            "
+          >
+            <h5 class="p-mb-2 p-m-md-0 p-as-md-center">Reviews</h5>
+
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText placeholder="Search..." v-model.trim="searchQuery" />
+            </span>
+          </div>
+        </template>
+
         <Column field="user.username" header="User" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.user.username }}
@@ -23,7 +39,15 @@
           </template>
         </Column>
 
-        <Column field="text" header="Review"> </Column>
+        <Column field="text" header="Review">
+          <template #body="slotProps">
+            {{
+              !slotProps.data.isHidden
+                ? slotProps.data.text
+                : "This comment is hidden by the administrator"
+            }}
+          </template>
+        </Column>
 
         <Column field="created_date" header="Created date" :sortable="true">
           <template #body="slotProps">
@@ -54,72 +78,56 @@
             />
           </template>
         </Column>
-      </template>
-      <template #modal>
-        <modal-form
-          modal-title="Create new record"
-          :displayModal="displayModal"
-          @close="closeModal"
-        >
-          <template #modal-content>
-            <admin-review-form
-              typeForm="create"
-              v-model:user="data.user"
-              v-model:book="data.book"
-              v-model:text="data.text"
-              v-model:created_date="data.created_date"
-              v-model:rating="data.rating"
-              :dataForm="data"
-              :books="books"
-              :users="users"
-              path="books/review"
-              :callback="this.getReviews"
-              @resetForm="resetForm"
-              @closeModal="closeModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-            />
-          </template>
-        </modal-form>
 
-        <modal-form
-          modal-title="Update record"
-          :displayModal="displayEditModal"
-          @close="closeEditModal"
-        >
-          <template #modal-content>
-            <admin-review-form
-              typeForm="update"
-              v-model:user="editForm.user"
-              v-model:book="editForm.book"
-              v-model:text="editForm.text"
-              v-model:created_date="editForm.created_date"
-              v-model:rating="editForm.rating"
-              :dataForm="editForm"
-              :books="books"
-              :users="users"
-              :path="`/books/updatereview/${editForm._id}`"
-              :callback="this.getReviews"
-              @resetForm="resetEditForm"
-              @closeModal="closeEditModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
+        <Column :exportable="false">
+          <template #body="slotProps">
+            <Button
+              v-if="!slotProps.data.isHidden"
+              icon="pi pi-eye-slash"
+              class="p-button-rounded p-button-warning"
+              @click="confirmHideReview(slotProps.data)"
+            />
+            <Button
+              v-if="slotProps.data.isHidden"
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-success p-mr-2"
+              @click="confirmHideReview(slotProps.data)"
             />
           </template>
-        </modal-form>
+        </Column>
+      </DataTable>
+    </div>
+    <Dialog
+      v-model:visible="itemHideDialog"
+      :style="{ width: '450px' }"
+      header="Confirm"
+      :modal="true"
+    >
+      <div class="confirmation-content">
+        <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+        <span>Are you sure you want to hide this review?</span>
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="itemHideDialog = false"
+        />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          class="p-button-text"
+          @click="hideReview"
+        />
       </template>
-    </admin-table>
+    </Dialog>
   </div>
 </template>
 
 <script>
-import moment from "moment";
-
-import AdminTable from "@/components/Admin/AdminTable.vue";
-import ModalForm from "@/components/UI/ModalForm";
-import AdminReviewForm from "@/components/Admin/Forms/AdminReviewForm.vue";
-
 import API from "@/utils/api";
+import moment from "moment";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -128,73 +136,37 @@ import toggle from "@/mixins/toggle.js";
 export default {
   name: "admin-users",
   mixins: [toggle, adminFormMixin, dataStore],
-  components: {
-    AdminTable,
-    ModalForm,
-    AdminReviewForm,
-  },
 
   data() {
     return {
       moment: moment,
-      data: {
-        user: "",
-        book: "",
-        created_date: "",
-        text: "",
-        rating: 0,
-      },
-
-      editForm: {
-        _id: "",
-        user: "",
-        book: "",
-        created_date: "",
-        text: "",
-        rating: 0,
-      },
+      itemHideDialog: false,
+      currentReview: null,
     };
   },
 
   methods: {
-    async onDeleteData(record) {
+    confirmHideReview(value) {
+      this.itemHideDialog = true;
+      this.currentReview = value;
+    },
+
+    async hideReview() {
       try {
-        await API.delete(`/books/deletereview/${record._id}`, {
-          data: { book: record.book },
+        await API.put(`/books/updatereview/${this.currentReview._id}`, {
+          ...this.currentReview,
+          isHidden: !this.currentReview.isHidden,
         });
+        this.currentReview = {};
+
         this.getReviews();
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: `Review for book ${record.book.title} deleted`,
-          life: 3000,
-        });
+        this.showMessage("Item updated");
       } catch (error) {
-        console.log(error);
-        this.$toast.add({
-          severity: "error",
-          summary: "Error Message",
-          detail: `${error.response.data.message}`,
-          life: 3000,
-        });
         this.getReviews();
+        console.log(error);
+        this.showErrorMessage(error.response.data.message);
       }
-    },
-
-    resetForm() {
-      this.data.user = this.users[0];
-      this.data.book = this.books[0];
-      this.data.text = "";
-      this.data.created_date = moment(new Date()).format("YYYY-MM-DDTHH:mm");
-    },
-
-    resetEditForm() {
-      const { user, book, text, created_date } = this.initialEditForm;
-      this.editForm.user = user;
-      this.editForm.book = book;
-      this.editForm.text = text;
-      this.editForm.created_date =
-        moment(created_date).format("YYYY-MM-DDTHH:mm");
+      this.itemHideDialog = false;
     },
   },
 
@@ -217,12 +189,6 @@ export default {
     this.getReviews();
     this.getBooks();
     this.getUsers();
-  },
-
-  mounted() {
-    this.data.user = this.users[0];
-    this.data.book = this.books[0];
-    this.data.created_date = moment(new Date()).format("YYYY-MM-DDTHH:mm");
   },
 };
 </script>

@@ -183,22 +183,10 @@ export default {
         });
 
         this.getReviewsBook();
-
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Updated",
-          life: 3000,
-        });
+        this.showMessage("Item updated");
       } catch (error) {
-        this.$toast.add({
-          severity: "error",
-          summary: "Error Message",
-          detail: `${error.response.data.message}`,
-          life: 3000,
-        });
-
         console.log(error);
+        this.showErrorMessage(error.response.data.message);
       }
     },
 

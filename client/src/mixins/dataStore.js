@@ -10,7 +10,6 @@ export default {
       getUserReservedBooks: "books/getUserReservedBooks",
       getReviews: "books/getReviews",
       getUsers: "login/getUsers",
-      getReviewsBook: "books/getReviewsBook",
       getAllBookActions: "books/getAllBookActions",
     }),
   },
@@ -29,7 +28,6 @@ export default {
       userReservedBooks: "books/userReservedBooks",
       reviews: "books/reviews",
       bookActions: "books/bookActions",
-      reviewsBook: "books/reviewsBook",
     }),
   },
 };

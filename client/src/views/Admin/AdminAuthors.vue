@@ -41,6 +41,7 @@
               :dataForm="data"
               path="books/author"
               :callback="this.getAuthors"
+              :textMessage="`${data.first_name} ${data.last_name} created`"
               @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
@@ -111,19 +112,12 @@ export default {
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/books/deleteauthor/${value._id}`, this.getAuthors);
-      this.showMessage(`${value.first_name} ${value.last_name} deleted`);
+      this.removeData(
+        `/books/deleteauthor/${value._id}`,
+        this.getAuthors,
+        `${value.first_name} ${value.last_name} deleted`
+      );
     },
-
-    // onDeleteItems(items) {
-    //   const ids = [];
-    //   items.forEach((elem) => {
-    //     ids.push(elem._id);
-    //   });
-
-    //   this.removeManyEntries(`/books/deletemanyauthors`, ids, this.getAuthors);
-    //   this.showMessage("Items deleted");
-    // },
 
     resetForm() {
       this.data.first_name = "";

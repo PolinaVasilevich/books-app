@@ -18,5 +18,9 @@ export default {
       type: Function,
       required: true,
     },
+
+    textMessage: {
+      type: String,
+    },
   },
 };

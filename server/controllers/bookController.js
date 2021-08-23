@@ -483,8 +483,6 @@ class bookController {
         { $sort: { last_action: -1 } },
       ]);
 
-      console.log(reservedBooks);
-
       res.json(reservedBooks);
     } catch (e) {
       console.log(e);

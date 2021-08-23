@@ -45,54 +45,28 @@ export default {
       this.$emit("resetForm");
     },
 
-    async addNewRecord(path, payload) {
+    async addNewRecord(path, payload, textMessage = "Item created") {
       try {
         await API.post(path, payload);
         this.callback();
-        // this.message = "New record has created";
-        // this.$emit("showMessage", this.message);
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Created",
-          life: 3000,
-        });
+        this.showMessage(textMessage);
       } catch (error) {
-        this.$toast.add({
-          severity: "error",
-          summary: "Error Message",
-          detail: `${error.response.data.message}`,
-          life: 3000,
-        });
         console.log(error);
         this.callback();
+        this.showMessage(error.response.data.message);
       }
     },
 
-    async updateData(path, payload) {
+    async updateData(path, payload, textMessage = "Item updated") {
       try {
         await API.put(path, payload);
         this.callback();
 
-        // this.message = "Record has updated";
-        // this.$emit("showMessage", this.message);
-
-        this.$toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item Updated",
-          life: 3000,
-        });
+        this.showMessage(textMessage);
       } catch (error) {
-        this.$toast.add({
-          severity: "error",
-          summary: "Error Message",
-          detail: `${error.response.data.message}`,
-          life: 3000,
-        });
-
         console.log(error);
         this.callback();
+        this.showMessage(error.response.data.message);
       }
     },
 
