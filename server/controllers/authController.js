@@ -1,4 +1,7 @@
 const User = require("../models/User/User");
+const Review = require("../models/Review");
+const BookActions = require("../models/BookActions");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
@@ -89,10 +92,19 @@ class authController {
   async deleteUser(req, res) {
     const { id } = req.params;
     try {
-      const user = await User.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${user.username} - were deleted successfully!`,
-      });
+      const bookAction = await BookActions.findOne({ user: id });
+      const review = await Review.findOne({ user: id });
+
+      if (!bookAction && !review) {
+        const user = await User.findByIdAndDelete({ _id: id });
+        return res.json({
+          message: `${user.username} were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `User can't be deleted. This entry is linked to other schemes!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete user with id ${id}` });
@@ -103,12 +115,21 @@ class authController {
     try {
       const { ids } = req.body;
 
-      await User.deleteMany({
-        _id: { $in: ids },
-      });
-      return res.json({
-        message: `Users with ids [${ids}] were deleted successfully!`,
-      });
+      const bookAction = await BookActions.findOne({ user: { $in: ids } });
+      const review = await Review.findOne({ user: { $in: ids } });
+
+      if (!bookAction && !review) {
+        await User.deleteMany({
+          _id: { $in: ids },
+        });
+        return res.json({
+          message: `Users with ids [${ids}] were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Users can't be deleted. This entry is linked to other schemes!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete users` });
