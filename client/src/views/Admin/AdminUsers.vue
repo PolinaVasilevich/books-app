@@ -8,6 +8,7 @@
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      @deleteItems="deleteItems($event, '/auth/deletemanyusers', this.getUsers)"
     >
       <template #content>
         <Column
@@ -149,13 +150,11 @@ export default {
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/auth/deleteuser/${value._id}`, this.getUsers);
-      this.$toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: `${value.username} Deleted`,
-        life: 3000,
-      });
+      this.removeData(
+        `/auth/deleteuser/${value._id}`,
+        this.getUsers,
+        `${value.username} deleted`
+      );
     },
 
     resetForm() {

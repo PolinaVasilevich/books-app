@@ -2,6 +2,20 @@
   <div>
     <Toast />
     <div class="card">
+      <h2>Reserved books</h2>
+      <div style="margin: 15px 0">
+        <span
+          class="p-input-icon-left"
+          style="display: inline-block; width: 100%"
+        >
+          <i class="pi pi-search" />
+          <InputText
+            placeholder="Search..."
+            v-model="searchQuery"
+            style="width: 100%"
+          />
+        </span>
+      </div>
       <DataTable
         :value="searchedItems"
         :paginator="true"
@@ -11,22 +25,6 @@
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
         responsiveLayout="scroll"
       >
-        <template #header>
-          <div
-            class="
-              table-header
-              p-d-flex p-flex-column p-flex-md-row p-jc-md-between
-            "
-          >
-            <h5 class="p-mb-2 p-m-md-0 p-as-md-center">Reviews</h5>
-
-            <span class="p-input-icon-left">
-              <i class="pi pi-search" />
-              <InputText placeholder="Search..." v-model.trim="searchQuery" />
-            </span>
-          </div>
-        </template>
-
         <Column field="user.username" header="User" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.user.username }}

@@ -19,6 +19,7 @@
       </div>
       <div style="margin-bottom: 1em">
         <Button
+          v-if="!isExpandAll"
           type="button"
           icon="pi pi-plus"
           label="Expand All"
@@ -27,6 +28,7 @@
           class="p-button-text"
         />
         <Button
+          v-else
           type="button"
           icon="pi pi-minus"
           label="Collapse All"
@@ -206,6 +208,7 @@ export default {
       displayMainDialog: false,
       textDialog: "",
       action: "",
+      isExpandAll: false,
       data: {
         user: "",
         book: "",
@@ -331,12 +334,14 @@ export default {
       for (let node of this.dataTable) {
         this.expandNode(node);
       }
+      this.isExpandAll = true;
 
       this.expandedKeys = { ...this.expandedKeys };
     },
 
     collapseAll() {
       this.expandedKeys = {};
+      this.isExpandAll = false;
     },
 
     expandNode(node) {

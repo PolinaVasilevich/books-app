@@ -1,17 +1,31 @@
 <template>
   <div>
     <Toast />
-    <admin-table
-      title="Books history"
-      v-model:searchQuery="searchQuery"
-      :data="searchedItems"
-      :showTableButtons="false"
-      :showHeaderButtons="false"
-      @openModal="openModal"
-      @openEditModal="editModal"
-      @deleteItem="onDeleteData"
-    >
-      <template #content>
+
+    <div class="card">
+      <h2>All book actions</h2>
+      <div style="margin: 15px 0">
+        <span
+          class="p-input-icon-left"
+          style="display: inline-block; width: 100%"
+        >
+          <i class="pi pi-search" />
+          <InputText
+            placeholder="Search..."
+            v-model="searchQuery"
+            style="width: 100%"
+          />
+        </span>
+      </div>
+      <DataTable
+        :value="searchedItems"
+        :paginator="true"
+        :rows="10"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        :rowsPerPageOptions="[5, 10, 25]"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+        responsiveLayout="scroll"
+      >
         <Column
           field="userAction.username"
           header="User action"
@@ -45,15 +59,14 @@
             }}
           </template>
         </Column>
-      </template>
-    </admin-table>
+      </DataTable>
+    </div>
   </div>
 </template>
 
 <script>
 import moment from "moment";
 import API from "@/utils/api";
-import AdminTable from "@/components/Admin/AdminTable.vue";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
@@ -63,9 +76,6 @@ export default {
   name: "admin-book-actions",
 
   mixins: [toggle, adminFormMixin, dataStore],
-  components: {
-    AdminTable,
-  },
 
   data() {
     return {

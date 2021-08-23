@@ -99,6 +99,22 @@ class authController {
     }
   }
 
+  async deleteManyUsers(req, res) {
+    try {
+      const { ids } = req.body;
+
+      await User.deleteMany({
+        _id: { $in: ids },
+      });
+      return res.json({
+        message: `Users with ids [${ids}] were deleted successfully!`,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete users` });
+    }
+  }
+
   async updateUser(req, res) {
     const { id } = req.params;
     try {
