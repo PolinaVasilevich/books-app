@@ -3,7 +3,6 @@ const ObjectId = require("mongodb").ObjectID;
 const crypto = require("crypto");
 
 const Book = require("../models/Book");
-const User = require("../models/User/User");
 
 const Author = require("../models/Author");
 const Genre = require("../models/Genre");
@@ -631,10 +630,19 @@ class bookController {
   async deleteBook(req, res) {
     const { id } = req.params;
     try {
-      const book = await Book.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${book.title}- Book were deleted successfully!`,
-      });
+      const bookAction = await BookActions.findOne({ book: id });
+      const review = await Review.findOne({ book: id });
+
+      if (!bookAction && !review) {
+        const book = await Book.findByIdAndDelete({ _id: id });
+        return res.json({
+          message: `${book.title} were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Book can't be deleted. This entry is linked to other schemes!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete book with id ${id}` });
@@ -644,13 +652,21 @@ class bookController {
   async deleteManyBooks(req, res) {
     try {
       const { ids } = req.body;
+      const bookAction = await BookActions.findOne({ book: { $in: ids } });
+      const review = await Review.findOne({ book: { $in: ids } });
 
-      await Book.deleteMany({
-        _id: { $in: ids },
-      });
-      return res.json({
-        message: `Books with ids [${ids}] were deleted successfully!`,
-      });
+      if (!bookAction && !review) {
+        await Book.deleteMany({
+          _id: { $in: ids },
+        });
+        return res.json({
+          message: `Books with ids [${ids}] were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Book can't be deleted. This entry is linked to other schemes!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete books` });
@@ -660,10 +676,20 @@ class bookController {
   async deleteAuthor(req, res) {
     const { id } = req.params;
     try {
-      const author = await Author.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${author.first_name} ${author.last_name} - Author were deleted successfully!`,
+      const book = await Book.findOne({
+        author: id,
       });
+
+      if (!book) {
+        const author = await Author.findByIdAndDelete({ _id: id });
+        return res.json({
+          message: `${author.first_name} ${author.last_name} were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Author can't be deleted. This entry is linked with ${book.title}!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete author with id ${id}` });
@@ -673,13 +699,22 @@ class bookController {
   async deleteManyAuthors(req, res) {
     try {
       const { ids } = req.body;
+      const book = await Book.findOne({
+        author: { $in: ids },
+      });
 
-      await Author.deleteMany({
-        _id: { $in: ids },
-      });
-      return res.json({
-        message: `Authors with ids [${ids}] were deleted successfully!`,
-      });
+      if (!book) {
+        await Author.deleteMany({
+          _id: { $in: ids },
+        });
+        return res.json({
+          message: `Authors with ids [${ids}] were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Author can't be deleted. This entry is linked with ${book.title}!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete authors` });
@@ -689,10 +724,20 @@ class bookController {
   async deleteGenre(req, res) {
     const { id } = req.params;
     try {
-      const genre = await Genre.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${genre.name} - Genre were deleted successfully!`,
+      const book = await Book.findOne({
+        author: id,
       });
+
+      if (!book) {
+        const genre = await Genre.findByIdAndDelete({ _id: id });
+        return res.json({
+          message: `${genre.name} were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Genre can't be deleted. This entry is linked with ${book.title}!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete genre with id ${id}` });
@@ -702,13 +747,22 @@ class bookController {
   async deleteManyGenres(req, res) {
     try {
       const { ids } = req.body;
+      const book = await Book.findOne({
+        author: { $in: ids },
+      });
 
-      await Genre.deleteMany({
-        _id: { $in: ids },
-      });
-      return res.json({
-        message: `Genres with ids [${ids}] were deleted successfully!`,
-      });
+      if (!book) {
+        await Genre.deleteMany({
+          _id: { $in: ids },
+        });
+        return res.json({
+          message: `Genres with ids [${ids}] were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Author can't be deleted. This entry is linked with ${book.title}!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete genres` });

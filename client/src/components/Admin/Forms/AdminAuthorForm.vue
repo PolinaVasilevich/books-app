@@ -11,7 +11,6 @@
     @resetForm="$emit('resetForm')"
   >
     <template v-slot:input>
-      {{ textMessage }}
       <div class="p-field">
         <label for="first_name">First name</label>
         <InputText
