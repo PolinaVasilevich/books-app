@@ -1,10 +1,16 @@
 <template>
   <div class="form">
-    <my-form @submitForm="onRegistration" typeForm="registration" />
+    <Toast />
+    <my-form
+      @submitForm="onRegistration"
+      typeForm="registration"
+      title="Registration"
+    />
   </div>
 </template>
 
 <script>
+import API from "@/utils/api";
 import MyForm from "@/components/MyForm/MyForm";
 import toggle from "@/mixins/toggle.js";
 
@@ -16,14 +22,13 @@ export default {
   methods: {
     async onRegistration(user) {
       try {
-        await this.$store.dispatch("login/registration", user);
+        await API.post("auth/user", user);
       } catch (error) {
         console.log(error);
         this.$toast.add({
           severity: "error",
           summary: "Error Message",
-          detail: error.message,
-          life: 3000,
+          detail: error.response.data.message,
         });
       }
     },
