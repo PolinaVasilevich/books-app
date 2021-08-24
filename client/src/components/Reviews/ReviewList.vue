@@ -1,6 +1,6 @@
 <template>
   <div class="review-list">
-    <h2>Reviews</h2>
+    <!-- <h2>Reviews</h2> -->
 
     <div v-if="items.length">
       <review-item

@@ -52,7 +52,7 @@ export default {
 <style scoped>
 .form {
   width: 750px;
-  margin: 150px auto;
+  margin: 50px auto;
   text-align: center;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="card" style="border: none; box-shadow: none; padding: 0">
+  <div class="card" style="border: none; box-shadow: none; padding: 0 4%">
     <Toast />
     <Button
       v-if="user.isAdmin"
@@ -7,7 +7,7 @@
       icon="pi pi-plus"
       class="p-button-success p-mr-2"
       @click="openModal"
-      style="margin-bottom: 30px; align-self: flex-end"
+      style="margin: 30px 0; align-self: flex-end"
     />
     <modal-form
       modal-title="Create new record"
@@ -34,10 +34,37 @@
         />
       </template>
     </modal-form>
-    <DataView :value="sortedBooks" :layout="layout" :paginator="true" :rows="6">
+    <DataView
+      :value="searchedBooksByGenre"
+      :layout="layout"
+      :paginator="true"
+      :rows="8"
+    >
       <template #header>
         <div class="p-grid p-nogutter">
-          <div style="width: 100%">
+          <div class="buttons" style="margin: 20px auto">
+            <Button
+              label="All"
+              class="p-button p-button-text search-button"
+              @click="searchQuery = 'all'"
+              :class="{ 'active-search-button': searchQuery === 'all' }"
+            />
+            <Button
+              label="Most popular"
+              class="p-button p-button-text search-button"
+              @click="searchQuery = 'popular'"
+              :class="{ 'active-search-button': searchQuery === 'popular' }"
+            />
+            <Button
+              v-for="genre in genres"
+              :key="genre.name"
+              :label="genre.name"
+              class="p-button p-button-text search-button"
+              @click="searchQuery = genre.name"
+              :class="{ 'active-search-button': searchQuery === genre.name }"
+            />
+          </div>
+          <!-- <div style="width: 100%">
             <span class="p-input-icon-left" style="width: 100%">
               <i class="pi pi-search" />
               <InputText
@@ -46,7 +73,7 @@
                 style="width: 100%"
               />
             </span>
-          </div>
+          </div> -->
           <div
             class="p-col-6"
             style="
@@ -58,14 +85,14 @@
               align-items: center;
             "
           >
-            <Dropdown
+            <!-- <Dropdown
               v-model="selectedSort"
               :options="sortOptions"
               optionLabel="label"
               optionValue="value"
               placeholder="Sort By..."
               style="text-align: left"
-            />
+            /> -->
             <DataViewLayoutOptions v-model="layout" />
           </div>
         </div>
@@ -87,14 +114,35 @@
             </router-link>
 
             <div class="product-list-detail">
-              <div class="product-name">{{ slotProps.data.title }}</div>
-              <div class="product-description">
+              <div
+                class="product-description"
+                style="
+                  margin-top: 1px;
+                  letter-spacing: 0.35em;
+                  font-family: josefin sans, sans-serif;
+                  font-size: 12px;
+                  text-transform: uppercase;
+                  color: #999;
+                "
+              >
                 {{
                   slotProps.data.author.first_name +
                   " " +
                   slotProps.data.author.last_name
                 }}
               </div>
+              <div
+                class="product-name"
+                style="
+                  color: #000;
+                  font-weight: 500;
+                  letter-spacing: 0.01em;
+                  word-wrap: break-word;
+                "
+              >
+                {{ slotProps.data.title }}
+              </div>
+
               <Rating
                 :modelValue="slotProps.data.rating"
                 :readonly="true"
@@ -151,13 +199,35 @@
                 "
                 ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
               </router-link>
-              <div class="product-name">{{ slotProps.data.title }}</div>
-              <div class="product-description">
+              <div
+                class="product-description"
+                style="
+                  margin-top: 1px;
+                  letter-spacing: 0.35em;
+                  font-family: josefin sans, sans-serif;
+                  font-size: 12px;
+                  text-transform: uppercase;
+                  color: #999;
+                "
+              >
                 {{
                   slotProps.data.author.first_name +
                   " " +
                   slotProps.data.author.last_name
                 }}
+              </div>
+              <div
+                class="product-name"
+                style="
+                  color: #000;
+
+                  font-weight: 500;
+                  letter-spacing: 0.01em;
+
+                  word-wrap: break-word;
+                "
+              >
+                {{ slotProps.data.title }}
               </div>
               <Rating
                 :modelValue="slotProps.data.rating"
@@ -208,7 +278,7 @@ export default {
         { label: "Sort By Title", value: "title" },
         { label: "Sort By Rating", value: "rating" },
       ],
-      searchQuery: "",
+      searchQuery: "all",
     };
   },
 
@@ -229,6 +299,16 @@ export default {
           book.author.last_name?.toLowerCase().includes(this.searchQuery)
         );
       });
+    },
+
+    searchedBooksByGenre() {
+      if (this.searchQuery === "all") {
+        return [...this.books];
+      }
+      return this.books.filter(
+        (book) =>
+          book.genre.name?.toLowerCase() === this.searchQuery?.toLowerCase()
+      );
     },
 
     sortedBooks() {
@@ -259,6 +339,7 @@ export default {
     this.getBooks();
     this.getUsers();
     this.getAuthors();
+    this.getGenres();
   },
 };
 </script>

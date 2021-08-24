@@ -1,23 +1,19 @@
 <template>
   <div class="app">
-    <div
-      v-if="$route.path == '/'"
-      :style="{
-        backgroundImage: `url(http://subsolardesigns.com/leona/wp-content/uploads/2019/04/hero_image2_clear.jpg)`,
-        width: '100%',
-        height: '600px',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }"
-    ></div>
-    <i
+    <!-- <i
       v-if="$route.path !== '/'"
       @click="getBack"
       class="bi bi-arrow-left arrow"
-    ></i>
+    ></i> -->
 
-    <header class="header">
+    <header
+      id="header"
+      class="header"
+      :class="{
+        'fixed-header': $route.path === '/',
+        'show-header': isShowHeader,
+      }"
+    >
       <div class="header__logo">
         <h1>
           <router-link class="header__logo__link" to="/">Books App</router-link>
@@ -69,6 +65,11 @@
 import { mapGetters, mapState } from "vuex";
 
 export default {
+  data() {
+    return {
+      isShowHeader: false,
+    };
+  },
   methods: {
     logout() {
       this.$store.dispatch("login/logout").then(() => {
@@ -89,6 +90,17 @@ export default {
       isLoggedIn: "isLoggedIn",
       isAdmin: "isAdmin",
     }),
+  },
+
+  mounted() {
+    window.document.onscroll = () => {
+      const header = document.getElementById("header");
+      if (window.scrollY > header.offsetTop) {
+        this.isShowHeader = true;
+      } else {
+        this.isShowHeader = false;
+      }
+    };
   },
 };
 </script>

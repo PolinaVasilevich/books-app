@@ -1,7 +1,19 @@
 <template>
   <div class="book-page">
     <Toast />
-    <div class="alerts">
+
+    <div class="mkdf-has-bg-image" data-height="300">
+      <div class="mkdf-title-wrapper" style="height: 300px">
+        <div class="mkdf-title-inner" style="height: inherit">
+          <div class="mkdf-grid">
+            <!-- <h2 class="mkdf-page-title entry-title" style="color: #ffffff">
+              {{ currentBook.title }}
+            </h2> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="alerts">
       <Message
         v-if="!currentBook.count && !isReserved"
         severity="warn"
@@ -15,11 +27,10 @@
         class="message"
         >You have already reserved this book</Message
       >
-    </div>
-
+    </div> -->
     <div>
       <div class="book-page__content">
-        <div>
+        <div style="position: sticky; top: 20px">
           <img
             :src="currentBook.img"
             :alt="currentBook.title"
@@ -27,25 +38,17 @@
           />
         </div>
         <div class="book-page__content__info">
-          <h2 class="book-page__content__info__title">
-            {{ currentBook.title }}
-          </h2>
-          <p class="book-page__content__info__text">
-            <strong>Author: </strong>
+          <p class="book-page__content__info__author">
+            BY
             {{
               currentBook.author?.first_name +
               " " +
               currentBook.author?.last_name
             }}
           </p>
-          <p class="book-page__content__info__text">
-            <strong>Genre: </strong>
-            {{ currentBook.genre?.name }}
-          </p>
-          <p class="book-page__content__info__text">
-            <strong>Count: </strong>
-            {{ currentBook?.count }}
-          </p>
+          <h2 class="book-page__content__info__title">
+            {{ currentBook.title }}
+          </h2>
 
           <Rating
             :modelValue="currentBook.rating"
@@ -53,64 +56,91 @@
             :readonly="true"
             v-if="currentBook.rating"
             class="book-page__content__info__text"
+            style="margin-top: 10px"
           />
 
           <Button
-            v-if="isLoggedIn && !user.isAdmin"
-            :label="!isReserved ? 'Reserve book' : 'Reserved'"
+            v-if="!currentBook.count && !isReserved"
+            :label="'out of stock'.toUpperCase()"
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
             :disabled="!currentBook.count || !currentBook.count || isReserved"
             icon="pi pi-book"
+            style="margin: 50px 0"
           />
-        </div>
-      </div>
-      <div>
-        <review-list
-          :items="reviewsBook"
-          :currentUser="user"
-          typeForm="update"
-          :callback="this.getReviewsBook"
-        />
 
-        <Button
-          label="New review"
-          icon="pi pi-plus"
-          class="p-button-success p-mr-2"
-          @click="openModal"
-          v-if="isLoggedIn && user.username !== 'admin'"
-        />
+          <Button
+            v-if="isLoggedIn && !user.isAdmin"
+            :label="
+              !isReserved
+                ? 'Reserve book'
+                : 'You have already reserved this book'
+            "
+            class="p-button-warning"
+            @click="onReserveBook(currentBook, user)"
+            :disabled="!currentBook.count || !currentBook.count || isReserved"
+            icon="pi pi-book"
+            style="margin: 50px 0"
+          />
 
-        <Dialog
-          v-model:visible="displayModal"
-          :style="{ width: '450px' }"
-          header="Add review"
-          :modal="true"
-          class="p-fluid"
-        >
-          <div class="p-field">
-            <label for="name">Text</label>
-            <Textarea
-              v-model="data.text"
-              :autoResize="true"
-              rows="5"
-              required
-            />
-            <div>
-              <span>Your rating: </span
-              ><Rating v-model="data.rating" :readonly="false" />
-            </div>
+          <div>
+            <p class="book-page__content__info__text">
+              Genre: {{ currentBook.genre?.name }}
+            </p>
+            <p class="book-page__content__info__text">
+              Count:
+              {{ currentBook?.count }}
+            </p>
           </div>
 
-          <template #footer>
-            <Button
-              label="Save"
-              icon="pi pi-check"
-              class="p-button-text"
-              @click.prevent="onSave"
+          <div class="reviews">
+            <review-list
+              :items="reviewsBook"
+              :currentUser="user"
+              typeForm="update"
+              :callback="this.getReviewsBook"
             />
-          </template>
-        </Dialog>
+
+            <Button
+              label="New review"
+              icon="pi pi-plus"
+              class="p-button-success p-mr-2"
+              @click="openModal"
+              v-if="isLoggedIn && user.username !== 'admin'"
+            />
+
+            <Dialog
+              v-model:visible="displayModal"
+              :style="{ width: '450px' }"
+              header="Add review"
+              :modal="true"
+              class="p-fluid"
+            >
+              <div class="p-field">
+                <label for="name">Text</label>
+                <Textarea
+                  v-model="data.text"
+                  :autoResize="true"
+                  rows="5"
+                  required
+                />
+                <div>
+                  <span>Your rating: </span
+                  ><Rating v-model="data.rating" :readonly="false" />
+                </div>
+              </div>
+
+              <template #footer>
+                <Button
+                  label="Save"
+                  icon="pi pi-check"
+                  class="p-button-text"
+                  @click.prevent="onSave"
+                />
+              </template>
+            </Dialog>
+          </div>
+        </div>
       </div>
     </div>
   </div>

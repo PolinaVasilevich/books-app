@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding: 0 4%">
     <Toast />
     <div class="user-page">
       <h1>My reserved books</h1>

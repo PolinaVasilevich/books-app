@@ -23,6 +23,7 @@ import Timeline from "primevue/timeline";
 import TreeTable from "primevue/treetable";
 import Password from "primevue/password";
 import Divider from "primevue/divider";
+import Carousel from "primevue/carousel";
 
 export default [
   Dialog,
@@ -49,4 +50,5 @@ export default [
   TreeTable,
   Password,
   Divider,
+  Carousel,
 ];

@@ -1,5 +1,5 @@
 <template>
-  <div class="book-page">
+  <div class="book-page" style="padding: 0 4%">
     <Message v-if="displayMessage" severity="success">{{ message }}</Message>
 
     <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>

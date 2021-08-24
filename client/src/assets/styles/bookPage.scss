@@ -1,13 +1,13 @@
 $margin-bottom-field: 10px;
 
 .book-page {
-  padding: 70px 100px;
   &__content {
     display: flex;
     align-items: flex-start;
     margin-top: 50px;
+    padding: 4%;
     &__img {
-      margin-right: 30px;
+      margin-right: 40px;
       display: block;
       object-fit: cover;
       width: 400px;
@@ -33,20 +33,76 @@ $margin-bottom-field: 10px;
     }
 
     &__info {
+      width: 100%;
+      &__author {
+        letter-spacing: 0.35em;
+        font-family: josefin sans, sans-serif;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #999;
+        transform: translateY(-3px);
+        display: inline-block;
+      }
+      &__title {
+        color: #000;
+        // margin: 25px 0;
+
+        margin: -9px 0 0;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+
+        word-wrap: break-word;
+      }
+
       &__text {
-        font-size: 1.2em;
         margin: 0;
-        margin-bottom: $margin-bottom-field;
+      }
+      &__subtitle {
+        font-family: cormorant garamond, sans-serif;
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        vertical-align: middle;
+        margin: 26px 0 0;
+
+        box-sizing: border-box;
+
+        font-size: 19px;
+        font-weight: 400;
+        line-height: 28px;
+        color: #555;
       }
     }
   }
 }
+.mkdf-has-bg-image {
+  height: 300px;
+  background-image: url(https://chapterone.qodeinteractive.com/wp-content/uploads/2019/07/shop-list-title-area-1.jpg);
+  background-color: #fbf9f6;
+  background-position: center 0;
+  background-repeat: no-repeat;
+  z-index: 101;
+  width: 100%;
+  padding: 0 !important;
+}
 
-.alerts {
-  margin: 0;
-  padding: 0;
+.mkdf-grid {
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .message {
-    margin: 0 -100px 50px -100px;
-  }
+.reviews {
+  display: table;
+  border-top: 1px solid #e1e1e1;
+  border-bottom: 1px solid #e1e1e1;
+  margin: 230px 0 50px;
+  padding: 37px 0 45px;
+  width: 100%;
+}
+.alerts,
+.message {
+  margin: 0 !important;
+  padding: 0 !important;
 }

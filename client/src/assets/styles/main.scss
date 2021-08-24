@@ -20,8 +20,7 @@ $dark: #333;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  // font-family: "Roboto", sans-serif;
-  font-family: "Open Sans", sans-serif;
+
   color: $dark;
 }
 
@@ -35,6 +34,7 @@ body {
   font-variant-ligatures: no-common-ligatures;
   overflow-x: hidden;
   word-wrap: break-word;
+  font-family: cormorant garamond, sans-serif;
   // background-color: #fafafa;
 }
 
@@ -66,14 +66,16 @@ body {
 }
 
 .app__content {
-  margin-top: 50px;
-  padding: 10px 100px;
+  // margin-top: 70px;
+  // padding: 10px 100px;
 }
-
+.admin-page {
+  padding: 0 4%;
+}
 .arrow {
-  position: fixed;
-  top: 20px;
-  left: 30px;
+  position: absolute;
+  top: 15px;
+  left: 5px;
   z-index: 9999;
   font-size: 2em;
   cursor: pointer;
