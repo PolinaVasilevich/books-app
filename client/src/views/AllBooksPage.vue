@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" style="border: none; box-shadow: none; padding: 0">
     <Toast />
     <Button
       v-if="user.isAdmin"
@@ -37,23 +37,36 @@
     <DataView :value="sortedBooks" :layout="layout" :paginator="true" :rows="6">
       <template #header>
         <div class="p-grid p-nogutter">
-          <div class="p-col-6" style="text-align: left">
-            <span class="p-input-icon-left">
+          <div style="width: 100%">
+            <span class="p-input-icon-left" style="width: 100%">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." v-model="searchQuery" />
+              <InputText
+                placeholder="Search..."
+                v-model="searchQuery"
+                style="width: 100%"
+              />
             </span>
           </div>
-          <div class="p-col-6" style="text-align: right">
-            <DataViewLayoutOptions v-model="layout" />
-
+          <div
+            class="p-col-6"
+            style="
+              text-align: left;
+              display: flex;
+              margin-top: 20px;
+              width: 100%;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
             <Dropdown
               v-model="selectedSort"
               :options="sortOptions"
               optionLabel="label"
               optionValue="value"
               placeholder="Sort By..."
-              style="text-align: left; margin-top: 10px"
+              style="text-align: left"
             />
+            <DataViewLayoutOptions v-model="layout" />
           </div>
         </div>
       </template>
@@ -105,7 +118,10 @@
       </template>
 
       <template #grid="slotProps">
-        <div class="p-col-12 p-md-4" style="display: flex">
+        <div
+          class="p-col-12 p-md-4"
+          style="display: flex; padding: 0 !important"
+        >
           <div class="product-grid-item card">
             <div class="product-grid-item-top">
               <div>

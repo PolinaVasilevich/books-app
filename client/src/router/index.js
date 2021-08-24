@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 
 import Login from "@/views/Login.vue";
+import Home from "@/views/Home.vue";
 import Registration from "@/views/Registration.vue";
-import AllBooksPage from "@/views/AllBooksPage.vue";
+// import AllBooksPage from "@/views/AllBooksPage.vue";
 import BookPage from "@/views/BookPage.vue";
 
 import UserPage from "@/views/UserPage.vue";
@@ -23,12 +24,13 @@ const routes = [
   {
     path: "/",
     name: "books",
-    component: AllBooksPage,
+    component: Home,
   },
   {
     path: "/login",
     name: "login",
     component: Login,
+    props: true,
   },
 
   {

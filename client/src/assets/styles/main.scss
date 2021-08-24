@@ -8,19 +8,24 @@
 @import "@/assets/styles/admin-book-page.scss";
 @import "@/assets/styles/reviews.scss";
 
+$font-family-sans-serif: BlinkMacSystemFont, "Segoe UI", Roboto,
+  "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+  "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+  "Liberation Mono", "Courier New", monospace;
+
+$dark: #333;
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   // font-family: "Roboto", sans-serif;
-
-  color: #000;
-  text-decoration: none;
+  font-family: "Open Sans", sans-serif;
+  color: $dark;
 }
 
 body {
-  // max-width: 1600px;
-  // margin: 0 auto;
   color: #7a7a7a;
   font-size: 16px;
   font-weight: 400;
@@ -30,7 +35,12 @@ body {
   font-variant-ligatures: no-common-ligatures;
   overflow-x: hidden;
   word-wrap: break-word;
-  background-color: #fafafa;
+  // background-color: #fafafa;
+}
+
+.links {
+  text-decoration: none;
+  color: $dark;
 }
 
 .btns,
@@ -56,7 +66,7 @@ body {
 }
 
 .app__content {
-  margin-top: 70px;
+  margin-top: 50px;
   padding: 10px 100px;
 }
 
@@ -110,4 +120,15 @@ body {
 .p-highlight {
   background: #f8f9fa;
   color: #2196f3;
+}
+
+.p-dataview-header {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+.product-grid-item {
+  margin-left: 0 !important;
 }

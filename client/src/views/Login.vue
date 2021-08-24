@@ -1,8 +1,15 @@
 <template>
   <div class="form">
     <Toast />
-    <my-form @submitForm="onLogin" />
-    <p><router-link to="/registration">Registration </router-link></p>
+    <my-form @submitForm="onLogin" :data="data" />
+    <p>
+      Not registred?
+      <router-link
+        style="text-decoration: none; color: #f66e5e"
+        to="/registration"
+        >Create an account!</router-link
+      >
+    </p>
   </div>
 </template>
 
@@ -10,6 +17,11 @@
 import MyForm from "@/components/MyForm/MyForm";
 
 export default {
+  props: {
+    data: {
+      type: Object,
+    },
+  },
   components: {
     MyForm,
   },

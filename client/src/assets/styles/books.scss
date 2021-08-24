@@ -105,8 +105,11 @@
     width: 50% !important;
   }
 }
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 800px) {
   .p-md-4 {
+    width: 100% !important;
+  }
+  .product-grid-item {
     width: 100% !important;
   }
 }

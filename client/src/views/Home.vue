@@ -6,9 +6,8 @@
 
 <script>
 import AllBooksPage from "./AllBooksPage.vue";
+
 export default {
   components: { AllBooksPage },
 };
 </script>
-
-<style></style>

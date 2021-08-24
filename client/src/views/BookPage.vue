@@ -144,7 +144,12 @@ export default {
   methods: {
     async getReservedBooks() {
       try {
-        await this.$store.dispatch("books/getUserReservedBooks", this.user._id);
+        if (this.user._id) {
+          await this.$store.dispatch(
+            "books/getUserReservedBooks",
+            this.user._id
+          );
+        }
       } catch (error) {
         console.log(error);
       }

@@ -27,48 +27,29 @@
 
           <div class="p-field">
             <div class="p-float-label">
-              <my-input
-                v-if="typeForm === 'login'"
-                class="p-inputtext p-component p-password-input"
-                :class="{ 'p-invalid': v$.password.$invalid && submitted }"
-                placeholder="Password*"
-                v-model="v$.password.$model"
-                type="password"
-              />
               <Password
-                v-if="typeForm === 'registration'"
                 id="password"
                 placeholder="Password*"
                 v-model="v$.password.$model"
                 :class="{ 'p-invalid': v$.password.$invalid && submitted }"
                 toggleMask
+                :feedback="false"
               >
-                <template #header>
-                  <h6>Pick a password</h6>
-                </template>
-                <template #footer="sp">
-                  {{ sp.level }}
-                  <Divider />
-                  <p class="p-mt-2">Suggestions</p>
-                  <ul class="p-pl-2 p-ml-2 p-mt-0" style="line-height: 1.5">
-                    <li>At least one lowercase</li>
-                    <li>At least one uppercase</li>
-                    <li>At least one numeric</li>
-                    <li>Minimum 8 characters</li>
-                  </ul>
-                </template>
               </Password>
             </div>
-            <small
+            <div
               v-if="
                 (v$.password.$invalid && submitted) ||
                 v$.password.$pending.$response
               "
-              class="p-error"
-              >{{
-                v$.password.required.$message.replace("Value", "Password")
-              }}</small
             >
+              <small class="p-error" v-if="v$.password.required.$invalid"
+                >Password is required</small
+              >
+              <small class="p-error" v-if="v$.password.minLength.$invalid"
+                >Password must be at least 8 characters</small
+              >
+            </div>
           </div>
 
           <Button type="submit" label="Submit" class="p-mt-2" />
@@ -79,9 +60,9 @@
 </template>
 
 <script>
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
 import { useVuelidate } from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
+import { required, minLength } from "@vuelidate/validators";
 
 export default {
   name: "my-form",
@@ -90,17 +71,27 @@ export default {
       type: String,
       default: "Login",
     },
-    typeForm: {
+    data: {
       type: String,
-      default: "login",
     },
   },
+
   data() {
     return {
       submitted: false,
     };
   },
-  setup() {
+
+  setup(props) {
+    onMounted(() => {
+      if (props.data) {
+        const { username, password } = JSON.parse(props.data);
+
+        user.username = username;
+        user.password = password;
+      }
+    });
+
     const user = reactive({
       username: "",
       password: "",
@@ -108,7 +99,7 @@ export default {
 
     const rules = {
       username: { required },
-      password: { required },
+      password: { required, minLength: minLength(3) },
     };
 
     const v$ = useVuelidate(rules, user);
