@@ -1,7 +1,5 @@
 <template>
   <div class="review-list">
-    <!-- <h2>Reviews</h2> -->
-
     <div v-if="items.length">
       <review-item
         v-for="item in items"
@@ -46,4 +44,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.single-review {
+  background-color: #fbf9f6;
+  margin-bottom: 30px;
+}
+</style>

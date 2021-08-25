@@ -1,15 +1,24 @@
 <template>
   <div class="form">
     <Toast />
-    <my-form @submitForm="onLogin" :data="data" />
-    <p>
-      Not registred?
-      <router-link
-        style="text-decoration: none; color: #f66e5e"
-        to="/registration"
-        >Create an account!</router-link
-      >
-    </p>
+    <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
+      <div class="mkdf-title-wrapper" style="height: 300px">
+        <div class="mkdf-title-inner" style="height: inherit">
+          <div class="mkdf-grid">
+            <!-- <h2 class="mkdf-page-title entry-title" style="color: #ffffff">
+              {{ currentBook.title }}
+            </h2> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <my-form
+      @submitForm="onLogin"
+      :data="data"
+      style="text-align: center"
+      typeForm="login"
+    />
   </div>
 </template>
 
@@ -50,9 +59,9 @@ export default {
 </script>
 
 <style scoped>
-.form {
+/* .form {
   width: 750px;
   margin: 50px auto;
   text-align: center;
-}
+} */
 </style>

@@ -10,41 +10,7 @@
         backgroundRepeat: 'no-repeat',
       }"
     ></div>
-    <!-- <div class="card">
-      <Carousel
-        :value="books"
-        :numVisible="3"
-        :numScroll="1"
-        :responsiveOptions="responsiveOptions"
-        class="custom-carousel"
-        :circular="true"
-        :autoplayInterval="3000"
-      >
-        <template #item="slotProps">
-          <div class="product-item">
-            <div class="product-item-content">
-              <div class="p-mb-3">
-                <img
-                  :src="slotProps.data.img"
-                  :alt="slotProps.data.name"
-                  class="product-image"
-                  style="
-                    width: 100%;
-                    height: 250px;
-                    object-fit: cover;
-                    object-position: center;
-                  "
-                />
-              </div>
-              <div>
-                <h4 class="p-mb-1">{{ slotProps.data.name }}</h4>
-              </div>
-            </div>
-          </div>
-        </template>
-      </Carousel>
-    </div> -->
-    <all-books-page />
+    <all-books-page :bookGenre="bookGenre" />
   </div>
 </template>
 
@@ -54,7 +20,11 @@ import dataStore from "@/mixins/dataStore.js";
 export default {
   mixins: [dataStore],
   components: { AllBooksPage },
-
+  props: {
+    bookGenre: {
+      type: String,
+    },
+  },
   created() {
     this.getBooks();
     this.getUsers();

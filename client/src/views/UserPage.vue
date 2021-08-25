@@ -1,9 +1,18 @@
 <template>
-  <div style="padding: 0 4%">
+  <div>
     <Toast />
-    <div class="user-page">
-      <h1>My reserved books</h1>
-
+    <div class="mkdf-has-bg-image" data-height="300">
+      <div class="mkdf-title-wrapper" style="height: 300px">
+        <div class="mkdf-title-inner" style="height: inherit">
+          <div class="mkdf-grid">
+            <h2 class="mkdf-page-title entry-title" style="color: #ffffff">
+              My reserved books
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="user-page" style="padding: 20px 4%">
       <div v-if="userReservedBooks?.length" style="margin-top: 15px">
         <span
           class="p-input-icon-left"

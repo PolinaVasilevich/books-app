@@ -38,7 +38,7 @@
       :value="searchedBooksByGenre"
       :layout="layout"
       :paginator="true"
-      :rows="8"
+      :rows="9"
     >
       <template #header>
         <div class="p-grid p-nogutter">
@@ -110,7 +110,19 @@
                       params: { id: slotProps.data._id },
                     }
               "
-              ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
+              ><img
+                :src="slotProps.data.img"
+                :alt="slotProps.data.title"
+                width="800"
+                height="1104"
+                class="
+                  attachment-woocommerce_single
+                  size-woocommerce_single
+                  wp-post-image
+                "
+                loading="lazy"
+                sizes="(max-width: 800px) 100vw, 800px"
+              />
             </router-link>
 
             <div class="product-list-detail">
@@ -173,9 +185,12 @@
           <div class="product-grid-item card">
             <div class="product-grid-item-top">
               <div>
-                <span class="product-category">{{
-                  slotProps.data.category
-                }}</span>
+                <Button
+                  v-if="this.user.isAdmin"
+                  icon="pi pi-times"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  @click="deleteBook"
+                />
               </div>
               <span
                 class="product-badge"
@@ -257,7 +272,12 @@ export default {
     AdminBooksForm,
   },
   mixins: [adminFormMixin, toggle, dataStore],
-
+  props: {
+    bookGenre: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       layout: "grid",
@@ -305,6 +325,9 @@ export default {
       if (this.searchQuery === "all") {
         return [...this.books];
       }
+      if (this.searchQuery === "popular") {
+        return [...this.mostPopularBooks];
+      }
       return this.books.filter(
         (book) =>
           book.genre.name?.toLowerCase() === this.searchQuery?.toLowerCase()
@@ -334,12 +357,28 @@ export default {
           return [...this.searchedBooks];
       }
     },
+
+    mostPopularBooks() {
+      const mostPopularBooks = [];
+      this.bookActions
+        .filter((book) => book.status === "Received")
+        .forEach((item) => {
+          mostPopularBooks.push(item.book);
+        });
+
+      return mostPopularBooks.slice(0, 4);
+    },
   },
   created() {
     this.getBooks();
     this.getUsers();
     this.getAuthors();
     this.getGenres();
+    this.getAllBookActions();
+
+    if (this.bookGenre) {
+      this.searchQuery = this.bookGenre;
+    }
   },
 };
 </script>

@@ -1,121 +1,214 @@
 <template>
-  <div class="book-page" style="padding: 0 4%">
-    <Message v-if="displayMessage" severity="success">{{ message }}</Message>
-
-    <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
-    <div class="flex-container" style="margin-top: 70px">
-      <div>
-        <img
-          :src="book.img"
-          :alt="book.title"
-          class="book-page__content__img"
-        />
-      </div>
-      <div style="width: 100%" class="flex-container">
-        <Button
-          icon="pi pi pi-pencil"
-          class="p-button-rounded p-button-success p-button-text"
-          style="fontsize: 2rem"
-          @click="displayEditForm = !displayEditForm"
-        />
-
-        <admin-form
-          style="width: 100%"
-          typeForm="update"
-          :showButtons="displayEditForm"
-          :dataForm="editForm"
-          :path="`/books/updatebook/${editForm._id}`"
-          :callback="this.getBooks"
-          @resetForm="resetForm"
-          @showMessage="showMessage"
-          @showErrorMessage="showErrorMessage"
-          @closeEditForm="closeEditForm"
-        >
-          <template v-slot:input>
-            <Textarea
-              v-model="editForm.title"
-              :autoResize="true"
-              placeholder="Enter title book"
-              class="book-info-title"
-              :class="{ 'disabled-form': !displayEditForm }"
-            />
-
-            <p class="flex-container book-info-text-container">
-              <strong class="book-info-text">Author: </strong>
-              <select
-                class="form-control book-info-text input-margin"
-                v-model="editForm.author"
-                :class="{ 'disabled-form': !displayEditForm }"
-              >
-                <option v-for="item in authors" :key="item._id" :value="item">
-                  {{ item.first_name + " " + item.last_name }}
-                </option>
-              </select>
-            </p>
-
-            <p class="flex-container book-info-text-container">
-              <strong class="book-info-text">Genre: </strong>
-
-              <select
-                class="form-control book-info-text input-margin"
-                v-model="editForm.genre"
-                :class="{ 'disabled-form': !displayEditForm }"
-              >
-                <option v-for="item in genres" :key="item._id" :value="item">
-                  {{ item.name }}
-                </option>
-              </select>
-            </p>
-
-            <p
-              class="flex-container book-info-text-container"
-              v-if="displayEditForm"
-            >
-              <strong class="book-info-text">Image: </strong>
-              <Textarea
-                v-model="editForm.img"
-                :autoResize="true"
-                placeholder="Enter image book"
-                class="form-control book-info-text input-margin"
-              />
-            </p>
-
-            <p class="flex-container book-info-text-container">
-              <strong class="book-info-text">Count: </strong>
-              <input
-                v-model="editForm.count"
-                class="form-control book-info-text input-margin"
-                :class="{ 'disabled-form': !displayEditForm }"
-                type="number"
-                placeholder="Enter count books"
-                min="1"
-                required
-              />
-            </p>
-            <Rating
-              v-model="editForm.rating"
-              :cancel="false"
-              :readonly="true"
-            />
-            <router-link
-              :to="{
-                name: 'reservedBooks',
-                params: { reservedBookTitle: book.title },
-              }"
-              class="header__link"
-              >Users who reserved this book</router-link
-            >
-          </template>
-        </admin-form>
-      </div>
-    </div>
-
+  <div class="book-page">
+    <Toast />
     <div>
-      <review-list
-        :items="reviewsBook"
-        :currentUser="user"
-        @hideReview="hideReview"
-      />
+      <div class="book-page__content">
+        <div style="position: sticky; top: 20px">
+          <img
+            :src="book.img"
+            :alt="book.title"
+            class="book-page__content__img"
+          />
+        </div>
+        <div style="width: 100%" class="book-page__content__info">
+          <div style="width: 100%" class="flex-container">
+            <Button
+              icon="pi pi pi-pencil"
+              class="p-button-rounded p-button-success p-button-text"
+              style="fontsize: 2rem; padding-top: 0"
+              @click="displayEditForm = !displayEditForm"
+            />
+
+            <admin-form
+              style="width: 100%"
+              typeForm="update"
+              :showButtons="displayEditForm"
+              :dataForm="editForm"
+              :path="`/books/updatebook/${editForm._id}`"
+              :callback="this.getBook"
+              @resetForm="resetForm"
+              @showMessage="showMessage"
+              @showErrorMessage="showErrorMessage"
+              @closeEditForm="closeEditForm"
+            >
+              <template v-slot:input>
+                <div class="flex-container book-info-text-container">
+                  <span class="book-page__content__info__author">BY </span>
+                  <select
+                    class="form-control book-page__content__info__author"
+                    v-model="editForm.author"
+                    :class="{
+                      'disabled-form': !displayEditForm,
+                      'input-margin-bottom': displayEditForm,
+                    }"
+                  >
+                    <option
+                      v-for="item in authors"
+                      :key="item._id"
+                      :value="item"
+                    >
+                      {{
+                        (item.first_name + " " + item.last_name).toUpperCase()
+                      }}
+                    </option>
+                  </select>
+                </div>
+
+                <Textarea
+                  v-model="editForm.title"
+                  :autoResize="true"
+                  placeholder="Enter title book"
+                  class="book-page__content__info__title"
+                  :class="{
+                    'disabled-form': !displayEditForm,
+                    'input-margin-bottom': displayEditForm,
+                  }"
+                  style="padding-left: 0"
+                />
+
+                <Rating
+                  v-model="editForm.rating"
+                  :cancel="false"
+                  :readonly="true"
+                  v-if="book.rating && !displayEditForm"
+                  class="book-page__content__info__text"
+                  style="margin-top: -30px"
+                />
+
+                <!-- <Textarea
+                v-model="editForm.title"
+                :autoResize="true"
+                placeholder="Enter title book"
+                class="book-page__content__info__title"
+                :class="{ 'disabled-form': !displayEditForm }"
+              /> -->
+
+                <p
+                  class="
+                    flex-container
+                    book-info-text-container
+                    book-page__content__info__text
+                  "
+                >
+                  Genre:
+                  <select
+                    class="form-control"
+                    v-model="editForm.genre"
+                    :class="{
+                      'disabled-form': !displayEditForm,
+                      'input-margin-bottom': displayEditForm,
+                    }"
+                  >
+                    <option
+                      v-for="item in genres"
+                      :key="item._id"
+                      :value="item"
+                    >
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </p>
+
+                <p
+                  class="
+                    flex-container
+                    book-info-text-container
+                    book-page__content__info__text
+                  "
+                  v-if="displayEditForm"
+                >
+                  Image:
+                  <Textarea
+                    v-model="editForm.img"
+                    :autoResize="true"
+                    placeholder="Enter image book"
+                    class="form-control input-margin-bottom"
+                  />
+                </p>
+
+                <p
+                  class="
+                    flex-container
+                    book-info-text-container
+                    book-page__content__info__text
+                  "
+                >
+                  Count:
+                  <input
+                    v-model="editForm.count"
+                    class="form-control book-page__content__info__text"
+                    :class="{
+                      'disabled-form': !displayEditForm,
+                      'input-margin-bottom': displayEditForm,
+                    }"
+                    type="number"
+                    placeholder="Enter count books"
+                    min="1"
+                    required
+                  />
+                </p>
+
+                <router-link
+                  :to="{
+                    name: 'reservedBooks',
+                    params: { reservedBookTitle: book.title },
+                  }"
+                  class="header__link"
+                  >Users who reserved this book</router-link
+                >
+              </template>
+            </admin-form>
+          </div>
+          <div class="reviews">
+            <review-list
+              :items="reviewsBook"
+              :currentUser="user"
+              typeForm="update"
+              :callback="this.getReviewsBook"
+              @hideReview="hideReview"
+            />
+
+            <Button
+              label="New review"
+              icon="pi pi-plus"
+              class="p-button-success p-mr-2"
+              @click="openModal"
+              v-if="isLoggedIn && user.username !== 'admin'"
+            />
+
+            <Dialog
+              v-model:visible="displayModal"
+              :style="{ width: '450px' }"
+              header="Add review"
+              :modal="true"
+              class="p-fluid"
+            >
+              <div class="p-field">
+                <label for="name">Text</label>
+                <Textarea
+                  v-model="data.text"
+                  :autoResize="true"
+                  rows="5"
+                  required
+                />
+                <div>
+                  <span>Your rating: </span
+                  ><Rating v-model="data.rating" :readonly="false" />
+                </div>
+              </div>
+
+              <template #footer>
+                <Button
+                  label="Save"
+                  icon="pi pi-check"
+                  class="p-button-text"
+                  @click.prevent="onSave"
+                />
+              </template>
+            </Dialog>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -161,6 +254,7 @@ export default {
       }
     },
     getBook() {
+      this.getBooks();
       try {
         const book = this.books.find(
           (book) => book._id === this.$route.params.id

@@ -1,8 +1,7 @@
 <template>
   <div class="book-page">
     <Toast />
-
-    <div class="mkdf-has-bg-image" data-height="300">
+    <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
       <div class="mkdf-title-wrapper" style="height: 300px">
         <div class="mkdf-title-inner" style="height: inherit">
           <div class="mkdf-grid">
@@ -13,21 +12,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class="alerts">
-      <Message
-        v-if="!currentBook.count && !isReserved"
-        severity="warn"
-        class="message"
-        >Sorry, but now books out of stock</Message
-      >
-
-      <Message
-        v-if="isReserved && !displayMessage"
-        severity="info"
-        class="message"
-        >You have already reserved this book</Message
-      >
-    </div> -->
     <div>
       <div class="book-page__content">
         <div style="position: sticky; top: 20px">
@@ -49,15 +33,27 @@
           <h2 class="book-page__content__info__title">
             {{ currentBook.title }}
           </h2>
+          <div style="display: flex">
+            <Rating
+              :modelValue="currentBook.rating"
+              :cancel="false"
+              :readonly="true"
+              v-if="currentBook.rating"
+              class="book-page__content__info__text"
+              style="margin-top: 10px"
+            />
+          </div>
 
-          <Rating
-            :modelValue="currentBook.rating"
-            :cancel="false"
-            :readonly="true"
-            v-if="currentBook.rating"
-            class="book-page__content__info__text"
-            style="margin-top: 10px"
-          />
+          <div class="woocommerce-product-details__short-description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit. Simul vidisse eu vim. Probo
+              tincidunt ne vel.
+            </p>
+          </div>
 
           <Button
             v-if="!currentBook.count && !isReserved"
@@ -73,19 +69,27 @@
             v-if="isLoggedIn && !user.isAdmin"
             :label="
               !isReserved
-                ? 'Reserve book'
-                : 'You have already reserved this book'
+                ? 'Reserve book'.toUpperCase()
+                : 'You reserved this book'.toUpperCase()
             "
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
-            :disabled="!currentBook.count || !currentBook.count || isReserved"
+            :disabled="!currentBook.count || isReserved"
             icon="pi pi-book"
             style="margin: 50px 0"
           />
 
           <div>
             <p class="book-page__content__info__text">
-              Genre: {{ currentBook.genre?.name }}
+              Genre:
+              <router-link
+                style="text-decoration: none"
+                :to="{
+                  name: 'books',
+                  params: { bookGenre: currentBook.genre.name },
+                }"
+                >{{ currentBook.genre?.name }}</router-link
+              >
             </p>
             <p class="book-page__content__info__text">
               Count:
@@ -94,19 +98,19 @@
           </div>
 
           <div class="reviews">
+            <Button
+              label="ADD REVIEW"
+              icon="pi pi-user-edit"
+              class="p-button-raised p-button-secondary p-button-text"
+              @click="openModal"
+              v-if="isLoggedIn && user.username !== 'admin'"
+              style="margin-bottom: 37px"
+            />
             <review-list
               :items="reviewsBook"
               :currentUser="user"
               typeForm="update"
               :callback="this.getReviewsBook"
-            />
-
-            <Button
-              label="New review"
-              icon="pi pi-plus"
-              class="p-button-success p-mr-2"
-              @click="openModal"
-              v-if="isLoggedIn && user.username !== 'admin'"
             />
 
             <Dialog
@@ -232,14 +236,14 @@ export default {
             book: this.currentBook,
           });
 
-          this.isReserved = true;
+          // this.isReserved = true;
           this.getBooks();
-          this.getReservedBooks();
+          // this.getReservedBooks();
           this.showMessage("Book reserved");
         } catch (error) {
           console.log(error);
           this.getBooks();
-          this.getReservedBooks();
+          // this.getReservedBooks();
           this.showErrorMessage(error.response.data.message);
         }
       }
@@ -285,3 +289,5 @@ export default {
   },
 };
 </script>
+
+<style scoped></style>

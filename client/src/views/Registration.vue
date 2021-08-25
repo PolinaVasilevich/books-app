@@ -1,6 +1,17 @@
 <template>
   <div class="form">
     <Toast />
+    <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
+      <div class="mkdf-title-wrapper" style="height: 300px">
+        <div class="mkdf-title-inner" style="height: inherit">
+          <div class="mkdf-grid">
+            <!-- <h2 class="mkdf-page-title entry-title" style="color: #ffffff">
+              {{ currentBook.title }}
+            </h2> -->
+          </div>
+        </div>
+      </div>
+    </div>
     <Dialog v-model:visible="displayMessage" :style="{ width: '50vw' }">
       <div class="p-d-flex p-ai-center p-dir-col p-pt-6 p-px-3">
         <i
@@ -73,11 +84,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.form {
-  width: 750px;
-  margin: 50px auto;
-  text-align: center;
-}
-</style>

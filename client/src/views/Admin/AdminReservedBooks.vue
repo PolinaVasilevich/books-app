@@ -269,11 +269,11 @@ export default {
           return_date: this.data.return_date,
         });
 
-        this.getReservedBooks();
-        this.showMessage("Book received");
+        this.getDataTable();
+        this.showMessage("Book gave out");
       } catch (error) {
         console.log(error);
-        this.getReservedBooks();
+        this.getDataTable();
         this.showErrorMessage(error.response.data.message);
       }
     },
@@ -303,6 +303,7 @@ export default {
     },
 
     getDataTable() {
+      this.getReservedBooks();
       const dataTable = [];
       let item = {};
       let children = {};
@@ -374,7 +375,6 @@ export default {
   },
 
   created() {
-    this.getReservedBooks();
     this.getDataTable();
     this.getBooks();
     this.getUsers();

@@ -25,6 +25,7 @@ const routes = [
     path: "/",
     name: "books",
     component: Home,
+    props: true,
   },
   {
     path: "/login",
