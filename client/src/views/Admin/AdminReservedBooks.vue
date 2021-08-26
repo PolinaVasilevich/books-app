@@ -359,8 +359,9 @@ export default {
   computed: {
     searchedItems() {
       return this.dataTable.filter((item) => {
+        console.log(item);
         return (
-          item?.book?.title
+          item?.data.book?.title
             ?.toLowerCase()
             .includes(this.searchQuery.toLowerCase()) ||
           item?.user?.username

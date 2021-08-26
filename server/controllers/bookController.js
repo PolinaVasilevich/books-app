@@ -318,6 +318,49 @@ class bookController {
     }
   }
 
+  async getMostPopularBooks(req, res) {
+    try {
+      const mostPopularBooks = await BookActions.aggregate([
+        { $match: { status: "Returned" } },
+
+        {
+          $group: {
+            _id: "$book",
+            book: { $first: "$book" },
+            count: { $sum: 1 },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $match: {
+            count: { $gte: 2 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            count: 0,
+          },
+        },
+      ]);
+
+      res.json(mostPopularBooks);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async getAuthors(req, res) {
     try {
       const authors = await Author.find();

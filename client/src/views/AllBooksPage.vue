@@ -9,6 +9,7 @@
       @click="openModal"
       style="margin: 30px 0; align-self: flex-end"
     />
+
     <modal-form
       modal-title="Create new record"
       :displayModal="displayModal"
@@ -38,7 +39,7 @@
       :value="searchedBooksByGenre"
       :layout="layout"
       :paginator="true"
-      :rows="9"
+      :rows="rows"
     >
       <template #header>
         <div class="p-grid p-nogutter">
@@ -163,6 +164,14 @@
               ></Rating>
             </div>
             <div class="product-list-action">
+              <div>
+                <Button
+                  v-if="user.isAdmin"
+                  icon="pi pi-times"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  @click="confirmDelete(slotProps.data)"
+                />
+              </div>
               <span
                 class="product-badge"
                 :class="[
@@ -186,10 +195,10 @@
             <div class="product-grid-item-top">
               <div>
                 <Button
-                  v-if="this.user.isAdmin"
+                  v-if="user.isAdmin"
                   icon="pi pi-times"
                   class="p-button-rounded p-button-danger p-button-text"
-                  @click="deleteBook"
+                  @click="confirmDelete(slotProps.data)"
                 />
               </div>
               <span
@@ -255,21 +264,32 @@
         </div>
       </template>
     </DataView>
+
+    <confirm-dialog
+      text="delete this book"
+      :displayConfirmDialog="displayConfirmDialog"
+      @hideConfirmDialog="displayConfirmDialog = false"
+      @action="onDeleteBook"
+    />
   </div>
 </template>
 
 <script>
+import API from "@/utils/api";
+
 import adminFormMixin from "@/mixins/adminFormMixin";
 import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminBooksForm from "@/components/Admin/Forms/AdminBooksForm";
+import ConfirmDialog from "@/components/UI/ConfirmDialog";
 
 export default {
   components: {
     ModalForm,
     AdminBooksForm,
+    ConfirmDialog,
   },
   mixins: [adminFormMixin, toggle, dataStore],
   props: {
@@ -281,6 +301,10 @@ export default {
   data() {
     return {
       layout: "grid",
+      displayConfirmDialog: false,
+      mostPopularBooks: [],
+      book: "",
+      rows: 9,
       data: {
         title: "",
         author: "",
@@ -307,6 +331,49 @@ export default {
       if (!count) return "OUTOFSTOCK";
       if (count < 5) return "LOWSTOCK";
       else return "INSTOCK";
+    },
+
+    async getMostPopularBooks() {
+      try {
+        const mostPopularBooks = await API.get("/books/mostpopularbooks");
+        this.mostPopularBooks = mostPopularBooks.data.map((elem) => ({
+          ...elem.book,
+        }));
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    },
+    confirmDelete(book) {
+      this.displayConfirmDialog = true;
+      this.book = book;
+    },
+
+    async onDeleteBook() {
+      this.displayConfirmDialog = false;
+      try {
+        await API.delete(`/books/deletebook/${this.book._id}`);
+        this.getBooks;
+        this.showMessage(`${this.book.title} deleted`);
+      } catch (error) {
+        console.log(error);
+        this.showErrorMessage(error.response.data.message);
+        this.getBooks;
+      }
+    },
+
+    handleChangeWidth() {
+      const mediaQuery = window.matchMedia("(min-width: 900px)");
+      if (mediaQuery.matches) {
+        console.log(mediaQuery);
+      }
+    },
+
+    onResize() {
+      if (window.innerWidth < 900) {
+        this.rows = 8;
+      } else {
+        this.rows = 9;
+      }
     },
   },
 
@@ -358,16 +425,23 @@ export default {
       }
     },
 
-    mostPopularBooks() {
-      const mostPopularBooks = [];
-      this.bookActions
-        .filter((book) => book.status === "Received")
-        .forEach((item) => {
-          mostPopularBooks.push(item.book);
-        });
+    // mostPopularBooks() {
+    //   const popularBooks = [];
+    //   this.bookActions
+    //     .filter((book) => book.status === "Received")
+    //     .forEach((item) => {
+    //       popularBooks.push(item.book);
+    //     });
 
-      return mostPopularBooks.slice(0, 4);
-    },
+    //   const obj = popularBooks.reduce((acc, elem) => {
+    //     acc[elem] = (acc[elem] || 0) + 1;
+    //     return acc;
+    //   }, {});
+
+    //   console.log(obj);
+
+    //   return [];
+    // },
   },
   created() {
     this.getBooks();
@@ -375,10 +449,12 @@ export default {
     this.getAuthors();
     this.getGenres();
     this.getAllBookActions();
+    this.getMostPopularBooks();
 
     if (this.bookGenre) {
       this.searchQuery = this.bookGenre;
     }
+    window.addEventListener("resize", this.onResize);
   },
 };
 </script>

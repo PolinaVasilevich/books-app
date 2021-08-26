@@ -83,13 +83,13 @@
               v-if="!slotProps.data.isHidden"
               icon="pi pi-eye-slash"
               class="p-button-rounded p-button-warning"
-              @click="confirmHideReview(slotProps.data)"
+              @click="confirmHideReview(slotProps.data, 'hide')"
             />
             <Button
               v-if="slotProps.data.isHidden"
               icon="pi pi-eye"
               class="p-button-rounded p-button-success p-mr-2"
-              @click="confirmHideReview(slotProps.data)"
+              @click="confirmHideReview(slotProps.data, 'show')"
             />
           </template>
         </Column>
@@ -103,7 +103,10 @@
     >
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
-        <span>Are you sure you want to hide this review?</span>
+        <span
+          >Are you sure you want to {{ textDialog ? textDialog : "hide" }} this
+          review?</span
+        >
       </div>
       <template #footer>
         <Button
@@ -138,15 +141,17 @@ export default {
   data() {
     return {
       moment: moment,
+      textDialog: "",
       itemHideDialog: false,
       currentReview: null,
     };
   },
 
   methods: {
-    confirmHideReview(value) {
+    confirmHideReview(value, textDialog) {
       this.itemHideDialog = true;
       this.currentReview = value;
+      this.textDialog = textDialog;
     },
 
     async hideReview() {

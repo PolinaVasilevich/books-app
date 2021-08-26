@@ -65,8 +65,8 @@
             style="margin: 50px 0"
           />
 
-          <Button
-            v-if="isLoggedIn && !user.isAdmin"
+          <!-- <Button
+            v-if="isLoggedIn && !user.isAdmin && currentBook.count"
             :label="
               !isReserved
                 ? 'Reserve book'.toUpperCase()
@@ -74,6 +74,27 @@
             "
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
+            :disabled="!currentBook.count || isReserved"
+            icon="pi pi-book"
+            style="margin: 50px 0"
+          /> -->
+
+          <Button
+            v-if="
+              isLoggedIn && !user.isAdmin && currentBook.count && !isReserved
+            "
+            :label="'Reserve book'.toUpperCase()"
+            class="p-button-warning"
+            @click="onReserveBook(currentBook, user)"
+            :disabled="!currentBook.count || isReserved || isDisabled"
+            icon="pi pi-book"
+            style="margin: 50px 0"
+          />
+
+          <Button
+            v-if="isLoggedIn && !user.isAdmin && isReserved"
+            :label="'You reserved this book'.toUpperCase()"
+            class="p-button-warning"
             :disabled="!currentBook.count || isReserved"
             icon="pi pi-book"
             style="margin: 50px 0"
@@ -165,6 +186,7 @@ export default {
   data() {
     return {
       isReserved: false,
+      isDisabled: false,
       editDataFormID: null,
       reviewsBook: [],
       currentBook: {},
@@ -236,14 +258,14 @@ export default {
             book: this.currentBook,
           });
 
-          // this.isReserved = true;
+          this.isDisabled = true;
           this.getBooks();
-          // this.getReservedBooks();
+          this.getReservedBooks();
           this.showMessage("Book reserved");
         } catch (error) {
           console.log(error);
           this.getBooks();
-          // this.getReservedBooks();
+          this.getReservedBooks();
           this.showErrorMessage(error.response.data.message);
         }
       }
