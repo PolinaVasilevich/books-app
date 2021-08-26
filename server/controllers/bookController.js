@@ -343,6 +343,17 @@ class bookController {
         { $unwind: "$book" },
 
         {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        {
           $match: {
             count: { $gte: 2 },
           },

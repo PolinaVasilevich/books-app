@@ -1,13 +1,12 @@
 <template>
-  <div class="card" style="border: none; box-shadow: none; padding: 0 4%">
+  <div class="books-page">
     <Toast />
     <Button
       v-if="user.isAdmin"
       label="New book"
       icon="pi pi-plus"
-      class="p-button-success p-mr-2"
+      class="books-page__admin-button p-button-success p-mr-2"
       @click="openModal"
-      style="margin: 30px 0; align-self: flex-end"
     />
 
     <modal-form
@@ -43,24 +42,26 @@
     >
       <template #header>
         <div class="p-grid p-nogutter">
-          <div class="buttons" style="margin: 20px auto">
+          <div class="books-page__buttons-container">
             <Button
               label="All"
-              class="p-button p-button-text search-button"
+              class="p-button p-button-text search-button button-genre"
               @click="searchQuery = 'all'"
               :class="{ 'active-search-button': searchQuery === 'all' }"
             />
+
             <Button
               label="Most popular"
-              class="p-button p-button-text search-button"
+              class="p-button p-button-text search-button button-genre"
               @click="searchQuery = 'popular'"
               :class="{ 'active-search-button': searchQuery === 'popular' }"
             />
+
             <Button
               v-for="genre in genres"
               :key="genre.name"
               :label="genre.name"
-              class="p-button p-button-text search-button"
+              class="p-button p-button-text search-button button-genre"
               @click="searchQuery = genre.name"
               :class="{ 'active-search-button': searchQuery === genre.name }"
             />
@@ -75,17 +76,7 @@
               />
             </span>
           </div> -->
-          <div
-            class="p-col-6"
-            style="
-              text-align: left;
-              display: flex;
-              margin-top: 20px;
-              width: 100%;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
+          <div class="p-col-6 books-page__buttons-sort-container">
             <!-- <Dropdown
               v-model="selectedSort"
               :options="sortOptions"
@@ -127,32 +118,14 @@
             </router-link>
 
             <div class="product-list-detail">
-              <div
-                class="product-description"
-                style="
-                  margin-top: 1px;
-                  letter-spacing: 0.35em;
-                  font-family: josefin sans, sans-serif;
-                  font-size: 12px;
-                  text-transform: uppercase;
-                  color: #999;
-                "
-              >
+              <div class="product-description books-page__description-author">
                 {{
                   slotProps.data.author.first_name +
                   " " +
                   slotProps.data.author.last_name
                 }}
               </div>
-              <div
-                class="product-name"
-                style="
-                  color: #000;
-                  font-weight: 500;
-                  letter-spacing: 0.01em;
-                  word-wrap: break-word;
-                "
-              >
+              <div class="books-page__description-title">
                 {{ slotProps.data.title }}
               </div>
 
@@ -223,34 +196,14 @@
                 "
                 ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
               </router-link>
-              <div
-                class="product-description"
-                style="
-                  margin-top: 1px;
-                  letter-spacing: 0.35em;
-                  font-family: josefin sans, sans-serif;
-                  font-size: 12px;
-                  text-transform: uppercase;
-                  color: #999;
-                "
-              >
+              <div class="product-description books-page__description-author">
                 {{
                   slotProps.data.author.first_name +
                   " " +
                   slotProps.data.author.last_name
                 }}
               </div>
-              <div
-                class="product-name"
-                style="
-                  color: #000;
-
-                  font-weight: 500;
-                  letter-spacing: 0.01em;
-
-                  word-wrap: break-word;
-                "
-              >
+              <div class="product-description books-page__description-title">
                 {{ slotProps.data.title }}
               </div>
               <Rating
@@ -369,7 +322,9 @@ export default {
     },
 
     onResize() {
-      if (window.innerWidth < 900) {
+      if (window.innerWidth < 666) {
+        this.rows = 4;
+      } else if (window.innerWidth < 900 && window.innerWidth > 666) {
         this.rows = 8;
       } else {
         this.rows = 9;

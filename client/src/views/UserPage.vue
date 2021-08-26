@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <div class="user-page" style="padding: 20px 4%">
+    <div class="user-page">
       <div v-if="userReservedBooks?.length" style="margin-top: 15px">
         <span
           class="p-input-icon-left"
@@ -25,6 +25,34 @@
             style="width: 100%"
           />
         </span>
+
+        <div class="user-page__buttons">
+          <Button
+            type="button"
+            icon="pi pi-book"
+            label="All books"
+            @click="filteredData = null"
+            class="p-button-text"
+          />
+
+          <Button
+            type="button"
+            icon="pi pi-calendar"
+            label="Must return today"
+            @click="getBooksWhichMustReturnToday"
+            class="p-button-text"
+            :badge="badgeMostReturnToday"
+          />
+
+          <Button
+            type="button"
+            icon="pi pi-calendar"
+            label="Not returned"
+            @click="getBooksWhichNotReturned"
+            class="p-button-text"
+            :badge="badgeNotReturned"
+          />
+        </div>
       </div>
 
       <div>
@@ -35,11 +63,13 @@
         >
           <template #header>
             <router-link :to="{ name: 'book', params: { id: item.book._id } }">
-              <img
-                :src="item.book.img"
-                :alt="item.book.title"
-                class="user-page__content__img"
-              />
+              <div class="user-page__img-container">
+                <img
+                  :src="item.book.img"
+                  :alt="item.book.title"
+                  class="user-page__content__img"
+                />
+              </div>
             </router-link>
           </template>
           <template #title>
@@ -62,7 +92,7 @@
             <Button
               v-if="getLastActionBook(item) === 'Reserved'"
               icon="pi pi-times"
-              label="Cancel reserve"
+              label="Cancel reservation"
               class="p-button-warning"
               @click="showConfirmDialog(item.book)"
             />
@@ -98,6 +128,9 @@ export default {
     return {
       moment: moment,
       displayConfirmDialog: false,
+      badgeMostReturnToday: null,
+      badgeNotReturned: null,
+      filteredData: null,
       bookActions: [],
       item: null,
       icons: [
@@ -169,10 +202,41 @@ export default {
       this.displayConfirmDialog = true;
       this.item = value;
     },
+
+    getBooksWhichNotReturned() {
+      const booksWhichNotReturned = this.userReservedBooks.filter(
+        (elem) =>
+          elem.details.status === "Received" &&
+          new Date(elem.details.return_date) < new Date()
+      );
+
+      this.filteredData = [...booksWhichNotReturned];
+    },
+
+    getBooksWhichMustReturnToday() {
+      const booksWhichMustReturnToday = this.userReservedBooks.filter(
+        (elem) => {
+          console.log(
+            elem.details.filter((innerElem) => {
+              console.log(innerElem.return_date);
+              innerElem.status === "Received" &&
+                new Date(innerElem.return_date) === new Date();
+            })
+          );
+        }
+      );
+
+      this.filteredData = [...booksWhichMustReturnToday];
+
+      console.log(booksWhichMustReturnToday);
+    },
   },
 
   computed: {
     searchedItems() {
+      if (this.filteredData) {
+        return [...this.filteredData];
+      }
       return this.userReservedBooks.filter((item) => {
         return (
           item.book.title

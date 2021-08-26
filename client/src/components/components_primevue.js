@@ -24,6 +24,7 @@ import TreeTable from "primevue/treetable";
 import Password from "primevue/password";
 import Divider from "primevue/divider";
 import Carousel from "primevue/carousel";
+import Badge from "primevue/badge";
 
 export default [
   Dialog,
@@ -51,4 +52,5 @@ export default [
   Password,
   Divider,
   Carousel,
+  Badge,
 ];

@@ -8,6 +8,8 @@
 @import "@/assets/styles/admin-book-page.scss";
 @import "@/assets/styles/reviews.scss";
 
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,300&display=swap");
+
 $font-family-sans-serif: BlinkMacSystemFont, "Segoe UI", Roboto,
   "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
   "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -20,7 +22,7 @@ $dark: #333;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
+  font-family: "Cormorant Garamond", sans-serif;
   color: $dark;
 }
 
@@ -46,7 +48,7 @@ body {
   font-variant-ligatures: no-common-ligatures;
   overflow-x: hidden;
   word-wrap: break-word;
-  font-family: cormorant garamond, sans-serif;
+  font-family: "Cormorant Garamond", sans-serif;
   // background-color: #fafafa;
 }
 
@@ -142,6 +144,11 @@ body {
 
 .product-grid-item {
   margin-left: 0 !important;
+}
+
+.p-datatable-wrapper,
+.p-treetable-wrapper {
+  font-size: 1.1rem;
 }
 
 ////

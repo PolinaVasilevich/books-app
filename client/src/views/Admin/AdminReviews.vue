@@ -2,7 +2,7 @@
   <div>
     <Toast />
     <div class="card">
-      <h2>Reserved books</h2>
+      <h2>Reviews</h2>
       <div style="margin: 15px 0">
         <span
           class="p-input-icon-left"

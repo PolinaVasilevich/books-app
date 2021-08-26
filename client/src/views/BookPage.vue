@@ -14,7 +14,7 @@
     </div>
     <div>
       <div class="book-page__content">
-        <div style="position: sticky; top: 20px">
+        <div class="book-page__content__img-container">
           <img
             :src="currentBook.img"
             :alt="currentBook.title"

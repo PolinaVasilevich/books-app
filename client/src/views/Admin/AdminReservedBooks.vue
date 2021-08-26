@@ -35,6 +35,30 @@
           @click="collapseAll"
           class="p-button-text"
         />
+
+        <Button
+          type="button"
+          icon="pi pi-book"
+          label="All books"
+          @click="filteredData = null"
+          class="p-button-text"
+        />
+
+        <Button
+          type="button"
+          icon="pi pi-calendar"
+          label="Must return today"
+          @click="getBooksWhichMustReturnToday"
+          class="p-button-text"
+        />
+
+        <Button
+          type="button"
+          icon="pi pi-calendar"
+          label="Not returned"
+          @click="getBooksWhichNotReturned"
+          class="p-button-text"
+        />
       </div>
 
       <TreeTable
@@ -203,6 +227,7 @@ export default {
     return {
       moment,
       dataTable: [],
+      filteredData: null,
       expandedKeys: {},
       displayConfirmDialog: false,
       displayMainDialog: false,
@@ -303,7 +328,6 @@ export default {
     },
 
     getDataTable() {
-      this.getReservedBooks();
       const dataTable = [];
       let item = {};
       let children = {};
@@ -354,12 +378,34 @@ export default {
         }
       }
     },
+
+    getBooksWhichNotReturned() {
+      const booksWhichNotReturned = this.dataTable.filter(
+        (elem) =>
+          elem.data.status === "Received" &&
+          new Date(elem.data.return_date) < new Date()
+      );
+
+      this.filteredData = [...booksWhichNotReturned];
+    },
+
+    getBooksWhichMustReturnToday() {
+      const booksWhichMustReturnToday = this.dataTable.filter(
+        (elem) =>
+          elem.data.status === "Received" &&
+          new Date(elem.data.return_date) === new Date()
+      );
+
+      this.filteredData = [...booksWhichMustReturnToday];
+    },
   },
 
   computed: {
     searchedItems() {
+      if (this.filteredData) {
+        return [...this.filteredData];
+      }
       return this.dataTable.filter((item) => {
-        console.log(item);
         return (
           item?.data.book?.title
             ?.toLowerCase()
@@ -376,9 +422,11 @@ export default {
   },
 
   created() {
-    this.getDataTable();
     this.getBooks();
     this.getUsers();
+    this.getAllBookActions();
+    this.getReservedBooks();
+    this.getDataTable();
 
     if (this.reservedBookTitle) {
       this.searchQuery = this.reservedBookTitle;

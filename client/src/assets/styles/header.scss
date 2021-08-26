@@ -82,3 +82,11 @@
 .show-header {
   background-color: #fff;
 }
+
+.admin-header {
+  &__links {
+    .router-link-active {
+      color: #f66e5e;
+    }
+  }
+}

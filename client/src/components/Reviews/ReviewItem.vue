@@ -133,7 +133,7 @@
               placeholder="Enter your review"
               :class="{ 'disabled-form': !displayEditForm }"
               required
-              style="width: 100%"
+              style="width: 100%; background: transparent"
             />
             <p v-else>This comment is hidden by the administrator</p>
           </template>
