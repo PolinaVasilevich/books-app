@@ -316,43 +316,24 @@ export default {
           user: this.data.user,
           userAction: this.user,
         });
-        this.getReservedBooks();
+        this.getDataTable();
         this.showMessage("Book returned");
       } catch (error) {
         console.log(error);
-        this.getReservedBooks();
+        this.getDataTable();
         this.showErrorMessage(error.response.data.message);
       }
 
       this.displayConfirmDialog = false;
     },
 
-    getDataTable() {
-      const dataTable = [];
-      let item = {};
-      let children = {};
-      this.reservedBooks.forEach((elem1, index) => {
-        item.key = index;
-        item.user = elem1._id.user;
-        item.data = elem1.data[0];
-        item.data.user = elem1._id.user;
-        item.data.book = elem1._id.book;
-        item.children = [];
-
-        elem1.data.slice(1).forEach((elem2, index) => {
-          children.key = index;
-          children.data = elem2;
-          children.data.user = elem1._id.user;
-          children.data.book = elem1._id.book;
-          item.children.push(children);
-          children = {};
-        });
-
-        dataTable.push(item);
-        item = {};
-      });
-
-      this.dataTable = dataTable;
+    async getDataTable() {
+      try {
+        const data = await API.get("/books/modifiedreservedbooks");
+        this.dataTable = data.data;
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     expandAll() {
@@ -426,11 +407,9 @@ export default {
   },
 
   created() {
+    this.getDataTable();
     this.getBooks();
     this.getUsers();
-    this.getAllBookActions();
-    this.getReservedBooks();
-    this.getDataTable();
 
     if (this.reservedBookTitle) {
       this.searchQuery = this.reservedBookTitle;

@@ -41,12 +41,33 @@
     }
   }
 
-  &__link {
-    font-size: 1.2em;
+  &__text {
+    font-size: 1.3em;
     color: #051441;
     font-weight: 500;
     opacity: 1 !important;
+  }
 
+  &__text-button {
+    font-size: 1.3em !important;
+    &:hover {
+      background: none !important;
+      color: none !important;
+      box-shadow: none !important;
+    }
+    &:focus {
+      background: none !important;
+      color: none !important;
+      box-shadow: none !important;
+    }
+    &:active {
+      background: none !important;
+      color: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  &__link {
     &::before {
       content: "";
       position: absolute;

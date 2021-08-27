@@ -542,6 +542,85 @@ class bookController {
     }
   }
 
+  async getModifiedReservedBooks(req, res) {
+    try {
+      const reservedBooks = await BookActions.aggregate([
+        {
+          $match: {
+            isActual: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+
+        {
+          $lookup: {
+            from: "books",
+            localField: "book",
+            foreignField: "_id",
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        { $sort: { action_date: -1 } },
+
+        {
+          $set: {
+            data: "$$ROOT",
+          },
+        },
+
+        {
+          $group: {
+            _id: { user: "$user", book: "$book" },
+            last_action: { $first: "$action_date" },
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        { $sort: { last_action: -1 } },
+
+        {
+          $addFields: {
+            data: { $arrayElemAt: ["$items", 0] },
+            children: { $slice: ["$items", -1] },
+          },
+        },
+
+        {
+          $set: {
+            "data.key": "$data._id",
+            key: "$data._id",
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            data: 1,
+            key: 1,
+            "children.key": "$data._id",
+            "children.data": 1,
+          },
+        },
+      ]);
+
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async getReviews(req, res) {
     try {
       const reviews = await Review.find()

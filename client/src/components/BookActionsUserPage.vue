@@ -42,11 +42,14 @@
         <div style="width: max-content">
           <p>{{ slotProps.item.status }}</p>
           <p
+            :class="{ 'not-returned-text': false }"
             v-if="
               slotProps.item.status === 'Received' && slotProps.item.return_date
             "
           >
-            <b>Book must be returned on:</b>
+            <b :class="{ 'not-returned-text': false }"
+              >Book must be returned on:</b
+            >
             {{
               slotProps.item.return_date
                 ? moment(slotProps.item.return_date).format("YYYY-MM-DD")
@@ -75,6 +78,9 @@ export default {
       required: true,
     },
     icons: {
+      type: Array,
+    },
+    booksWhichNotReturned: {
       type: Array,
     },
   },

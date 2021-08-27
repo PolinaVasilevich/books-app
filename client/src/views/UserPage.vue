@@ -39,18 +39,20 @@
             type="button"
             icon="pi pi-calendar"
             label="Must return today"
-            @click="getBooksWhichMustReturnToday"
+            @click="filteredData = [...booksWhichMustReturnToday]"
             class="p-button-text"
             :badge="badgeMostReturnToday"
+            badgeClass="p-badge-danger"
           />
 
           <Button
             type="button"
             icon="pi pi-calendar"
             label="Not returned"
-            @click="getBooksWhichNotReturned"
+            @click="filteredData = [...booksWhichNotReturned]"
             class="p-button-text"
             :badge="badgeNotReturned"
+            badgeClass="p-badge-danger"
           />
         </div>
       </div>
@@ -85,7 +87,11 @@
               }}</span>
             </h5>
 
-            <book-actions-user-page :data="item.details" :icons="icons" />
+            <book-actions-user-page
+              :data="item.details"
+              :icons="icons"
+              :booksWhichNotReturned="booksWhichNotReturned"
+            />
           </template>
 
           <template #footer>
@@ -130,6 +136,8 @@ export default {
       displayConfirmDialog: false,
       badgeMostReturnToday: null,
       badgeNotReturned: null,
+      booksWhichNotReturned: [],
+      booksWhichMustReturnToday: [],
       filteredData: null,
       bookActions: [],
       item: null,
@@ -215,7 +223,8 @@ export default {
         })?.length;
       });
 
-      this.booksWhichNotReturned = [...booksWhichNotReturned];
+      this.booksWhichNotReturned = booksWhichNotReturned;
+      this.badgeNotReturned = booksWhichNotReturned?.length;
     },
 
     getBooksWhichMustReturnToday() {
@@ -232,6 +241,7 @@ export default {
       );
 
       this.booksWhichMustReturnToday = [...booksWhichMustReturnToday];
+      this.badgeMostReturnToday = booksWhichMustReturnToday?.length;
     },
   },
 
@@ -255,6 +265,8 @@ export default {
 
   created() {
     this.getReservedBooks();
+    this.getBooksWhichNotReturned();
+    this.getBooksWhichMustReturnToday();
   },
 };
 </script>

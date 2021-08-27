@@ -23,38 +23,59 @@
         <div class="nav-list">
           <div class="nav-list__links">
             <span class="nav-list__item"
-              ><router-link class="header__link" to="/">Home</router-link></span
+              ><router-link class="header__link header__text" to="/"
+                >Home</router-link
+              ></span
             >
 
             <span v-if="isAdmin" class="nav-list__item"
-              ><router-link class="header__link" to="/admin/adminbooks"
+              ><router-link
+                class="header__link header__text"
+                to="/admin/adminbooks"
                 >Admin</router-link
               ></span
             >
             <span v-if="isLoggedIn && !user.isAdmin" class="nav-list__item"
               ><router-link
-                class="header__link"
+                class="header__link header__text"
                 :to="{ name: 'userPage', params: { id: user._id } }"
                 >My books</router-link
               ></span
             >
           </div>
-          <div>
+          <div class="nav-list__links">
             <span v-if="!isLoggedIn" class="nav-list__item nav-list__links"
-              ><router-link class="header__link" to="/login"
+              ><router-link class="header__link header__text" to="/login"
                 >Login</router-link
               ></span
             >
 
             <span v-if="!isLoggedIn" class="nav-list__item"
-              ><router-link class="header__link" to="/registration"
+              ><router-link class="header__link header__text" to="/registration"
                 >Register</router-link
               ></span
             >
 
-            <span v-else class="nav-list__item header__link" @click="logout"
+            <span
+              v-else
+              class="nav-list__item header__link header__text"
+              @click="logout"
               >Logout</span
             >
+          </div>
+          <div>
+            <Button
+              v-if="isLoggedIn"
+              type="button"
+              :label="user.username"
+              icon="pi pi-user"
+              class="
+                p-button-text p-button-text
+                header__text header__text-button
+              "
+              :badge="badgeNotReturned"
+              badgeClass="p-badge-danger"
+            />
           </div>
         </div>
       </nav>
@@ -68,13 +89,16 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import MyFooter from "@/components/Footer/MyFooter";
+import dataStore from "@/mixins/dataStore.js";
 
 export default {
   components: { MyFooter },
+  mixins: [dataStore],
   data() {
     return {
       isShowHeader: false,
       isShowSearchInput: false,
+      badgeNotReturned: null,
     };
   },
   methods: {
@@ -86,6 +110,20 @@ export default {
 
     getBack() {
       this.$router.go(-1);
+    },
+
+    getBooksWhichNotReturned() {
+      const today = new Date().setHours(0, 0, 0, 0);
+      const booksWhichNotReturned = this.userReservedBooks.filter((elem) => {
+        return elem.details.filter((innerElem) => {
+          return (
+            innerElem.status === "Received" &&
+            new Date(innerElem.return_date).setHours(0, 0, 0, 0) > today &&
+            new Date(innerElem.return_date).setHours(0, 0, 0, 0) !== today
+          );
+        })?.length;
+      });
+      this.badgeNotReturned = booksWhichNotReturned?.length;
     },
   },
   computed: {
@@ -100,6 +138,8 @@ export default {
   },
 
   mounted() {
+    this.getReservedBooks();
+    this.getBooksWhichNotReturned();
     window.document.onscroll = () => {
       const header = document.getElementById("header");
       if (window.scrollY > header.offsetTop) {
