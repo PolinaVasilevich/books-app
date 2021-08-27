@@ -204,31 +204,34 @@ export default {
     },
 
     getBooksWhichNotReturned() {
-      const booksWhichNotReturned = this.userReservedBooks.filter(
-        (elem) =>
-          elem.details.status === "Received" &&
-          new Date(elem.details.return_date) < new Date()
-      );
+      const today = new Date().setHours(0, 0, 0, 0);
+      const booksWhichNotReturned = this.userReservedBooks.filter((elem) => {
+        return elem.details.filter((innerElem) => {
+          return (
+            innerElem.status === "Received" &&
+            new Date(innerElem.return_date).setHours(0, 0, 0, 0) > today &&
+            new Date(innerElem.return_date).setHours(0, 0, 0, 0) !== today
+          );
+        })?.length;
+      });
 
-      this.filteredData = [...booksWhichNotReturned];
+      this.booksWhichNotReturned = [...booksWhichNotReturned];
     },
 
     getBooksWhichMustReturnToday() {
+      const today = new Date().setHours(0, 0, 0, 0);
       const booksWhichMustReturnToday = this.userReservedBooks.filter(
         (elem) => {
-          console.log(
-            elem.details.filter((innerElem) => {
-              console.log(innerElem.return_date);
+          return elem.details.filter((innerElem) => {
+            return (
               innerElem.status === "Received" &&
-                new Date(innerElem.return_date) === new Date();
-            })
-          );
+              new Date(innerElem.return_date).setHours(0, 0, 0, 0) === today
+            );
+          })?.length;
         }
       );
 
-      this.filteredData = [...booksWhichMustReturnToday];
-
-      console.log(booksWhichMustReturnToday);
+      this.booksWhichMustReturnToday = [...booksWhichMustReturnToday];
     },
   },
 

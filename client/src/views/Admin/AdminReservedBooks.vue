@@ -380,21 +380,25 @@ export default {
     },
 
     getBooksWhichNotReturned() {
+      const today = new Date().setHours(0, 0, 0, 0);
       const booksWhichNotReturned = this.dataTable.filter(
         (elem) =>
           elem.data.status === "Received" &&
-          new Date(elem.data.return_date) < new Date()
+          new Date(elem.data.return_date).setHours(0, 0, 0, 0) < today &&
+          new Date(elem.data.return_date).setHours(0, 0, 0, 0) !== today
       );
 
       this.filteredData = [...booksWhichNotReturned];
     },
 
     getBooksWhichMustReturnToday() {
-      const booksWhichMustReturnToday = this.dataTable.filter(
-        (elem) =>
+      const today = new Date().setHours(0, 0, 0, 0);
+      const booksWhichMustReturnToday = this.dataTable.filter((elem) => {
+        return (
           elem.data.status === "Received" &&
-          new Date(elem.data.return_date) === new Date()
-      );
+          today === new Date(elem.data.return_date).setHours(0, 0, 0, 0)
+        );
+      });
 
       this.filteredData = [...booksWhichMustReturnToday];
     },
