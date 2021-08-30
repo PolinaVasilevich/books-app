@@ -23,6 +23,7 @@ router.get("/allreviews", bookController.getReviews);
 router.get("/allbookactions", bookController.getAllBookActions);
 router.get("/reviewsbook/:id", bookController.getReviewsBook);
 router.get("/mostpopularbooks", bookController.getMostPopularBooks);
+router.get("/topbooks", bookController.getTopBooks);
 
 router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);

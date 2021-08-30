@@ -1,10 +1,10 @@
 <template>
-  <div style="height: 600px; width: 600px">
+  <div style="height: 600px; width: 600px; margin: 0 auto">
     <vue3-chart-js
       :id="chart.id"
       :type="chart.type"
       :data="chart.data"
-      @before-render="beforeRenderLogic"
+      :options="chart.data.options"
     ></vue3-chart-js>
   </div>
 </template>
@@ -35,6 +35,7 @@ export default {
       type: String,
     },
   },
+
   setup(props) {
     const chart = {
       id: `chart-${props.type}`,
@@ -44,7 +45,7 @@ export default {
         labels: props.labels,
         datasets: [
           {
-            label: props.title,
+            label: "Books",
             data: props.data,
             backgroundColor: [
               "rgba(255, 99, 132, 0.2)",
@@ -67,6 +68,22 @@ export default {
             borderWidth: 1,
           },
         ],
+
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              min: 0,
+              max: 10,
+            },
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: props.title,
+            },
+          },
+        },
       },
     };
 

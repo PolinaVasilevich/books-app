@@ -358,24 +358,10 @@ class bookController {
             count: { $gte: 2 },
           },
         },
-
-        {
-          $group: {
-            _id: null,
-            entries: { $push: "$$ROOT" },
-          },
-        },
         {
           $project: {
             _id: 0,
             count: 0,
-            titles: {
-              $map: {
-                input: "$entries",
-                as: "grade",
-                in: "$$grade",
-              },
-            },
           },
         },
       ]);
@@ -388,7 +374,7 @@ class bookController {
 
   async getTopBooks(req, res) {
     try {
-      const mostPopularBooks = await BookActions.aggregate([
+      const topBooks = await BookActions.aggregate([
         { $match: { status: "Returned" } },
 
         {
@@ -426,15 +412,43 @@ class bookController {
             count: { $gte: 2 },
           },
         },
+
+        { $sort: { "book.title": 1 } },
+
+        {
+          $group: {
+            _id: null,
+            books: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.book.title",
+              },
+            },
+            data: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+          },
+        },
+
         {
           $project: {
             _id: 0,
-            count: 0,
+            books: 0,
           },
         },
       ]);
-
-      res.json(mostPopularBooks);
+      res.json(topBooks[0]);
     } catch (error) {
       console.log(error);
     }
