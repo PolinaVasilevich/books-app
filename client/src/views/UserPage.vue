@@ -31,17 +31,28 @@
             type="button"
             icon="pi pi-book"
             label="All books"
-            @click="filteredData = null"
-            class="p-button-text"
+            @click="showAllBooks"
+            :class="[
+              'p-button-text',
+              {
+                'user-page__active-search-button':
+                  searchQueryButton?.toLowerCase() === 'all',
+              },
+            ]"
           />
 
           <Button
             type="button"
             icon="pi pi-calendar"
             label="Must return today"
-            @click="filteredData = [...booksWhichMustReturnToday]"
-            class="p-button-text"
-            :badge="badgeMostReturnToday"
+            @click="showBooksWhichMustReturnToday"
+            :class="[
+              'p-button-text',
+              {
+                'user-page__active-search-button':
+                  searchQueryButton?.toLowerCase() === 'returntoday',
+              },
+            ]"
             badgeClass="p-badge-danger"
           />
 
@@ -49,8 +60,14 @@
             type="button"
             icon="pi pi-calendar"
             label="Not returned"
-            @click="filteredData = [...booksWhichNotReturned]"
-            class="p-button-text"
+            @click="showBooksWhichNotReturned"
+            :class="[
+              'p-button-text',
+              {
+                'user-page__active-search-button':
+                  searchQueryButton?.toLowerCase() === 'notreturned',
+              },
+            ]"
             :badge="badgeNotReturned"
             badgeClass="p-badge-danger"
           />
@@ -86,11 +103,11 @@
                 item.reservation_number
               }}</span>
             </h5>
-
             <book-actions-user-page
               :data="item.details"
               :icons="icons"
               :booksWhichNotReturned="booksWhichNotReturned"
+              :isNotReturned="isNotReturned(item)"
             />
           </template>
 
@@ -134,13 +151,14 @@ export default {
     return {
       moment: moment,
       displayConfirmDialog: false,
-      badgeMostReturnToday: null,
+      badgeMustReturnToday: null,
       badgeNotReturned: null,
       booksWhichNotReturned: [],
       booksWhichMustReturnToday: [],
       filteredData: null,
       bookActions: [],
       item: null,
+      searchQueryButton: "all",
       icons: [
         {
           status: "Reserved",
@@ -217,7 +235,7 @@ export default {
         return elem.details.filter((innerElem) => {
           return (
             innerElem.status === "Received" &&
-            new Date(innerElem.return_date).setHours(0, 0, 0, 0) > today &&
+            new Date(innerElem.return_date).setHours(0, 0, 0, 0) < today &&
             new Date(innerElem.return_date).setHours(0, 0, 0, 0) !== today
           );
         })?.length;
@@ -241,7 +259,28 @@ export default {
       );
 
       this.booksWhichMustReturnToday = [...booksWhichMustReturnToday];
-      this.badgeMostReturnToday = booksWhichMustReturnToday?.length;
+      this.badgeMustReturnToday = booksWhichMustReturnToday?.length;
+    },
+
+    showBooksWhichNotReturned() {
+      this.filteredData = [...this.booksWhichNotReturned];
+      this.searchQueryButton = "notreturned";
+    },
+
+    showBooksWhichMustReturnToday() {
+      this.filteredData = [...this.booksWhichMustReturnToday];
+      this.searchQueryButton = "returntoday";
+    },
+
+    showAllBooks() {
+      this.filteredData = null;
+      this.searchQueryButton = "all";
+    },
+
+    isNotReturned(book) {
+      return !!this.booksWhichNotReturned?.filter((item) => {
+        return item.book.title === book.book?.title;
+      })?.length;
     },
   },
 

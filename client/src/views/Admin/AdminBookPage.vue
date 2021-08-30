@@ -3,14 +3,14 @@
     <Toast />
     <div>
       <div class="book-page__content">
-        <div style="position: sticky; top: 20px">
+        <div class="book-page__content__img-container">
           <img
-            :src="book.img"
-            :alt="book.title"
+            :src="currentBook.img"
+            :alt="currentBook.title"
             class="book-page__content__img"
           />
         </div>
-        <div style="width: 100%" class="book-page__content__info">
+        <div class="book-page__content__info">
           <div style="width: 100%" class="flex-container">
             <Button
               icon="pi pi pi-pencil"
@@ -25,7 +25,7 @@
               :showButtons="displayEditForm"
               :dataForm="editForm"
               :path="`/books/updatebook/${editForm._id}`"
-              :callback="this.getBook"
+              :callback="this.getCurrentBook"
               @resetForm="resetForm"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
@@ -63,25 +63,41 @@
                     'disabled-form': !displayEditForm,
                     'input-margin-bottom': displayEditForm,
                   }"
-                  style="padding-left: 0"
+                  style="
+                    margin-bottom: 10px;
+                    padding-left: 0;
+                    width: 100%;
+                    font-family: 'Cormorant Garamond', sans-serif;
+                  "
                 />
 
                 <Rating
                   v-model="editForm.rating"
                   :cancel="false"
                   :readonly="true"
-                  v-if="book.rating && !displayEditForm"
+                  v-if="currentBook.rating && !displayEditForm"
                   class="book-page__content__info__text"
                   style="margin-top: -30px"
                 />
 
-                <!-- <Textarea
-                v-model="editForm.title"
-                :autoResize="true"
-                placeholder="Enter title book"
-                class="book-page__content__info__title"
-                :class="{ 'disabled-form': !displayEditForm }"
-              /> -->
+                <div class="woocommerce-product-details__short-description">
+                  <Textarea
+                    v-model="editForm.description"
+                    :autoResize="true"
+                    placeholder="Enter description book"
+                    :class="[
+                      'woocommerce-product-details__short-description',
+                      {
+                        'disabled-form': !displayEditForm,
+                        'input-margin-bottom': displayEditForm,
+                      },
+                    ]"
+                    style="
+                      padding: 0;
+                      font-family: 'Cormorant Garamond', sans-serif;
+                    "
+                  />
+                </div>
 
                 <p
                   class="
@@ -151,9 +167,9 @@
                 <router-link
                   :to="{
                     name: 'reservedBooks',
-                    params: { reservedBookTitle: book.title },
+                    params: { reservedBookTitle: currentBook.title },
                   }"
-                  class="header__link"
+                  class="router-link"
                   >Users who reserved this book</router-link
                 >
               </template>
@@ -228,7 +244,7 @@ export default {
 
   data() {
     return {
-      book: null,
+      currentBook: {},
       reviewsBook: [],
       editForm: {
         _id: "",
@@ -253,19 +269,15 @@ export default {
         console.log(error);
       }
     },
-    getBook() {
-      this.getBooks();
-      try {
-        const book = this.books.find(
-          (book) => book._id === this.$route.params.id
-        );
 
-        if (book) {
-          this.book = book;
-          this.editForm = book;
-        }
-      } catch (error) {
-        console.log(error);
+    getCurrentBook() {
+      const book = this.books.find(
+        (book) => book._id === this.$route.params.id
+      );
+
+      if (book) {
+        this.currentBook = book;
+        this.editForm = book;
       }
     },
 
@@ -286,13 +298,13 @@ export default {
 
     resetForm() {
       this.getBooks();
-      this.getBook();
+      this.getCurrentBook();
     },
   },
 
   created() {
     this.getReviewsBook();
-    this.getBook();
+    this.getCurrentBook();
     this.getBooks();
     this.getAuthors();
     this.getGenres();

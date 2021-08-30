@@ -64,18 +64,20 @@
             >
           </div>
           <div>
-            <Button
-              v-if="isLoggedIn"
-              type="button"
-              :label="user.username"
-              icon="pi pi-user"
-              class="
-                p-button-text p-button-text
-                header__text header__text-button
-              "
-              :badge="badgeNotReturned"
-              badgeClass="p-badge-danger"
-            />
+            <router-link :to="{ name: 'userPage', params: { id: user._id } }">
+              <Button
+                v-if="isLoggedIn"
+                type="button"
+                :label="user.username"
+                icon="pi pi-user"
+                class="
+                  p-button-text p-button-text
+                  header__text header__text-button
+                "
+                :badge="badgeNotReturned"
+                badgeClass="p-badge-danger"
+              />
+            </router-link>
           </div>
         </div>
       </nav>
@@ -118,7 +120,7 @@ export default {
         return elem.details.filter((innerElem) => {
           return (
             innerElem.status === "Received" &&
-            new Date(innerElem.return_date).setHours(0, 0, 0, 0) > today &&
+            new Date(innerElem.return_date).setHours(0, 0, 0, 0) < today &&
             new Date(innerElem.return_date).setHours(0, 0, 0, 0) !== today
           );
         })?.length;

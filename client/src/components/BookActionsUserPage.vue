@@ -42,12 +42,12 @@
         <div style="width: max-content">
           <p>{{ slotProps.item.status }}</p>
           <p
-            :class="{ 'not-returned-text': false }"
+            :class="{ 'not-returned-text': isNotReturned }"
             v-if="
               slotProps.item.status === 'Received' && slotProps.item.return_date
             "
           >
-            <b :class="{ 'not-returned-text': false }"
+            <b :class="{ 'not-returned-text': isNotReturned }"
               >Book must be returned on:</b
             >
             {{
@@ -82,6 +82,10 @@ export default {
     },
     booksWhichNotReturned: {
       type: Array,
+    },
+    isNotReturned: {
+      type: Boolean,
+      default: false,
     },
   },
 

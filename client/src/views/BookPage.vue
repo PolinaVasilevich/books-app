@@ -46,12 +46,7 @@
 
           <div class="woocommerce-product-details__short-description">
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit. Simul vidisse eu vim. Probo
-              tincidunt ne vel.
+              {{ currentBook.description }}
             </p>
           </div>
 
@@ -64,20 +59,6 @@
             icon="pi pi-book"
             style="margin: 50px 0"
           />
-
-          <!-- <Button
-            v-if="isLoggedIn && !user.isAdmin && currentBook.count"
-            :label="
-              !isReserved
-                ? 'Reserve book'.toUpperCase()
-                : 'You reserved this book'.toUpperCase()
-            "
-            class="p-button-warning"
-            @click="onReserveBook(currentBook, user)"
-            :disabled="!currentBook.count || isReserved"
-            icon="pi pi-book"
-            style="margin: 50px 0"
-          /> -->
 
           <Button
             v-if="

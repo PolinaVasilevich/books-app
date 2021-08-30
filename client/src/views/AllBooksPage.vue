@@ -1,13 +1,15 @@
 <template>
   <div class="books-page">
     <Toast />
-    <Button
-      v-if="user.isAdmin"
-      label="New book"
-      icon="pi pi-plus"
-      class="books-page__admin-button p-button-success p-mr-2"
-      @click="openModal"
-    />
+    <div class="books-page__admin-button-container">
+      <Button
+        v-if="user.isAdmin"
+        label="New book"
+        icon="pi pi-plus"
+        class="books-page__admin-button p-button-success p-mr-2"
+        @click="openModal"
+      />
+    </div>
 
     <modal-form
       modal-title="Create new record"
@@ -35,7 +37,7 @@
       </template>
     </modal-form>
     <DataView
-      :value="searchedBooksByGenre"
+      :value="searchedBooks"
       :layout="layout"
       :paginator="true"
       :rows="rows"
@@ -46,15 +48,17 @@
             <Button
               label="All"
               class="p-button p-button-text search-button button-genre"
-              @click="searchQuery = 'all'"
-              :class="{ 'active-search-button': searchQuery === 'all' }"
+              @click="searchGenreQuery = 'all'"
+              :class="{ 'active-search-button': searchGenreQuery === 'all' }"
             />
 
             <Button
               label="Most popular"
               class="p-button p-button-text search-button button-genre"
-              @click="searchQuery = 'popular'"
-              :class="{ 'active-search-button': searchQuery === 'popular' }"
+              @click="searchGenreQuery = 'popular'"
+              :class="{
+                'active-search-button': searchGenreQuery === 'popular',
+              }"
             />
 
             <Button
@@ -62,21 +66,28 @@
               :key="genre.name"
               :label="genre.name"
               class="p-button p-button-text search-button button-genre"
-              @click="searchQuery = genre.name"
-              :class="{ 'active-search-button': searchQuery === genre.name }"
+              @click="searchGenreQuery = genre.name"
+              :class="{
+                'active-search-button': searchGenreQuery === genre.name,
+              }"
             />
           </div>
-          <!-- <div style="width: 100%">
+
+          <div style="width: 100%; margin-right: 0.5rem; margin-top: 1rem">
             <span class="p-input-icon-left" style="width: 100%">
               <i class="pi pi-search" />
               <InputText
                 placeholder="Search..."
                 v-model="searchQuery"
-                style="width: 100%"
+                style="
+                  width: 100%;
+                  font-family: 'Cormorant Garamond', sans-serif;
+                "
               />
             </span>
-          </div> -->
-          <div class="p-col-6 books-page__buttons-sort-container">
+          </div>
+
+          <div class="books-page__buttons-sort-container">
             <!-- <Dropdown
               v-model="selectedSort"
               :options="sortOptions"
@@ -85,6 +96,7 @@
               placeholder="Sort By..."
               style="text-align: left"
             /> -->
+
             <DataViewLayoutOptions v-model="layout" />
           </div>
         </div>
@@ -275,7 +287,8 @@ export default {
         { label: "Sort By Title", value: "title" },
         { label: "Sort By Rating", value: "rating" },
       ],
-      searchQuery: "all",
+      searchQuery: "",
+      searchGenreQuery: "all",
     };
   },
 
@@ -334,25 +347,30 @@ export default {
 
   computed: {
     searchedBooks() {
-      return this.books.filter((book) => {
-        return (
-          book.title?.toLowerCase().includes(this.searchQuery) ||
-          book.author.first_name?.toLowerCase().includes(this.searchQuery) ||
-          book.author.last_name?.toLowerCase().includes(this.searchQuery)
-        );
-      });
+      if (this.searchQuery) {
+        return this.books.filter((book) => {
+          return (
+            book.title?.toLowerCase().includes(this.searchQuery) ||
+            book.author.first_name?.toLowerCase().includes(this.searchQuery) ||
+            book.author.last_name?.toLowerCase().includes(this.searchQuery)
+          );
+        });
+      } else {
+        return this.searchedBooksByGenre;
+      }
     },
 
     searchedBooksByGenre() {
-      if (this.searchQuery === "all") {
+      if (this.searchGenreQuery === "all") {
         return [...this.books];
       }
-      if (this.searchQuery === "popular") {
+      if (this.searchGenreQuery === "popular") {
         return [...this.mostPopularBooks];
       }
       return this.books.filter(
         (book) =>
-          book.genre.name?.toLowerCase() === this.searchQuery?.toLowerCase()
+          book.genre.name?.toLowerCase() ===
+          this.searchGenreQuery?.toLowerCase()
       );
     },
 
@@ -379,24 +397,6 @@ export default {
           return [...this.searchedBooks];
       }
     },
-
-    // mostPopularBooks() {
-    //   const popularBooks = [];
-    //   this.bookActions
-    //     .filter((book) => book.status === "Received")
-    //     .forEach((item) => {
-    //       popularBooks.push(item.book);
-    //     });
-
-    //   const obj = popularBooks.reduce((acc, elem) => {
-    //     acc[elem] = (acc[elem] || 0) + 1;
-    //     return acc;
-    //   }, {});
-
-    //   console.log(obj);
-
-    //   return [];
-    // },
   },
   created() {
     this.getBooks();
@@ -407,7 +407,7 @@ export default {
     this.getMostPopularBooks();
 
     if (this.bookGenre) {
-      this.searchQuery = this.bookGenre;
+      this.searchGenreQuery = this.bookGenre;
     }
     window.addEventListener("resize", this.onResize);
   },

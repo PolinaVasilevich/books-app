@@ -42,6 +42,12 @@
             All book actions</router-link
           >
         </my-button>
+
+        <my-button type="button">
+          <router-link class="router-link" to="/admin/adminchart">
+            Chart</router-link
+          >
+        </my-button>
       </div>
     </div>
     <router-view />

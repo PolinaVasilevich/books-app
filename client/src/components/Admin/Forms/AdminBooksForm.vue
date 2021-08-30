@@ -24,6 +24,13 @@
         </option>
       </select>
 
+      <textarea
+        :value="description"
+        @input="$emit('update:description', $event.target.value)"
+        class="form-control input"
+        placeholder="Enter description book"
+      />
+
       <select class="form-control select" v-model="selectGenre">
         <option
           v-for="item in genres"
@@ -50,7 +57,7 @@
         class="form-control input"
         type="number"
         placeholder="Enter count"
-        min="1"
+        min="0"
         required
       />
     </template>
@@ -91,6 +98,10 @@ export default {
     },
     genres: {
       type: Object,
+    },
+
+    description: {
+      type: String,
     },
   },
   computed: {

@@ -19,6 +19,7 @@ import AdminBookActions from "@/views/Admin/AdminBookActions.vue";
 import AdminReviews from "@/views/Admin/AdminReviews.vue";
 
 import AdminBookPage from "@/views/Admin/AdminBookPage.vue";
+import AdminChart from "@/views/Admin/AdminChart.vue";
 
 const routes = [
   {
@@ -111,6 +112,16 @@ const routes = [
         path: "adminreviews",
         name: "reviews",
         component: AdminReviews,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
+
+      {
+        path: "adminchart",
+        name: "chart",
+        component: AdminChart,
         meta: {
           requiresAuth: true,
           isAdmin: true,

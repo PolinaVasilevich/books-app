@@ -90,6 +90,7 @@
               typeForm="create"
               v-model:title="data.title"
               v-model:author="data.author"
+              v-model:description="data.description"
               v-model:genre="data.genre"
               v-model:img="data.img"
               v-model:count="data.count"
@@ -116,6 +117,7 @@
               typeForm="update"
               v-model:title="editForm.title"
               v-model:author="editForm.author"
+              v-model:description="editForm.description"
               v-model:genre="editForm.genre"
               v-model:img="editForm.img"
               v-model:count="editForm.count"
@@ -182,6 +184,7 @@ export default {
       data: {
         title: "",
         author: "",
+        description: "",
         genre: "",
         img: "",
         count: 0,
@@ -191,6 +194,7 @@ export default {
         _id: "",
         title: "",
         author: "",
+        description: "",
         genre: "",
         img: "",
         count: 0,
@@ -214,6 +218,7 @@ export default {
     resetForm() {
       this.data.title = "";
       this.data.author = this.authors[0];
+      this.data.description = "";
       this.data.genre = this.genres[0];
       this.data.img = "";
       this.data.count = 0;
@@ -222,6 +227,7 @@ export default {
     resetEditForm() {
       this.editForm.title = this.initialEditForm.title;
       this.editForm.author = this.initialEditForm.author;
+      this.editForm.description = this.initialEditForm.description;
       this.editForm.genre = this.initialEditForm.genre;
       this.editForm.img = this.initialEditForm.img;
       this.editForm.count = this.initialEditForm.count;
