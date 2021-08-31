@@ -44,7 +44,7 @@
 
         <chart
           v-if="statisticsUserByMonth"
-          type="line"
+          type="bar"
           :topData="statisticsUserByMonth"
         />
       </div>
