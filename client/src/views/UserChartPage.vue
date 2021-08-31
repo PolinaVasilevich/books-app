@@ -64,7 +64,7 @@ export default {
       topBooks: null,
       statisticsUserByMonth: null,
       selectedItem: "all",
-      title: "All reserved books of all time",
+      title: "Statistics",
     };
   },
 
