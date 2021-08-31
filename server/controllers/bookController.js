@@ -414,7 +414,7 @@ class bookController {
           },
         },
 
-        { $sort: { count: -1 } },
+        { $sort: { count: -1, "book.title": 1 } },
 
         { $limit: 5 },
 
@@ -509,11 +509,13 @@ class bookController {
 
         {
           $match: {
-            count: { $gte: 5 },
+            count: { $gte: 1 },
           },
         },
 
-        { $sort: { count: -1 } },
+        { $sort: { count: -1, "book.title": 1 } },
+
+        { $limit: 5 },
 
         {
           $group: {
@@ -540,8 +542,6 @@ class bookController {
             },
           },
         },
-
-        { $limit: 5 },
 
         {
           $project: {
