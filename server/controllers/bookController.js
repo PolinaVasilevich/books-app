@@ -381,6 +381,7 @@ class bookController {
           $group: {
             _id: "$book",
             book: { $first: "$book" },
+            action_date: { $first: "$action_date" },
             count: { $sum: 1 },
           },
         },
@@ -409,11 +410,194 @@ class bookController {
 
         {
           $match: {
-            count: { $gte: 2 },
+            count: { $gte: 3 },
           },
         },
 
-        { $sort: { "book.title": 1 } },
+        { $sort: { count: -1 } },
+
+        { $limit: 5 },
+
+        {
+          $group: {
+            _id: null,
+            books: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.book.title",
+              },
+            },
+            data: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+            action_date: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.action_date",
+              },
+            },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            books: 0,
+          },
+        },
+      ]);
+      res.json(topBooks[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getTopBooksOfCurrentMonth(req, res) {
+    try {
+      const topBooks = await BookActions.aggregate([
+        {
+          $match: {
+            status: "Returned",
+            $expr: {
+              $eq: [{ $month: "$action_date" }, { $month: new Date() }],
+            },
+          },
+        },
+
+        {
+          $group: {
+            _id: "$book",
+            book: { $first: "$book" },
+
+            count: { $sum: 1 },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        {
+          $match: {
+            count: { $gte: 5 },
+          },
+        },
+
+        { $sort: { count: -1 } },
+
+        {
+          $group: {
+            _id: null,
+            books: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.book.title",
+              },
+            },
+            data: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+          },
+        },
+
+        { $limit: 5 },
+
+        {
+          $project: {
+            _id: 0,
+            books: 0,
+          },
+        },
+      ]);
+      res.json(topBooks[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getTopBooksUser(req, res) {
+    const { id } = req.params;
+    try {
+      const topBooks = await BookActions.aggregate([
+        {
+          $match: { status: "Returned", user: new mongoose.Types.ObjectId(id) },
+        },
+
+        {
+          $group: {
+            _id: "$book",
+            book: { $first: "$book" },
+            action_date: { $first: "$action_date" },
+            count: { $sum: 1 },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        { $sort: { count: -1, "book.title": 1 } },
+
+        // { $limit: 5 },
 
         {
           $group: {
@@ -445,6 +629,115 @@ class bookController {
           $project: {
             _id: 0,
             books: 0,
+          },
+        },
+      ]);
+      res.json(topBooks[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getStatisticsUserByMonth(req, res) {
+    const { id } = req.params;
+    try {
+      const topBooks = await BookActions.aggregate([
+        {
+          $match: { status: "Returned", user: new mongoose.Types.ObjectId(id) },
+        },
+
+        {
+          $addFields: {
+            month: { $month: "$action_date" },
+          },
+        },
+
+        {
+          $group: {
+            _id: "$month",
+            book: { $first: "$book" },
+            month: { $first: "$month" },
+            count: { $sum: 1 },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        { $sort: { month: 1 } },
+
+        // // { $limit: 5 },
+
+        {
+          $group: {
+            _id: null,
+            books: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            months: [
+              "",
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ],
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: { $arrayElemAt: ["$months", "$$item.month"] },
+              },
+            },
+            data: {
+              $map: {
+                input: "$books",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            books: 0,
+            months: 0,
           },
         },
       ]);
@@ -561,7 +854,8 @@ class bookController {
       const bookActions = await BookActions.find()
         .populate("user")
         .populate("userAction")
-        .populate({ path: "book", populate: ["author", "genre"] });
+        .populate({ path: "book", populate: ["author", "genre"] })
+        .sort({ action_date: -1 });
 
       res.json(bookActions);
     } catch (error) {
@@ -707,7 +1001,8 @@ class bookController {
     try {
       const reviews = await Review.find()
         .populate("user")
-        .populate({ path: "book", populate: ["author", "genre"] });
+        .populate({ path: "book", populate: ["author", "genre"] })
+        .sort({ created_date: -1 });
       res.json(reviews);
     } catch (error) {
       console.log(error);

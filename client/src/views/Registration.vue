@@ -12,28 +12,35 @@
         </div>
       </div>
     </div>
-    <Dialog v-model:visible="displayMessage" :style="{ width: '50vw' }">
-      <div class="p-d-flex p-ai-center p-dir-col p-pt-6 p-px-3">
-        <i
-          class="pi pi-check-circle"
-          :style="{
-            fontSize: '5rem',
-            color: 'var(--green-500)',
-            marginBottom: '10px',
-          }"
-        ></i>
+    <Dialog v-model:visible="displayMessage" :style="{ width: '500px' }">
+      <div
+        class="p-d-flex p-ai-center p-dir-col p-pt-6 p-px-3"
+        style="padding-top: 0 !important"
+      >
+        <img
+          src="https://media.istockphoto.com/vectors/like-reading-everywhere-vector-id628136102?k=6&m=628136102&s=170667a&w=0&h=E_yMs6EawXGH4jcAvhvc6KA7x2nklNn7BvhlvTA4ElQ="
+          alt="welcome"
+        />
         <div style="text-align: center">
-          <h5>Welcome to the Book App!</h5>
-          <span :style="{ lineHeight: 1.5, textIndent: '1rem' }">
-            Thank you for joining our website.
+          <h3 style="font-weight: bold">Welcome!</h3>
+          <span
+            :style="{
+              lineHeight: 1.5,
+              textIndent: '1rem',
+              fontSize: '1.2rem',
+            }"
+          >
+            You have successfully registration on <b>Book App</b>
           </span>
+          <small></small>
         </div>
       </div>
       <template #footer>
         <div class="p-d-flex p-jc-center">
           <Button
-            class="p-button-raised"
+            class="p-button-raised p-button-text p-button-plain"
             label="Login to your account"
+            icon="pi pi-user"
             @click="loginToAccount"
           />
         </div>

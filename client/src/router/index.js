@@ -8,7 +8,7 @@ import Registration from "@/views/Registration.vue";
 import BookPage from "@/views/BookPage.vue";
 
 import UserPage from "@/views/UserPage.vue";
-
+import UserChartPage from "@/views/UserChartPage.vue";
 import Admin from "@/views/Admin/Admin.vue";
 import AdminBooks from "@/views/Admin/AdminBooks.vue";
 import AdminAuthors from "@/views/Admin/AdminAuthors.vue";
@@ -156,6 +156,15 @@ const routes = [
     name: "userPage",
     component: UserPage,
 
+    meta: {
+      requiresAuth: true,
+    },
+  },
+
+  {
+    path: "/top/:id",
+    name: "userChartPage",
+    component: UserChartPage,
     meta: {
       requiresAuth: true,
     },

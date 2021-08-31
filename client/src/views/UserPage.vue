@@ -128,7 +128,7 @@
           @action="cancelReserve(item)"
         />
       </div>
-      <p v-if="!userReservedBooks?.length">
+      <p v-if="!userReservedBooks?.length" style="font-size: 1.2rem">
         You have not reserved any books yet.
       </p>
     </div>

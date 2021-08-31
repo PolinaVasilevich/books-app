@@ -24,6 +24,12 @@ router.get("/allbookactions", bookController.getAllBookActions);
 router.get("/reviewsbook/:id", bookController.getReviewsBook);
 router.get("/mostpopularbooks", bookController.getMostPopularBooks);
 router.get("/topbooks", bookController.getTopBooks);
+router.get("/topbooksuser/:id", bookController.getTopBooksUser);
+router.get("/topbookscurrentmonth", bookController.getTopBooksOfCurrentMonth);
+router.get(
+  "/statisticsuserbymonth/:id",
+  bookController.getStatisticsUserByMonth
+);
 
 router.put("/updatebook/:id", bookController.updateBook);
 router.put("/updateauthor/:id", bookController.updateAuthor);

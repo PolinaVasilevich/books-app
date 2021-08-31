@@ -64,7 +64,9 @@
             >
           </div>
           <div>
-            <router-link :to="{ name: 'userPage', params: { id: user._id } }">
+            <router-link
+              :to="{ name: 'userChartPage', params: { id: user._id } }"
+            >
               <Button
                 v-if="isLoggedIn"
                 type="button"

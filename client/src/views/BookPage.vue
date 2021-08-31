@@ -50,6 +50,28 @@
             </p>
           </div>
 
+          <!-- <div v-if="!currentBook.count">
+            <p
+              style="
+                color: #000;
+                font-family: 'Josefin Sans', sans-serif;
+                font-size: 12px;
+                text-transform: uppercase;
+                font-weight: 400;
+                margin: 41px 0 0 0;
+                display: inline-block;
+                background-color: transparent;
+                border: 2px solid #efe6d5;
+                text-align: center;
+                line-height: 2.857em;
+                letter-spacing: 0.35em;
+                padding: 9px 27px 5px 32px;
+              "
+            >
+              {{ currentBook?.count }} IN STOCK
+            </p>
+          </div> -->
+
           <Button
             v-if="!currentBook.count && !isReserved"
             :label="'out of stock'.toUpperCase()"
