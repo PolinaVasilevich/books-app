@@ -129,12 +129,14 @@
               @click="openModal"
               v-if="isLoggedIn && user.username !== 'admin'"
               style="margin-bottom: 37px"
+              :disabled="isReview"
             />
             <review-list
               :items="reviewsBook"
               :currentUser="user"
               typeForm="update"
               :callback="this.getReviewsBook"
+              :bookTitle="currentBook.title"
             />
 
             <Dialog
@@ -190,6 +192,7 @@ export default {
     return {
       isReserved: false,
       isDisabled: false,
+      isReview: false,
       editDataFormID: null,
       reviewsBook: [],
       currentBook: {},
@@ -253,6 +256,23 @@ export default {
       }
     },
 
+    checkReviewBook() {
+      try {
+        const reviews = this.reviewsBook.filter((item) => {
+          return (
+            item.book._id === this.currentBook._id &&
+            item.user._id === this.user._id
+          );
+        });
+
+        console.log(reviews);
+
+        this.isReview = !!reviews.length;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     async onReserveBook() {
       if (this.currentBook.count) {
         try {
@@ -311,6 +331,7 @@ export default {
     this.getReviewsBook();
     this.getReservedBooks();
     this.checkReserveBook(this.currentBook._id, this.user._id);
+    this.checkReviewBook();
   },
 };
 </script>

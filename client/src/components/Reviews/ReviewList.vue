@@ -12,7 +12,12 @@
       />
     </div>
 
-    <p v-else>There are no reviews yet.</p>
+    <p v-else>
+      There are no reviews yet.
+      <span
+        >Be the first to review <b>"{{ bookTitle }}"</b>.</span
+      >
+    </p>
   </div>
 </template>
 
@@ -34,6 +39,9 @@ export default {
       required: true,
     },
     currentUser: { type: Object, required: true },
+    bookTitle: {
+      type: String,
+    },
   },
 
   methods: {

@@ -1,49 +1,84 @@
 const Router = require("express");
 const router = new Router();
+
 const bookController = require("../controllers/bookController");
+const authorController = require("../controllers/authorController");
+const genreController = require("../controllers/genreController");
+const reviewController = require("../controllers/reviewController");
+const bookActionsController = require("../controllers/bookActionsController");
+const reservedBooksController = require("../controllers/reservedBooksController");
+const statisticsController = require("../controllers/statisticsController");
 
-router.post("/book", bookController.createBook);
-router.post("/author", bookController.createAuthor);
-router.post("/genre", bookController.createGenre);
-
-router.post("/review", bookController.createReview);
-
-router.post("/reservebook", bookController.reserveBook);
-router.post("/giveoutbook", bookController.giveOutBook);
-router.post("/returnbook", bookController.returnBook);
-router.post("/cancelbook", bookController.cancelBook);
-
+////BGN BOOK////
 router.get("/allbooks", bookController.getBooks);
-router.get("/allauthors", bookController.getAuthors);
-router.get("/allgenres", bookController.getGenres);
-router.get("/allreservedbooks", bookController.getReservedBooks);
-router.get("/modifiedreservedbooks", bookController.getModifiedReservedBooks);
-router.get("/reservedbooks/:id", bookController.getUserReservedBooks);
-router.get("/allreviews", bookController.getReviews);
-router.get("/allbookactions", bookController.getAllBookActions);
-router.get("/reviewsbook/:id", bookController.getReviewsBook);
-router.get("/mostpopularbooks", bookController.getMostPopularBooks);
-router.get("/topbooks", bookController.getTopBooks);
-router.get("/topbooksuser/:id", bookController.getTopBooksUser);
-router.get("/topbookscurrentmonth", bookController.getTopBooksOfCurrentMonth);
-router.get(
-  "/statisticsuserbymonth/:id",
-  bookController.getStatisticsUserByMonth
-);
-
+router.post("/book", bookController.createBook);
 router.put("/updatebook/:id", bookController.updateBook);
-router.put("/updateauthor/:id", bookController.updateAuthor);
-router.put("/updategenre/:id", bookController.updateGenre);
-router.put("/updatereview/:id", bookController.updateReview);
-router.put("/updatereservedbook/:id", bookController.updateReservedBook);
-
 router.delete("/deletebook/:id", bookController.deleteBook);
 router.delete("/deletemanybooks", bookController.deleteManyBooks);
-router.delete("/deleteauthor/:id", bookController.deleteAuthor);
-router.delete("/deletemanyauthors", bookController.deleteManyAuthors);
-router.delete("/deletegenre/:id", bookController.deleteGenre);
-router.delete("/deletemanygenres", bookController.deleteManyGenres);
-router.delete("/deletereservedbook/:id", bookController.deleteReservedBook);
-router.delete("/deletereview/:id", bookController.deleteReview);
+////END BOOK////
+
+////BGN AUTHOR////
+router.get("/allauthors", authorController.getAuthors);
+router.post("/author", authorController.createAuthor);
+router.put("/updateauthor/:id", authorController.updateAuthor);
+router.delete("/deleteauthor/:id", authorController.deleteAuthor);
+router.delete("/deletemanyauthors", authorController.deleteManyAuthors);
+////END AUTHOR////
+
+////BGN GENRE////
+router.get("/allgenres", genreController.getGenres);
+router.post("/genre", genreController.createGenre);
+router.put("/updategenre/:id", genreController.updateGenre);
+router.delete("/deletegenre/:id", genreController.deleteGenre);
+router.delete("/deletemanygenres", genreController.deleteManyGenres);
+////END GENRE////
+
+////BGN REVIEW////
+router.get("/allreviews", reviewController.getReviews);
+router.get("/reviewsbook/:id", reviewController.getReviewsBook);
+router.post("/review", reviewController.createReview);
+router.put("/updatereview/:id", reviewController.updateReview);
+router.delete("/deletereview/:id", reviewController.deleteReview);
+////END REVIEW////
+
+////BGN BOOK ACTIONS////
+router.get("/allbookactions", bookActionsController.getAllBookActions);
+router.post("/reservebook", bookActionsController.reserveBook);
+router.post("/giveoutbook", bookActionsController.giveOutBook);
+router.post("/returnbook", bookActionsController.returnBook);
+router.post("/cancelbook", bookActionsController.cancelBook);
+////END BOOK ACTIONS////
+
+////BGN RESERVED BOOKS////
+router.get("/allreservedbooks", reservedBooksController.getReservedBooks);
+router.get(
+  "/modifiedreservedbooks",
+  reservedBooksController.getModifiedReservedBooks
+);
+router.get("/reservedbooks/:id", reservedBooksController.getUserReservedBooks);
+
+router.put(
+  "/updatereservedbook/:id",
+  reservedBooksController.updateReservedBook
+);
+router.delete(
+  "/deletereservedbook/:id",
+  reservedBooksController.deleteReservedBook
+);
+////END RESERVED BOOKS////
+
+////BGN STATISTICS////
+router.get("/mostpopularbooks", statisticsController.getMostPopularBooks);
+router.get("/topbooks", statisticsController.getTopBooks);
+router.get("/topbooksuser/:id", statisticsController.getTopBooksUser);
+router.get(
+  "/topbookscurrentmonth",
+  statisticsController.getTopBooksOfCurrentMonth
+);
+router.get(
+  "/statisticsuserbymonth/:id",
+  statisticsController.getStatisticsUserByMonth
+);
+////END STATISTICS////
 
 module.exports = router;

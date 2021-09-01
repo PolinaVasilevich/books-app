@@ -81,6 +81,7 @@
           "
         >
           <Rating
+            v-if="editDataForm.rating"
             v-model="editDataForm.rating"
             :cancel="false"
             :readonly="!displayEditForm"
