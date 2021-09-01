@@ -9,6 +9,7 @@
         :typeForm="typeForm"
         :callback="callback"
         @hideReview="hideReview"
+        @deleteReview="deleteReview"
       />
     </div>
 
@@ -47,6 +48,10 @@ export default {
   methods: {
     hideReview(value) {
       this.$emit("hideReview", value);
+    },
+
+    deleteReview(value) {
+      this.$emit("deleteReview", value);
     },
   },
 };

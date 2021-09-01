@@ -71,6 +71,21 @@ class reviewController {
     }
   }
 
+  async getUserReviews(req, res) {
+    try {
+      const { bookid, userid } = req.params;
+      const reviews = await Review.find({
+        book: bookid,
+        user: userid,
+      })
+        .populate("user")
+        .populate({ path: "book", populate: ["author", "genre"] });
+      res.json(reviews);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async getReviewsBook(req, res) {
     const { id } = req.params;
     try {
@@ -114,23 +129,13 @@ class reviewController {
   async deleteReview(req, res) {
     const { id } = req.params;
     try {
-      const { book } = req.body;
-      const reservedBook = await Review.findByIdAndDelete({ _id: id });
-
-      await Book.findOneAndUpdate(
-        { _id: book._id },
-        { ...book, count: book.count + 1 },
-        { new: true, useFindAndModify: false }
-      );
-
+      await Review.findByIdAndDelete({ _id: id });
       return res.json({
-        message: `${reservedBook.book.title} - Reserved book were deleted successfully!`,
+        message: `$Review with id {id} were deleted successfully!`,
       });
     } catch (e) {
       console.log(e);
-      res
-        .status(400)
-        .json({ message: `Cannot delete reserved book with id ${id}` });
+      res.status(400).json({ message: `Cannot delete review with id ${id}` });
     }
   }
 }

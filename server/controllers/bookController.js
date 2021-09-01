@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-
 const Book = require("../models/Book");
 const Review = require("../models/Review");
 const BookActions = require("../models/BookActions");

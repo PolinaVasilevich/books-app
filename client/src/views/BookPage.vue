@@ -120,23 +120,33 @@
               {{ currentBook?.count }}
             </p>
           </div>
-
           <div class="reviews">
             <Button
-              label="ADD REVIEW"
-              icon="pi pi-user-edit"
+              :label="
+                !isUserReview
+                  ? 'ADD REVIEW'
+                  : 'You have already left a review'.toUpperCase()
+              "
+              :icon="!isUserReview ? 'pi pi-user-edit' : ''"
               class="p-button-raised p-button-secondary p-button-text"
               @click="openModal"
               v-if="isLoggedIn && user.username !== 'admin'"
               style="margin-bottom: 37px"
-              :disabled="isReview"
+              :disabled="isUserReview"
             />
             <review-list
               :items="reviewsBook"
               :currentUser="user"
               typeForm="update"
               :callback="this.getReviewsBook"
-              :bookTitle="currentBook.title"
+              :bookTitle="currentBook?.title"
+              @deleteReview="confirmDelete($event)"
+            />
+            <confirm-dialog
+              text="delete this review"
+              :displayConfirmDialog="displayConfirmDialog"
+              @hideConfirmDialog="displayConfirmDialog = false"
+              @action="onDeleteReview"
             />
 
             <Dialog
@@ -184,16 +194,19 @@ import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 import ReviewList from "@/components/Reviews/ReviewList";
+import ConfirmDialog from "@/components/UI/ConfirmDialog";
 
 export default {
-  components: { ReviewList },
+  components: { ReviewList, ConfirmDialog },
   mixins: [toggle, adminFormMixin, dataStore],
   data() {
     return {
       isReserved: false,
       isDisabled: false,
-      isReview: false,
+      isUserReview: false,
       editDataFormID: null,
+      displayConfirmDialog: false,
+      review: null,
       reviewsBook: [],
       currentBook: {},
       data: {
@@ -256,18 +269,12 @@ export default {
       }
     },
 
-    checkReviewBook() {
+    async checkUserReviewBook() {
       try {
-        const reviews = this.reviewsBook.filter((item) => {
-          return (
-            item.book._id === this.currentBook._id &&
-            item.user._id === this.user._id
-          );
-        });
-
-        console.log(reviews);
-
-        this.isReview = !!reviews.length;
+        const userReviews = await API.get(
+          `books/userreviewsbook/${this.$route.params.id}&${this.user._id}`
+        );
+        this.isUserReview = !!userReviews.data.length;
       } catch (error) {
         console.log(error);
       }
@@ -303,7 +310,7 @@ export default {
         });
         this.getBooks();
         this.getReviewsBook();
-
+        this.isUserReview = true;
         this.showMessage("Your review added");
       } catch (error) {
         console.log(error);
@@ -323,6 +330,24 @@ export default {
       this.data.text = "";
       this.data.rating = 0;
     },
+
+    confirmDelete(review) {
+      this.displayConfirmDialog = true;
+      this.review = review;
+    },
+
+    async onDeleteReview() {
+      this.displayConfirmDialog = false;
+      try {
+        await API.delete(`/books/deletereview/${this.review}`);
+        this.getReviewsBook();
+        this.showMessage(`Review with id ${this.review} deleted`);
+      } catch (error) {
+        console.log(error);
+        this.showErrorMessage(error.response.data.message);
+        this.getReviewsBook();
+      }
+    },
   },
 
   created() {
@@ -331,7 +356,7 @@ export default {
     this.getReviewsBook();
     this.getReservedBooks();
     this.checkReserveBook(this.currentBook._id, this.user._id);
-    this.checkReviewBook();
+    this.checkUserReviewBook();
   },
 };
 </script>

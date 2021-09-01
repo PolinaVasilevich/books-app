@@ -36,6 +36,7 @@ router.delete("/deletemanygenres", genreController.deleteManyGenres);
 ////BGN REVIEW////
 router.get("/allreviews", reviewController.getReviews);
 router.get("/reviewsbook/:id", reviewController.getReviewsBook);
+router.get("/userreviewsbook/:bookid&:userid", reviewController.getUserReviews);
 router.post("/review", reviewController.createReview);
 router.put("/updatereview/:id", reviewController.updateReview);
 router.delete("/deletereview/:id", reviewController.deleteReview);

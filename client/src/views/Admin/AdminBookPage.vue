@@ -181,6 +181,7 @@
               :currentUser="user"
               typeForm="update"
               :callback="this.getReviewsBook"
+              :bookTitle="currentBook.title"
               @hideReview="hideReview"
             />
 
