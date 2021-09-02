@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const BookActions = require("../models/BookActions");
+const User = require("../models/User/User");
 
 class statisticsController {
   async getMostPopularBooks(req, res) {
@@ -155,9 +156,18 @@ class statisticsController {
         {
           $match: {
             status: "Returned",
-            $expr: {
-              $eq: [{ $month: "$action_date" }, { $month: new Date() }],
-            },
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $month: "$action_date" }, { $month: new Date() }],
+                },
+              },
+              {
+                $expr: {
+                  $eq: [{ $year: "$action_date" }, { $year: new Date() }],
+                },
+              },
+            ],
           },
         },
 
@@ -427,6 +437,305 @@ class statisticsController {
         },
       ]);
       res.json(topBooks[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getNewUsersForCurrentYear(req, res) {
+    try {
+      const users = await User.aggregate([
+        {
+          $match: {
+            $expr: {
+              $eq: [{ $year: "$created_date" }, { $year: new Date() }],
+            },
+          },
+        },
+
+        {
+          $group: {
+            _id: { $month: "$created_date" },
+            month: { $first: { $month: "$created_date" } },
+            count: { $sum: 1 },
+          },
+        },
+
+        { $sort: { month: 1 } },
+
+        {
+          $group: {
+            _id: null,
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            months: [
+              "",
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ],
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: { $arrayElemAt: ["$months", "$$item.month"] },
+              },
+            },
+            data: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            items: 0,
+            months: 0,
+          },
+        },
+      ]);
+      res.json(users[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getNewUsersCurrentMonth(req, res) {
+    try {
+      const users = await User.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $month: "$created_date" }, { $month: new Date() }],
+                },
+              },
+              {
+                $expr: {
+                  $eq: [{ $year: "$created_date" }, { $year: new Date() }],
+                },
+              },
+            ],
+          },
+        },
+
+        {
+          $group: {
+            _id: { $dayOfYear: "$created_date" },
+            created_date: { $first: "$created_date" },
+            count: { $sum: 1 },
+          },
+        },
+
+        { $sort: { created_date: 1 } },
+
+        {
+          $group: {
+            _id: null,
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: {
+                  $dateToString: {
+                    format: "%Y-%m-%d",
+                    date: "$$item.created_date",
+                  },
+                },
+              },
+            },
+            data: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            items: 0,
+            created_date: 0,
+          },
+        },
+      ]);
+      res.json(users[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getStatisticsReservedBooksCurrentYear(req, res) {
+    try {
+      const books = await BookActions.aggregate([
+        {
+          $match: {
+            $or: [
+              { status: "Reserved" },
+              { status: "Returned" },
+              { status: "Canceled" },
+            ],
+
+            $expr: {
+              $eq: [{ $year: "$action_date" }, { $year: new Date() }],
+            },
+          },
+        },
+
+        {
+          $addFields: {
+            month: { $month: "$action_date" },
+          },
+        },
+
+        {
+          $group: {
+            _id: { month: "$month" },
+            month: { $first: "$month" },
+            status: { $push: "$status" },
+            // items: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            reserved: {
+              $size: {
+                $filter: {
+                  input: "$status",
+                  cond: { $eq: ["$$this", "Reserved"] },
+                },
+              },
+            },
+
+            returned: {
+              $size: {
+                $filter: {
+                  input: "$status",
+                  cond: { $eq: ["$$this", "Returned"] },
+                },
+              },
+            },
+
+            canceled: {
+              $size: {
+                $filter: {
+                  input: "$status",
+                  cond: { $eq: ["$$this", "Canceled"] },
+                },
+              },
+            },
+          },
+        },
+
+        { $sort: { month: 1 } },
+
+        {
+          $group: {
+            _id: null,
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $addFields: {
+            months: [
+              "",
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ],
+          },
+        },
+
+        {
+          $addFields: {
+            titles: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: { $arrayElemAt: ["$months", "$$item.month"] },
+              },
+            },
+
+            data1: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.reserved",
+              },
+            },
+
+            data2: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.returned",
+              },
+            },
+
+            data3: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.canceled",
+              },
+            },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            status: 0,
+            months: 0,
+            items: 0,
+          },
+        },
+      ]);
+      res.json(books[0]);
     } catch (error) {
       console.log(error);
     }

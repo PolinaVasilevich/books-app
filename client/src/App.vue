@@ -16,11 +16,24 @@
     >
       <div class="header__logo">
         <h1>
-          <router-link class="header__logo__link" to="/">Books App</router-link>
+          <router-link class="header__logo__link" to="/">
+            <img
+              src="https://chapterone.qodeinteractive.com/wp-content/uploads/2019/07/home-5-single-image-3.png"
+              alt="logo"
+              style="width: 70px"
+            />
+          </router-link>
         </h1>
       </div>
       <nav class="header__nav">
         <div class="nav-list">
+          <menu-header
+            class="nav-list__menu"
+            :isLogin="isLoggedIn"
+            :currentUser="user"
+            :isAdmin="user.isAdmin"
+            @logout="logout"
+          />
           <div class="nav-list__links">
             <span class="nav-list__item"
               ><router-link class="header__link header__text" to="/"
@@ -63,7 +76,7 @@
               >Logout</span
             >
           </div>
-          <div>
+          <div class="nav-list__link-user">
             <router-link
               :to="{ name: 'userChartPage', params: { id: user._id } }"
             >
@@ -91,12 +104,14 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import MyFooter from "@/components/Footer/MyFooter";
+import MenuHeader from "@/components/MenuHeader";
+
 import dataStore from "@/mixins/dataStore.js";
 
 export default {
-  components: { MyFooter },
+  components: { MyFooter, MenuHeader },
   mixins: [dataStore],
   data() {
     return {
@@ -131,13 +146,10 @@ export default {
     },
   },
   computed: {
-    ...mapState("login", {
-      user: (state) => state.user,
-    }),
-
     ...mapGetters("login", {
       isLoggedIn: "isLoggedIn",
       isAdmin: "isAdmin",
+      user: "user",
     }),
   },
 
@@ -191,5 +203,19 @@ export default {
 .show-search-input {
   opacity: 1;
   width: 100%;
+}
+
+.nav-list__menu {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .nav-list__links,
+  .nav-list__link-user {
+    display: none;
+  }
+  .nav-list__menu {
+    display: block;
+  }
 }
 </style>

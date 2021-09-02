@@ -25,6 +25,7 @@ import Password from "primevue/password";
 import Divider from "primevue/divider";
 import Carousel from "primevue/carousel";
 import Badge from "primevue/badge";
+import SplitButton from "primevue/splitbutton";
 
 export default [
   Dialog,
@@ -53,4 +54,5 @@ export default [
   Divider,
   Carousel,
   Badge,
+  SplitButton,
 ];

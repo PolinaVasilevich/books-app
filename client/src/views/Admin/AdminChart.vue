@@ -1,120 +1,90 @@
 <template>
-  <div
-    style="
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    "
-  >
-    <h2 style="text-align: center">{{ title }}</h2>
+  <div>
     <div>
-      <div>
-        <Button
-          label="All time"
-          @click="
-            selectedItem = 'all';
-            title = `Top 5 books of all time`;
-          "
-          class="p-button-text"
-          style="font-size: 1.3rem"
-        />
-        <Button
-          label="Current month"
-          @click="
-            selectedItem = 'month';
-            title = `Top 5 books of ${currentMonth}`;
-          "
-          class="p-button-text"
-          style="font-size: 1.3rem"
-        />
-      </div>
+      <Button
+        label="Top 5 reserved books"
+        class="p-button-text"
+        icon="pi pi-book"
+        @click="selectedChart = 'book'"
+        :class="{ 'active-button': selectedChart === 'book' }"
+      />
+      <Button
+        label="New users"
+        class="p-button-text"
+        icon="pi pi-user"
+        isLoading="true"
+        @click="selectedChart = 'user'"
+        :class="{ 'active-button': selectedChart === 'user' }"
+      />
 
-      <chart
-        v-if="topBooks && selectedItem === 'all'"
-        type="bar"
-        :topData="topBooks"
+      <Button
+        label="Book actions"
+        class="p-button-text"
+        icon="pi pi-star-o"
+        isLoading="true"
+        @click="selectedChart = 'action'"
+        :class="{ 'active-button': selectedChart === 'action' }"
       />
-      <chart
-        v-if="topBooks && selectedItem === 'month'"
-        type="bar"
-        :topData="topBooksCurrentMonth"
-      />
+    </div>
+
+    <div style="position: relative; width: 100%">
+      <transition name="fade">
+        <admin-chart-books-statistics
+          v-if="selectedChart === 'book'"
+          style="position: absolute; top: 0; left: 0"
+        />
+      </transition>
+
+      <transition name="fade">
+        <admin-chart-users-statistics
+          v-if="selectedChart === 'user'"
+          style="position: absolute; top: 0; left: 0"
+        />
+      </transition>
+
+      <transition name="fade">
+        <admin-chart-book-actions
+          v-if="selectedChart === 'action'"
+          style="position: absolute; top: 0; left: 0"
+        />
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
-import Chart from "@/components/Chart.vue";
-import API from "@/utils/api";
-import { ref, onMounted } from "vue";
+import AdminChartBooksStatistics from "@/views/Admin/Charts/AdminChartBooksStatistics";
+import AdminChartUsersStatistics from "@/views/Admin/Charts/AdminChartUsersStatistics";
+import AdminChartBookActions from "@/views/Admin/Charts/AdminChartBookActions";
 
 export default {
   name: "admin-chart",
   components: {
-    Chart,
+    AdminChartBooksStatistics,
+    AdminChartUsersStatistics,
+    AdminChartBookActions,
   },
-
   data() {
     return {
-      months: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
-
-      currentMonth: "",
-      selectedItem: "all",
-      title: "Top 5 books of all time",
+      isLoading: false,
+      selectedChart: "book",
     };
-  },
-
-  setup() {
-    const topBooks = ref(null);
-    const topBooksCurrentMonth = ref(null);
-
-    const getTopBooks = async () => {
-      try {
-        const data = await API.get("books/topbooks");
-        topBooks.value = data.data;
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const getTopBooksCurrentMonth = async () => {
-      try {
-        const data = await API.get("books/topbookscurrentmonth");
-        topBooksCurrentMonth.value = data.data;
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    onMounted(() => {
-      getTopBooks();
-      getTopBooksCurrentMonth();
-    });
-
-    return {
-      topBooks,
-      topBooksCurrentMonth,
-      getTopBooks,
-      getTopBooksCurrentMonth,
-    };
-  },
-
-  created() {
-    this.currentMonth = this.months[+new Date().getMonth()];
   },
 };
 </script>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.active-button {
+  background-color: #f3f3f3 !important;
+  border-color: #f3f3f3 !important;
+}
+</style>

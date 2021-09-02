@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 70vw">
+  <div style="width: 50vw">
     <vue3-chart-js
       :id="chart.id"
       :type="chart.type"

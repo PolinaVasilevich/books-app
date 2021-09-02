@@ -7,7 +7,7 @@
       align-items: center;
     "
   >
-    <div v-if="topBooks?.data.length">
+    <div v-if="topBooks?.data?.length">
       <h2 style="text-align: center">{{ title }}</h2>
       <div>
         <!-- <div>
@@ -64,7 +64,7 @@ export default {
       topBooks: null,
       statisticsUserByMonth: null,
       selectedItem: "all",
-      title: "Statistics",
+      title: "Count of reserved books for all time",
     };
   },
 
@@ -86,8 +86,6 @@ export default {
           `books/statisticsuserbymonth/${this.$route.params.id}`
         );
         this.statisticsUserByMonth = data.data;
-
-        console.log(data.data);
       } catch (error) {
         console.log(error);
       }

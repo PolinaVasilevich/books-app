@@ -45,7 +45,7 @@
 
         <my-button type="button">
           <router-link class="router-link" to="/admin/adminchart">
-            Chart</router-link
+            Statistics</router-link
           >
         </my-button>
       </div>

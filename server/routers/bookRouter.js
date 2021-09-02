@@ -71,15 +71,28 @@ router.delete(
 ////BGN STATISTICS////
 router.get("/mostpopularbooks", statisticsController.getMostPopularBooks);
 router.get("/topbooks", statisticsController.getTopBooks);
-router.get("/topbooksuser/:id", statisticsController.getTopBooksUser);
 router.get(
   "/topbookscurrentmonth",
   statisticsController.getTopBooksOfCurrentMonth
 );
+
+router.get("/topbooksuser/:id", statisticsController.getTopBooksUser);
+
 router.get(
   "/statisticsuserbymonth/:id",
   statisticsController.getStatisticsUserByMonth
 );
+
+router.get("/statistics-uses", statisticsController.getNewUsersForCurrentYear);
+router.get(
+  "/statistics-uses-current-month",
+  statisticsController.getNewUsersCurrentMonth
+);
+router.get(
+  "/statistics-reserved-books-current-year",
+  statisticsController.getStatisticsReservedBooksCurrentYear
+);
+
 ////END STATISTICS////
 
 module.exports = router;
