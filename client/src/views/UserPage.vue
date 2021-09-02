@@ -311,8 +311,7 @@ export default {
   created() {
     this.getReservedBooks();
     this.getBooksWhichNotReturned();
-    this.getBooksWhichMustReturnToday();
-    console.log(this.notReturned);
+
     if (this.notReturned) {
       this.searchQueryButton = "notreturned";
     }
