@@ -37,7 +37,6 @@ export default {};
 
 <style lang="scss">
 .footer {
-  flex: 0 0 auto;
 }
 .footer-top {
   padding: 20px 4%;

@@ -147,6 +147,12 @@ import ConfirmDialog from "@/components/UI/ConfirmDialog";
 export default {
   components: { BookActionsUserPage, ConfirmDialog },
   mixins: [dataStore, adminFormMixin, toggle],
+  props: {
+    notReturned: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       moment: moment,
@@ -306,6 +312,10 @@ export default {
     this.getReservedBooks();
     this.getBooksWhichNotReturned();
     this.getBooksWhichMustReturnToday();
+    console.log(this.notReturned);
+    if (this.notReturned) {
+      this.searchQueryButton = "notreturned";
+    }
   },
 };
 </script>

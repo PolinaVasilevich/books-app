@@ -155,6 +155,7 @@ const routes = [
     path: "/user/:id",
     name: "userPage",
     component: UserPage,
+    props: true,
 
     meta: {
       requiresAuth: true,

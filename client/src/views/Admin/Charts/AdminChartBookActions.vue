@@ -14,26 +14,25 @@
       <h2 style="text-align: center">{{ title }}</h2>
     </template>
     <template #chart>
-      <div style="width: 50vw" v-if="dataAllTime">
+      <div style="width: 50vw; margin-bottom: 100px">
         <vue3-chart-js
+          v-if="chart"
           :id="chart.id"
           :type="chart.type"
           :data="chart.data"
           :options="chart.data.options"
-          ref="chartRef"
         ></vue3-chart-js>
       </div>
-      {{ dataAllTime }}
     </template>
   </admin-chart-wrapper>
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import API from "@/utils/api";
 import Vue3ChartJs from "@j-t-mcc/vue3-chartjs";
 import ChartJsPluginDataLabels from "chartjs-plugin-datalabels";
 Vue3ChartJs.registerGlobalPlugins([ChartJsPluginDataLabels]);
-import API from "@/utils/api";
+
 import AdminChartWrapper from "@/components/AdminChartWrapper.vue";
 import adminChartMixin from "@/mixins/adminChartMixin";
 
@@ -42,108 +41,124 @@ export default {
   mixins: [adminChartMixin],
   components: {
     AdminChartWrapper,
+    Vue3ChartJs,
   },
 
   data() {
     return {
       title: "Top 5 books reserved books for all time",
+      chart: null,
     };
   },
 
-  setup() {
-    let dataAllTime = ref({});
+  methods: {
+    fillChartObject(data) {
+      this.chart = {
+        id: `chart-bar`,
+        type: "bar",
+        data: {
+          labels: data?.titles,
+          datasets: [
+            {
+              label: "Reserved",
+              data: data?.data1,
+              borderColor: "rgb(255, 99, 132)",
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              borderWidth: 1,
 
-    const chart = {
-      id: `chart-bar`,
-      type: "bar",
-      data: {
-        labels: dataAllTime.value.titles,
-        datasets: [
-          {
-            label: "Dataset 1",
-            data: dataAllTime.value.data1,
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            stack: "Stack 0",
-          },
-          {
-            label: "Dataset 2",
-            data: dataAllTime.value.data2,
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            stack: "Stack 0",
-          },
-          {
-            label: "Dataset 3",
-            data: dataAllTime.value.data3,
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            stack: "Stack 1",
-          },
-        ],
-
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              min: 0,
-              suggestedMax: 10,
-              // max: +props.topData.data[0] + 1,
-              ticks: {
+              datalabels: {
+                // align: "top",
+                // anchor: "end",
                 font: {
                   color: "#333",
-                  size: 16,
+                  size: 18,
                   family: "Cormorant Garamond",
+                  weight: "bold",
                 },
               },
             },
+            {
+              label: "Returned",
+              data: data?.data2,
+              borderColor: "rgb(255, 159, 64)",
+              backgroundColor: "rgba(255, 159, 64, 0.2)",
+              borderWidth: 1,
 
-            x: {
-              ticks: {
+              datalabels: {
+                // align: "top",
+                // anchor: "end",
                 font: {
                   color: "#333",
-                  size: 16,
+                  size: 18,
                   family: "Cormorant Garamond",
+                  weight: "bold",
                 },
               },
             },
-          },
-          plugins: {
-            // title: {
-            //   display: true,
-            //   text: props.title,
-            //   color: "#333",
-            //   font: {
-            //     size: 36,
-            //     family: "Cormorant Garamond",
-            //     weight: "normal",
-            //   },
-            // },
+            {
+              label: "Canceled",
+              data: data?.data3,
+              borderColor: "rgb(54, 162, 235)",
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderWidth: 1,
 
-            legend: {
-              display: false,
+              datalabels: {
+                // align: "top",
+                // anchor: "end",
+                font: {
+                  color: "#333",
+                  size: 18,
+                  family: "Cormorant Garamond",
+                  weight: "bold",
+                },
+              },
+            },
+          ],
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                min: 0,
+                suggestedMax: 10,
+                // max: +props.topData.data[0] + 1,
+                ticks: {
+                  font: {
+                    color: "#333",
+                    size: 16,
+                    family: "Cormorant Garamond",
+                  },
+                },
+              },
+
+              x: {
+                ticks: {
+                  font: {
+                    color: "#333",
+                    size: 16,
+                    family: "Cormorant Garamond",
+                  },
+                },
+              },
             },
           },
         },
-      },
-    };
+      };
+    },
 
-    const getData = async () => {
+    async getTopDataAllTime() {
       try {
         const data = await API.get(
           "books/statistics-reserved-books-current-year"
         );
-        dataAllTime.value = data.data;
+        this.fillChartObject(data.data);
       } catch (error) {
         console.log(error);
       }
-    };
+    },
+  },
 
-    onMounted(() => {
-      getData();
-    });
-
-    return {
-      chart,
-      dataAllTime,
-    };
+  mounted() {
+    this.getTopDataAllTime();
   },
 };
 </script>

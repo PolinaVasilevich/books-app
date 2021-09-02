@@ -78,7 +78,10 @@
           </div>
           <div class="nav-list__link-user">
             <router-link
-              :to="{ name: 'userChartPage', params: { id: user._id } }"
+              :to="{
+                name: 'userPage',
+                params: { id: user._id, notReturned: !!badgeNotReturned },
+              }"
             >
               <Button
                 v-if="isLoggedIn"

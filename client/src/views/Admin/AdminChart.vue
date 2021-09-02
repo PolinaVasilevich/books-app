@@ -27,7 +27,7 @@
       />
     </div>
 
-    <div style="position: relative; width: 100%">
+    <div style="position: relative; width: 100%; margin-bottom: 50px">
       <transition name="fade">
         <admin-chart-books-statistics
           v-if="selectedChart === 'book'"
