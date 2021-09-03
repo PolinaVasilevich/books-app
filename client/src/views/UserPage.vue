@@ -278,9 +278,9 @@ export default {
     this.getReservedBooks();
     this.getNotReturnedBooks(this.$route.params.id);
     this.getReturnTodayBooks(this.$route.params.id);
+
     if (this.notReturned) {
       this.showBooksWhichNotReturned();
-      this.showBooksWhichMustReturnToday();
     }
   },
 };
