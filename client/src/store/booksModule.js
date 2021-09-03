@@ -12,6 +12,9 @@ export const booksModule = {
       JSON.parse(localStorage.getItem("userReservedBooks")) || [],
 
     bookActions: JSON.parse(localStorage.getItem("bookActions")) || [],
+
+    returnTodayBooks:
+      JSON.parse(localStorage.getItem("returnTodayBooks")) || [],
   }),
 
   getters: {
@@ -42,6 +45,10 @@ export const booksModule = {
     bookActions(state) {
       return state.bookActions;
     },
+
+    returnTodayBooks(state) {
+      return state.returnTodayBooks;
+    },
   },
 
   mutations: {
@@ -71,6 +78,10 @@ export const booksModule = {
 
     setBookActions(state, bookActions) {
       state.bookActions = bookActions;
+    },
+
+    setReturnTodayBooks(state, returnTodayBooks) {
+      state.returnTodayBooks = returnTodayBooks;
     },
   },
 
@@ -148,6 +159,16 @@ export const booksModule = {
         const bookActions = await API.get("books/allbookactions");
         localStorage.setItem("bookActions", JSON.stringify(bookActions.data));
         commit("setBookActions", bookActions.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getReturnTodayBooks({ commit }, userID) {
+      try {
+        const books = await API.get(`books/return-today-books/${userID}`);
+        localStorage.setItem("returnTodayBooks", JSON.stringify(books.data));
+        commit("setReturnTodayBooks", books.data);
       } catch (error) {
         console.log(error);
       }

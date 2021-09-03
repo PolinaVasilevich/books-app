@@ -12,6 +12,12 @@
     >
       <template #content>
         <Column
+          field="_id"
+          header="ID"
+          :sortable="true"
+          style="min-width: 10rem"
+        ></Column>
+        <Column
           field="username"
           header="Username"
           :sortable="true"

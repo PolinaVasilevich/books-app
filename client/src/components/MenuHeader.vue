@@ -8,6 +8,7 @@
       aria-haspopup="true"
       aria-controls="overlay_menu"
     />
+
     <Menu
       id="overlay_menu"
       ref="menu"
@@ -31,6 +32,10 @@ export default {
     isAdmin: {
       type: Boolean,
       default: false,
+    },
+
+    notReturnedBooks: {
+      type: Array,
     },
   },
   data() {
@@ -62,11 +67,13 @@ export default {
 
       headersAuth: [
         {
-          label: this.currentUser?.username,
+          label: `${this.currentUser?.username} ${
+            this.notReturnedBooks?.length ? this.notReturnedBooks?.length : ""
+          } `,
           icon: "pi pi-user",
           command: () => {
             this.$router.push({
-              name: "userChartPage",
+              name: "userPage",
               params: { id: this.currentUser._id },
             });
           },
@@ -133,6 +140,8 @@ export default {
           },
         },
       ],
+
+      headers: [],
     };
   },
 
@@ -140,6 +149,14 @@ export default {
     toggle(event) {
       this.$refs.menu.toggle(event);
     },
+  },
+
+  mounted() {
+    this.headers = this.isAdmin
+      ? this.headersAdmin
+      : this.isLogin
+      ? this.headersAuth
+      : this.headersNotAuth;
   },
 };
 </script>

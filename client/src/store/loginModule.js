@@ -6,6 +6,8 @@ export const loginModule = {
     token: localStorage.getItem("token") || "",
     users: JSON.parse(localStorage.getItem("users")) || [],
     user: JSON.parse(localStorage.getItem("user")) || {},
+    notReturnedBooks:
+      JSON.parse(localStorage.getItem("notReturnedBooks")) || [],
   }),
 
   getters: {
@@ -27,6 +29,10 @@ export const loginModule = {
 
     user(state) {
       return state.user;
+    },
+
+    notReturnedBooks(state) {
+      return state.notReturnedBooks;
     },
   },
 
@@ -50,7 +56,12 @@ export const loginModule = {
     logout(state) {
       state.status = "";
       state.token = "";
-      state.user = "";
+      state.user = {};
+      state.notReturnedBooks = null;
+    },
+
+    setNotReturnedBooks(state, notReturnedBooks) {
+      state.notReturnedBooks = notReturnedBooks;
     },
   },
 
@@ -65,26 +76,27 @@ export const loginModule = {
       }
     },
 
-    login({ commit }, user) {
-      return new Promise((resolve, reject) => {
-        API.post("auth/login", { ...user })
-          .then((response) => {
-            commit("setStatus", "loading");
-            const { token, user: userInfo } = response.data;
+    async login({ commit }, user) {
+      try {
+        const data = await API.post("auth/login", { ...user });
 
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(userInfo));
+        commit("setStatus", "loading");
 
-            commit("setUser", userInfo);
-            commit("setToken", token);
+        const { token, user: userInfo } = data.data;
 
-            resolve(user);
-          })
-          .catch((error) => {
-            commit("setStatus", error.response.data.message);
-            reject(error.response.data);
-          });
-      });
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(userInfo));
+
+        commit("setUser", userInfo);
+        commit("setToken", token);
+
+        const books = await API.get(`books/not-returned-books/${userInfo._id}`);
+        localStorage.setItem("notReturnedBooks", JSON.stringify(books.data));
+
+        commit("setNotReturnedBooks", books.data);
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     async logout({ commit }) {
@@ -92,8 +104,19 @@ export const loginModule = {
         commit("logout");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("notReturnedBooks");
       } catch (e) {
         console.log(e);
+      }
+    },
+
+    async getNotReturnedBooks({ commit }, userID) {
+      try {
+        const books = await API.get(`books/not-returned-books/${userID}`);
+        localStorage.setItem("notReturnedBooks", JSON.stringify(books.data));
+        commit("setNotReturnedBooks", books.data);
+      } catch (error) {
+        console.log(error);
       }
     },
   },

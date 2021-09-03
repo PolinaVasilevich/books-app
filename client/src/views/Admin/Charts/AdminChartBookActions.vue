@@ -3,11 +3,11 @@
     :title="title"
     @showAllData="
       selectedItem = 'all';
-      title = 'Top 5 books reserved books for all time';
+      title = 'Book actions for current year';
     "
     @showMonthData="
       selectedItem = 'month';
-      title = `Top 5 books reserved books for ${currentMonth}`;
+      title = `Book actions for ${currentMonth}`;
     "
   >
     <template #title>
@@ -16,12 +16,17 @@
     <template #chart>
       <div style="width: 50vw; margin-bottom: 100px">
         <vue3-chart-js
-          v-if="chart"
+          v-if="chart && selectedItem === 'all'"
           :id="chart.id"
           :type="chart.type"
           :data="chart.data"
           :options="chart.data.options"
         ></vue3-chart-js>
+        <chart
+          v-if="topDataCurrentMonth && chart && selectedItem === 'month'"
+          type="bar"
+          :topData="topDataCurrentMonth"
+        />
       </div>
     </template>
   </admin-chart-wrapper>
@@ -33,6 +38,7 @@ import Vue3ChartJs from "@j-t-mcc/vue3-chartjs";
 import ChartJsPluginDataLabels from "chartjs-plugin-datalabels";
 Vue3ChartJs.registerGlobalPlugins([ChartJsPluginDataLabels]);
 
+import Chart from "@/components/Chart.vue";
 import AdminChartWrapper from "@/components/AdminChartWrapper.vue";
 import adminChartMixin from "@/mixins/adminChartMixin";
 
@@ -42,11 +48,12 @@ export default {
   components: {
     AdminChartWrapper,
     Vue3ChartJs,
+    Chart,
   },
 
   data() {
     return {
-      title: "Top 5 books reserved books for all time",
+      title: "Book actions for current year",
       chart: null,
     };
   },
@@ -159,6 +166,9 @@ export default {
 
   mounted() {
     this.getTopDataAllTime();
+    this.getTopDataCurrentMonth(
+      "books/statistics-reserved-books-current-month"
+    );
   },
 };
 </script>

@@ -15,6 +15,7 @@ router.post("/book", bookController.createBook);
 router.put("/updatebook/:id", bookController.updateBook);
 router.delete("/deletebook/:id", bookController.deleteBook);
 router.delete("/deletemanybooks", bookController.deleteManyBooks);
+
 ////END BOOK////
 
 ////BGN AUTHOR////
@@ -48,6 +49,16 @@ router.post("/reservebook", bookActionsController.reserveBook);
 router.post("/giveoutbook", bookActionsController.giveOutBook);
 router.post("/returnbook", bookActionsController.returnBook);
 router.post("/cancelbook", bookActionsController.cancelBook);
+
+router.get(
+  "/not-returned-books/:userID",
+  bookActionsController.getNotReturnedBooksUser
+);
+
+router.get(
+  "/return-today-books/:userID",
+  bookActionsController.getReturnTodayBooks
+);
 ////END BOOK ACTIONS////
 
 ////BGN RESERVED BOOKS////
@@ -91,6 +102,11 @@ router.get(
 router.get(
   "/statistics-reserved-books-current-year",
   statisticsController.getStatisticsReservedBooksCurrentYear
+);
+
+router.get(
+  "/statistics-reserved-books-current-month",
+  statisticsController.getStatisticsReservedBooksCurrentMonth
 );
 
 ////END STATISTICS////

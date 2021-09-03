@@ -1,11 +1,5 @@
 <template>
   <div class="app">
-    <!-- <i
-      v-if="$route.path !== '/'"
-      @click="getBack"
-      class="bi bi-arrow-left arrow"
-    ></i> -->
-
     <header
       id="header"
       class="header"
@@ -25,15 +19,19 @@
           </router-link>
         </h1>
       </div>
+
       <nav class="header__nav">
         <div class="nav-list">
           <menu-header
+            v-if="user"
             class="nav-list__menu"
             :isLogin="isLoggedIn"
             :currentUser="user"
             :isAdmin="user.isAdmin"
             @logout="logout"
+            :notReturnedBooks="notReturnedBooks"
           />
+
           <div class="nav-list__links">
             <span class="nav-list__item"
               ><router-link class="header__link header__text" to="/"
@@ -55,8 +53,7 @@
                 >My books</router-link
               ></span
             >
-          </div>
-          <div class="nav-list__links">
+
             <span v-if="!isLoggedIn" class="nav-list__item nav-list__links"
               ><router-link class="header__link header__text" to="/login"
                 >Login</router-link
@@ -72,33 +69,72 @@
             <span
               v-else
               class="nav-list__item header__link header__text"
-              @click="logout"
+              @click="openModal"
               >Logout</span
             >
-          </div>
-          <div class="nav-list__link-user">
-            <router-link
-              :to="{
-                name: 'userPage',
-                params: { id: user._id, notReturned: !!badgeNotReturned },
-              }"
+
+            <div
+              v-if="isLoggedIn"
+              class="nav-list__item"
+              :key="componentKey"
+              style="margin-left: 0"
             >
-              <Button
-                v-if="isLoggedIn"
-                type="button"
-                :label="user.username"
-                icon="pi pi-user"
-                class="
-                  p-button-text p-button-text
-                  header__text header__text-button
-                "
-                :badge="badgeNotReturned"
-                badgeClass="p-badge-danger"
-              />
-            </router-link>
+              <router-link
+                :to="{
+                  name: 'userPage',
+                  params: {
+                    id: user._id,
+                    notReturned: !!notReturnedBooks?.length,
+                  },
+                }"
+              >
+                <Button
+                  type="button"
+                  :label="user.username"
+                  icon="pi pi-user"
+                  class="
+                    p-button-text p-button-text
+                    header__text header__text-button
+                  "
+                  :badge="notReturnedBooks?.length"
+                  badgeClass="p-badge-danger"
+                />
+              </router-link>
+            </div>
           </div>
         </div>
       </nav>
+      <Dialog v-model:visible="displayModal" :style="{ width: '500px' }">
+        <div
+          class="p-d-flex p-ai-center p-dir-col p-pt-6 p-px-3"
+          style="padding-top: 0 !important"
+        >
+          <img
+            src="https://chapterone.qodeinteractive.com/wp-content/uploads/2019/07/home-5-single-image-4.png"
+            alt="buy"
+            style="width: 188, height: 124"
+          />
+          <div style="text-align: center">
+            <h4>Are you sure you want to leave our website?</h4>
+          </div>
+        </div>
+        <template #footer>
+          <div class="p-d-flex p-jc-center">
+            <Button
+              class="p-button p-component p-button-text"
+              label="Yes"
+              icon="pi pi-check"
+              @click="confirmLogout"
+            />
+            <Button
+              class="p-button p-component p-button-text"
+              label="Cancel"
+              icon="pi pi-times"
+              @click="closeModal"
+            />
+          </div>
+        </template>
+      </Dialog>
     </header>
 
     <router-view class="app__content" />
@@ -107,23 +143,26 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import MyFooter from "@/components/Footer/MyFooter";
 import MenuHeader from "@/components/MenuHeader";
 
 import dataStore from "@/mixins/dataStore.js";
-
+import toggle from "@/mixins/toggle.js";
 export default {
   components: { MyFooter, MenuHeader },
-  mixins: [dataStore],
+  mixins: [dataStore, toggle],
   data() {
     return {
       isShowHeader: false,
       isShowSearchInput: false,
-      badgeNotReturned: null,
     };
   },
   methods: {
+    confirmLogout() {
+      this.closeModal();
+      this.logout();
+    },
+
     logout() {
       this.$store.dispatch("login/logout").then(() => {
         this.$router.push("/");
@@ -133,32 +172,14 @@ export default {
     getBack() {
       this.$router.go(-1);
     },
-
-    getBooksWhichNotReturned() {
-      const today = new Date().setHours(0, 0, 0, 0);
-      const booksWhichNotReturned = this.userReservedBooks.filter((elem) => {
-        return elem.details.filter((innerElem) => {
-          return (
-            innerElem.status === "Received" &&
-            new Date(innerElem.return_date).setHours(0, 0, 0, 0) < today &&
-            new Date(innerElem.return_date).setHours(0, 0, 0, 0) !== today
-          );
-        })?.length;
-      });
-      this.badgeNotReturned = booksWhichNotReturned?.length;
-    },
-  },
-  computed: {
-    ...mapGetters("login", {
-      isLoggedIn: "isLoggedIn",
-      isAdmin: "isAdmin",
-      user: "user",
-    }),
   },
 
   mounted() {
     this.getReservedBooks();
-    this.getBooksWhichNotReturned();
+    if (this.isLoggedIn) {
+      this.getNotReturnedBooks(this.user?._id);
+    }
+
     window.document.onscroll = () => {
       const header = document.getElementById("header");
       if (window.scrollY > header.offsetTop) {
@@ -170,55 +191,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.arrow {
-  font-size: 1.4em;
-}
-.app__content {
-  flex: 1 0 auto;
-}
-.nav-list__links {
-  position: relative;
-}
-.nav-list__item {
-  padding: 3px 0;
-  transition: opacity 0.5s;
-}
-.nav-list__links::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -10px;
-  transform: translateY(-50%);
-  display: inline-block;
-  width: 1px;
-  height: 13px;
-  background-color: #000;
-}
-
-.hide-search-input {
-  opacity: 0;
-  width: 0;
-  transition: opacity 0.5s;
-}
-
-.show-search-input {
-  opacity: 1;
-  width: 100%;
-}
-
-.nav-list__menu {
-  display: none;
-}
-
-@media screen and (max-width: 600px) {
-  .nav-list__links,
-  .nav-list__link-user {
-    display: none;
-  }
-  .nav-list__menu {
-    display: block;
-  }
-}
-</style>
