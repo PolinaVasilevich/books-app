@@ -5,7 +5,7 @@
       <h2>Reviews</h2>
       <div style="margin: 15px 0">
         <span
-          class="p-input-icon-left"
+          class="p-input-icon-left app-text"
           style="display: inline-block; width: 100%"
         >
           <i class="pi pi-search" />
