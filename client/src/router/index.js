@@ -2,31 +2,43 @@ import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 
 import Login from "@/views/Login.vue";
-import AllBooksPage from "@/views/AllBooksPage.vue";
+import Home from "@/views/Home.vue";
+import Registration from "@/views/Registration.vue";
+// import AllBooksPage from "@/views/AllBooksPage.vue";
 import BookPage from "@/views/BookPage.vue";
 
 import UserPage from "@/views/UserPage.vue";
-
+import UserChartPage from "@/views/UserChartPage.vue";
 import Admin from "@/views/Admin/Admin.vue";
 import AdminBooks from "@/views/Admin/AdminBooks.vue";
 import AdminAuthors from "@/views/Admin/AdminAuthors.vue";
 import AdminGenres from "@/views/Admin/AdminGenres.vue";
 import AdminUsers from "@/views/Admin/AdminUsers.vue";
 import AdminReservedBooks from "@/views/Admin/AdminReservedBooks.vue";
+import AdminBookActions from "@/views/Admin/AdminBookActions.vue";
 import AdminReviews from "@/views/Admin/AdminReviews.vue";
 
 import AdminBookPage from "@/views/Admin/AdminBookPage.vue";
+import AdminChart from "@/views/Admin/AdminChart.vue";
 
 const routes = [
   {
     path: "/",
     name: "books",
-    component: AllBooksPage,
+    component: Home,
+    props: true,
   },
   {
     path: "/login",
     name: "login",
     component: Login,
+    props: true,
+  },
+
+  {
+    path: "/registration",
+    name: "registration",
+    component: Registration,
   },
 
   {
@@ -82,12 +94,34 @@ const routes = [
           requiresAuth: true,
           isAdmin: true,
         },
+        props: true,
+      },
+
+      {
+        path: "allbookactions",
+        name: "bookactions",
+        component: AdminBookActions,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+        props: true,
       },
 
       {
         path: "adminreviews",
         name: "reviews",
         component: AdminReviews,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
+
+      {
+        path: "adminchart",
+        name: "chart",
+        component: AdminChart,
         meta: {
           requiresAuth: true,
           isAdmin: true,
@@ -121,7 +155,17 @@ const routes = [
     path: "/user/:id",
     name: "userPage",
     component: UserPage,
+    props: true,
 
+    meta: {
+      requiresAuth: true,
+    },
+  },
+
+  {
+    path: "/top/:id",
+    name: "userChartPage",
+    component: UserChartPage,
     meta: {
       requiresAuth: true,
     },

@@ -3,10 +3,14 @@
     <Toast />
     <admin-table
       title="Authors"
-      :data="authors"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      @deleteItems="
+        deleteItems($event, '/books/deletemanyauthors', this.getAuthors)
+      "
     >
       <template #content>
         <Column
@@ -37,6 +41,7 @@
               :dataForm="data"
               path="books/author"
               :callback="this.getAuthors"
+              :textMessage="`${data.first_name} ${data.last_name} created`"
               @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
@@ -102,20 +107,16 @@ export default {
         first_name: "",
         last_name: "",
       },
-
-      headers: ["First name", "Last name"],
     };
   },
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/books/deleteauthor/${value._id}`, this.getAuthors);
-      this.$toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: `${value.first_name} ${value.last_name} Deleted`,
-        life: 3000,
-      });
+      this.removeData(
+        `/books/deleteauthor/${value._id}`,
+        this.getAuthors,
+        `${value.first_name} ${value.last_name} deleted`
+      );
     },
 
     resetForm() {
@@ -129,7 +130,20 @@ export default {
     },
   },
 
-  created() {
+  computed: {
+    searchedItems() {
+      return this.authors.filter((item) => {
+        return (
+          item.first_name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.last_name?.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      });
+    },
+  },
+
+  mounted() {
     this.getAuthors();
   },
 };

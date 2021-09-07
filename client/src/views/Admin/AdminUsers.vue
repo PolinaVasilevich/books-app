@@ -2,13 +2,21 @@
   <div>
     <Toast />
     <admin-table
-      titleTable="Users"
-      :data="users"
+      title="Users"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      @deleteItems="deleteItems($event, '/auth/deletemanyusers', this.getUsers)"
     >
       <template #content>
+        <Column
+          field="_id"
+          header="ID"
+          :sortable="true"
+          style="min-width: 10rem"
+        ></Column>
         <Column
           field="username"
           header="Username"
@@ -16,7 +24,12 @@
           style="min-width: 10rem"
         ></Column>
 
-        <Column field="isAdmin" header="Admin" style="min-width: 5rem"></Column>
+        <Column
+          field="isAdmin"
+          header="Admin"
+          style="min-width: 5rem"
+          :sortable="true"
+        ></Column>
         <Column
           field="created_date"
           header="Registration Date"
@@ -120,6 +133,7 @@ export default {
       moment,
       initialEditForm: {
         username: "",
+        password: "",
         isAdmin: false,
       },
 
@@ -132,6 +146,7 @@ export default {
       editForm: {
         _id: "",
         username: "",
+        password: "",
         isAdmin: false,
       },
 
@@ -141,13 +156,11 @@ export default {
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/auth/deleteuser/${value._id}`, this.getUsers);
-      this.$toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: `${value.username} Deleted`,
-        life: 3000,
-      });
+      this.removeData(
+        `/auth/deleteuser/${value._id}`,
+        this.getUsers,
+        `${value.username} deleted`
+      );
     },
 
     resetForm() {
@@ -160,6 +173,16 @@ export default {
       this.editForm.username = this.initialEditForm.username;
       this.editForm.password = this.initialEditForm.password;
       this.editForm.isAdmin = this.initialEditForm.isAdmin;
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.users.filter((item) => {
+        return item.username
+          ?.toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
+      });
     },
   },
 

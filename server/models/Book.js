@@ -12,6 +12,7 @@ const BookSchema = new Schema({
     type: Number,
     required: true,
   },
+  description: { type: String },
   genre: { type: Schema.ObjectId, ref: "Genre" },
   rating: { type: Number, default: 0 },
 });

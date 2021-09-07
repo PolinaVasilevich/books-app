@@ -5,6 +5,7 @@
     :path="path"
     :callback="callback"
     :isFormValid="isFormValid"
+    :textMessage="textMessage"
     @showMessage="showMessage"
     @showErrorMessage="showErrorMessage"
     @resetForm="$emit('resetForm')"

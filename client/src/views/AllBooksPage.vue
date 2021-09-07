@@ -1,17 +1,16 @@
 <template>
-  <div class="card">
-    <Message v-if="displayMessage" severity="success">{{ message }}</Message>
+  <div class="books-page">
+    <Toast />
+    <div class="books-page__admin-button-container">
+      <Button
+        v-if="user.isAdmin"
+        label="New book"
+        icon="pi pi-plus"
+        class="books-page__admin-button p-button-success p-mr-2"
+        @click="openModal"
+      />
+    </div>
 
-    <Message v-if="displayErrorMessage" severity="error">{{ message }}</Message>
-
-    <Button
-      v-if="user.username === 'admin'"
-      label="New book"
-      icon="pi pi-plus"
-      class="p-button-success p-mr-2"
-      @click="openModal"
-      style="margin-bottom: 30px; align-self: flex-end"
-    />
     <modal-form
       modal-title="Create new record"
       :displayModal="displayModal"
@@ -29,7 +28,8 @@
           v-model:genres="genres"
           :dataForm="data"
           path="books/book"
-          @resetForm="data = initialForm"
+          :callback="this.getBooks"
+          @resetForm="resetForm"
           @closeModal="closeModal"
           @showMessage="showMessage"
           @showErrorMessage="showErrorMessage"
@@ -37,48 +37,67 @@
       </template>
     </modal-form>
     <DataView
-      :value="filteredData"
+      :value="searchedBooks"
       :layout="layout"
       :paginator="true"
-      :rows="6"
+      :rows="rows"
     >
       <template #header>
         <div class="p-grid p-nogutter">
-          <div class="p-col-6" style="text-align: left">
-            <span class="p-input-icon-left">
+          <div class="books-page__buttons-container">
+            <Button
+              label="All"
+              class="p-button p-button-text search-button button-genre"
+              @click="searchGenreQuery = 'all'"
+              :class="{ 'active-search-button': searchGenreQuery === 'all' }"
+            />
+
+            <Button
+              label="Most popular"
+              class="p-button p-button-text search-button button-genre"
+              @click="searchGenreQuery = 'popular'"
+              :class="{
+                'active-search-button': searchGenreQuery === 'popular',
+              }"
+            />
+
+            <Button
+              v-for="genre in genres"
+              :key="genre.name"
+              :label="genre.name"
+              class="p-button p-button-text search-button button-genre"
+              @click="searchGenreQuery = genre.name"
+              :class="{
+                'active-search-button': searchGenreQuery === genre.name,
+              }"
+            />
+          </div>
+
+          <div style="width: 100%; margin-right: 0.5rem; margin-top: 1rem">
+            <span class="p-input-icon-left" style="width: 100%">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." v-model="filter" />
+              <InputText
+                placeholder="Search..."
+                v-model="searchQuery"
+                style="
+                  width: 100%;
+                  font-family: 'Cormorant Garamond', sans-serif;
+                "
+              />
             </span>
           </div>
-          <div class="p-col-6" style="text-align: right">
+
+          <div class="books-page__buttons-sort-container">
+            <!-- <Dropdown
+              v-model="selectedSort"
+              :options="sortOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Sort By..."
+              style="text-align: left"
+            /> -->
+
             <DataViewLayoutOptions v-model="layout" />
-            <div>
-              <Dropdown
-                v-model="sortKey"
-                :options="sortOptions"
-                optionLabel="label"
-                placeholder="Sort By..."
-                @change="onSortChangeOption($event)"
-                style="text-align: left; margin: 10px 10px 0 0"
-              />
-
-              <span
-                class="p-sortable-column-icon pi pi-fw pi-sort-alt"
-                style="cursor: pointer"
-                @click="isSort = !isSort"
-                v-if="!isSort"
-              ></span>
-
-              <span
-                class="p-sortable-column-icon pi pi-fw p-highlight"
-                :class="[
-                  isSortUp ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down',
-                ]"
-                style="cursor: pointer"
-                @click="onSortChange"
-                v-else
-              ></span>
-            </div>
           </div>
         </div>
       </template>
@@ -95,18 +114,33 @@
                       params: { id: slotProps.data._id },
                     }
               "
-              ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
+              ><img
+                :src="slotProps.data.img"
+                :alt="slotProps.data.title"
+                width="800"
+                height="1104"
+                class="
+                  attachment-woocommerce_single
+                  size-woocommerce_single
+                  wp-post-image
+                "
+                loading="lazy"
+                sizes="(max-width: 800px) 100vw, 800px"
+              />
             </router-link>
 
             <div class="product-list-detail">
-              <div class="product-name">{{ slotProps.data.title }}</div>
-              <div class="product-description">
+              <div class="product-description books-page__description-author">
                 {{
                   slotProps.data.author.first_name +
                   " " +
                   slotProps.data.author.last_name
                 }}
               </div>
+              <div class="books-page__description-title">
+                {{ slotProps.data.title }}
+              </div>
+
               <Rating
                 :modelValue="slotProps.data.rating"
                 :readonly="true"
@@ -115,6 +149,14 @@
               ></Rating>
             </div>
             <div class="product-list-action">
+              <div>
+                <Button
+                  v-if="user.isAdmin"
+                  icon="pi pi-times"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  @click="confirmDelete(slotProps.data)"
+                />
+              </div>
               <span
                 class="product-badge"
                 :class="[
@@ -130,13 +172,19 @@
       </template>
 
       <template #grid="slotProps">
-        <div class="p-col-12 p-md-4" style="display: flex">
+        <div
+          class="p-col-12 p-md-4"
+          style="display: flex; padding: 0 !important"
+        >
           <div class="product-grid-item card">
             <div class="product-grid-item-top">
               <div>
-                <span class="product-category">{{
-                  slotProps.data.category
-                }}</span>
+                <Button
+                  v-if="user.isAdmin"
+                  icon="pi pi-times"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  @click="confirmDelete(slotProps.data)"
+                />
               </div>
               <span
                 class="product-badge"
@@ -160,13 +208,15 @@
                 "
                 ><img :src="slotProps.data.img" :alt="slotProps.data.title" />
               </router-link>
-              <div class="product-name">{{ slotProps.data.title }}</div>
-              <div class="product-description">
+              <div class="product-description books-page__description-author">
                 {{
                   slotProps.data.author.first_name +
                   " " +
                   slotProps.data.author.last_name
                 }}
+              </div>
+              <div class="product-description books-page__description-title">
+                {{ slotProps.data.title }}
               </div>
               <Rating
                 :modelValue="slotProps.data.rating"
@@ -179,25 +229,47 @@
         </div>
       </template>
     </DataView>
+
+    <confirm-dialog
+      text="delete this book"
+      :displayConfirmDialog="displayConfirmDialog"
+      @hideConfirmDialog="displayConfirmDialog = false"
+      @action="onDeleteBook"
+    />
   </div>
 </template>
 
 <script>
+import API from "@/utils/api";
+
 import adminFormMixin from "@/mixins/adminFormMixin";
 import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminBooksForm from "@/components/Admin/Forms/AdminBooksForm";
+import ConfirmDialog from "@/components/UI/ConfirmDialog";
+
 export default {
   components: {
     ModalForm,
     AdminBooksForm,
+    ConfirmDialog,
   },
   mixins: [adminFormMixin, toggle, dataStore],
+  props: {
+    bookGenre: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       layout: "grid",
+      displayConfirmDialog: false,
+      mostPopularBooks: [],
+      book: "",
+      rows: 9,
       data: {
         title: "",
         author: "",
@@ -207,21 +279,17 @@ export default {
       },
       isSort: false,
       isSortUp: false,
-      sortKey: { label: "Sort By Title", value: "title" },
+      sortKey: null,
       sortOrder: null,
-      sortField: null,
+      selectedSort: null,
+      typeDataSort: "",
       sortOptions: [
         { label: "Sort By Title", value: "title" },
         { label: "Sort By Rating", value: "rating" },
       ],
-      filter: "",
+      searchQuery: "",
+      searchGenreQuery: "all",
     };
-  },
-
-  created() {
-    this.getBooks();
-    this.getUsers();
-    this.getAuthors();
   },
 
   methods: {
@@ -231,45 +299,117 @@ export default {
       else return "INSTOCK";
     },
 
-    onSortChangeOption(event) {
-      this.sortField = event.value.value;
+    async getMostPopularBooks() {
+      try {
+        const mostPopularBooks = await API.get("/books/mostpopularbooks");
+        this.mostPopularBooks = mostPopularBooks.data.map((elem) => ({
+          ...elem.book,
+        }));
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    },
+    confirmDelete(book) {
+      this.displayConfirmDialog = true;
+      this.book = book;
     },
 
-    onSortChange() {
-      this.isSortUp = !this.isSortUp;
-      if (typeof this.books[0][this.sortField] === "string") {
-        this.books.sort((firstField, secondField) => {
-          if (this.isSortUp) {
-            return firstField[this.sortField].toLowerCase() >
-              secondField[this.sortField].toLowerCase()
-              ? 1
-              : -1;
-          } else {
-            return firstField[this.sortField].toLowerCase() <
-              secondField[this.sortField].toLowerCase()
-              ? 1
-              : -1;
-          }
-        });
-      } else if (typeof this.books[0][this.sortField] === "number") {
-        this.books.sort((firstField, secondField) => {
-          if (this.isSortUp) {
-            return firstField[this.sortField] - secondField[this.sortField];
-          } else {
-            return secondField[this.sortField] - firstField[this.sortField];
-          }
-        });
+    async onDeleteBook() {
+      this.displayConfirmDialog = false;
+      try {
+        await API.delete(`/books/deletebook/${this.book._id}`);
+        this.getBooks;
+        this.showMessage(`${this.book.title} deleted`);
+      } catch (error) {
+        console.log(error);
+        this.showErrorMessage(error.response.data.message);
+        this.getBooks;
+      }
+    },
+
+    handleChangeWidth() {
+      const mediaQuery = window.matchMedia("(min-width: 900px)");
+      if (mediaQuery.matches) {
+        console.log(mediaQuery);
+      }
+    },
+
+    onResize() {
+      if (window.innerWidth < 666) {
+        this.rows = 4;
+      } else if (window.innerWidth < 900 && window.innerWidth > 666) {
+        this.rows = 8;
+      } else {
+        this.rows = 9;
       }
     },
   },
 
   computed: {
-    filteredData() {
-      return this.books.filter((elem) => {
-        if (this.filter === "") return true;
-        else return elem.title.toLowerCase().includes(this.filter);
-      });
+    searchedBooks() {
+      if (this.searchQuery) {
+        return this.books.filter((book) => {
+          return (
+            book.title?.toLowerCase().includes(this.searchQuery) ||
+            book.author.first_name?.toLowerCase().includes(this.searchQuery) ||
+            book.author.last_name?.toLowerCase().includes(this.searchQuery)
+          );
+        });
+      } else {
+        return this.searchedBooksByGenre;
+      }
     },
+
+    searchedBooksByGenre() {
+      if (this.searchGenreQuery === "all") {
+        return [...this.books];
+      }
+      if (this.searchGenreQuery === "popular") {
+        return [...this.mostPopularBooks];
+      }
+      return this.books.filter(
+        (book) =>
+          book.genre.name?.toLowerCase() ===
+          this.searchGenreQuery?.toLowerCase()
+      );
+    },
+
+    sortedBooks() {
+      const typeDataSort = this.searchedBooks
+        ? typeof this.searchedBooks[0][this.selectedSort]
+        : "";
+
+      switch (typeDataSort) {
+        case "string": {
+          return [...this.searchedBooks].sort((firstItem, secondItem) =>
+            firstItem[this.selectedSort]?.localeCompare(
+              secondItem[this.selectedSort]
+            )
+          );
+        }
+        case "number": {
+          return [...this.searchedBooks].sort(
+            (firstItem, secondItem) =>
+              secondItem[this.selectedSort] - firstItem[this.selectedSort]
+          );
+        }
+        default:
+          return [...this.searchedBooks];
+      }
+    },
+  },
+  created() {
+    this.getBooks();
+    this.getUsers();
+    this.getAuthors();
+    this.getGenres();
+    this.getAllBookActions();
+    this.getMostPopularBooks();
+
+    if (this.bookGenre) {
+      this.searchGenreQuery = this.bookGenre;
+    }
+    window.addEventListener("resize", this.onResize);
   },
 };
 </script>

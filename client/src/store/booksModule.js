@@ -6,7 +6,15 @@ export const booksModule = {
     authors: JSON.parse(localStorage.getItem("authors")) || [],
     genres: JSON.parse(localStorage.getItem("genres")) || [],
     reservedBooks: JSON.parse(localStorage.getItem("reservedBooks")) || [],
+
     reviews: JSON.parse(localStorage.getItem("reviews")) || [],
+    userReservedBooks:
+      JSON.parse(localStorage.getItem("userReservedBooks")) || [],
+
+    bookActions: JSON.parse(localStorage.getItem("bookActions")) || [],
+
+    returnTodayBooks:
+      JSON.parse(localStorage.getItem("returnTodayBooks")) || [],
   }),
 
   getters: {
@@ -26,8 +34,20 @@ export const booksModule = {
       return state.reservedBooks;
     },
 
+    userReservedBooks(state) {
+      return state.userReservedBooks;
+    },
+
     reviews(state) {
       return state.reviews;
+    },
+
+    bookActions(state) {
+      return state.bookActions;
+    },
+
+    returnTodayBooks(state) {
+      return state.returnTodayBooks;
     },
   },
 
@@ -48,8 +68,20 @@ export const booksModule = {
       state.reservedBooks = reservedBooks;
     },
 
+    setUserReservedBooks(state, userReservedBooks) {
+      state.userReservedBooks = userReservedBooks;
+    },
+
     setReviews(state, reviews) {
       state.reviews = reviews;
+    },
+
+    setBookActions(state, bookActions) {
+      state.bookActions = bookActions;
+    },
+
+    setReturnTodayBooks(state, returnTodayBooks) {
+      state.returnTodayBooks = returnTodayBooks;
     },
   },
 
@@ -96,11 +128,47 @@ export const booksModule = {
         console.log(error);
       }
     },
+
+    async getUserReservedBooks({ commit }, userID) {
+      try {
+        const userReservedBooks = await API.get(
+          `books/reservedbooks/${userID}`
+        );
+        localStorage.setItem(
+          "userReservedBooks",
+          JSON.stringify(userReservedBooks.data)
+        );
+        commit("setUserReservedBooks", userReservedBooks.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     async getReviews({ commit }) {
       try {
         const reviews = await API.get("books/allreviews");
         localStorage.setItem("reviews", JSON.stringify(reviews.data));
         commit("setReviews", reviews.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getAllBookActions({ commit }) {
+      try {
+        const bookActions = await API.get("books/allbookactions");
+        localStorage.setItem("bookActions", JSON.stringify(bookActions.data));
+        commit("setBookActions", bookActions.data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getReturnTodayBooks({ commit }, userID) {
+      try {
+        const books = await API.get(`books/return-today-books/${userID}`);
+        localStorage.setItem("returnTodayBooks", JSON.stringify(books.data));
+        commit("setReturnTodayBooks", books.data);
       } catch (error) {
         console.log(error);
       }

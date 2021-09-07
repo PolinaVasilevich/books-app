@@ -1,58 +1,8 @@
 const Book = require("../models/Book");
-const Author = require("../models/Author");
-const Genre = require("../models/Genre");
-const BookInstance = require("../models/bookinstance");
 const Review = require("../models/Review");
-
-const mongoose = require("mongoose");
-const { findById } = require("../models/bookinstance");
+const BookActions = require("../models/BookActions");
 
 class bookController {
-  ///BGN CREATE///
-  async createAuthor(req, res) {
-    try {
-      const { first_name, last_name } = req.body;
-      const authorBook = await Author.findOne({
-        first_name,
-        last_name,
-      });
-
-      if (authorBook) {
-        return res
-          .status(400)
-          .json({ message: "This author has already been created" });
-      }
-
-      const author = new Author({ first_name, last_name });
-      await author.save();
-      return res.json({ message: "Author has created" });
-    } catch (e) {
-      console.log(e);
-      res.status(400).json({ message: "Create author error" });
-    }
-  }
-
-  async createGenre(req, res) {
-    try {
-      const { name } = req.body;
-      const genreBook = await Genre.findOne({
-        name,
-      });
-      if (genreBook) {
-        return res
-          .status(400)
-          .json({ message: "This genre has already been created" });
-      }
-
-      const genre = new Genre({ name });
-      await genre.save();
-      return res.json({ message: "Genre has created" });
-    } catch (e) {
-      console.log(e);
-      res.status(400).json({ message: "Create genre error" });
-    }
-  }
-
   async createBook(req, res) {
     try {
       const { title, img, author, genre, count } = req.body;
@@ -83,117 +33,6 @@ class bookController {
     }
   }
 
-  async reserveBook(req, res) {
-    try {
-      const { user, book, date_reserved } = req.body;
-
-      if (!book.count) {
-        return res
-          .status(400)
-          .send({ message: "You can't book it. The book is out of stock. " });
-      }
-
-      const reservedBook = await BookInstance.findOne({
-        user: user._id,
-        book: book._id,
-      });
-
-      if (reservedBook && reservedBook.status === "Reserved") {
-        return res
-          .status(400)
-          .send({ message: "You have already reserved this book" });
-      }
-
-      const bookInstance = new BookInstance({
-        book: book._id,
-        user: user._id,
-        status: "Reserved",
-        date_reserved,
-      });
-
-      await Book.findOneAndUpdate(
-        { _id: book._id },
-        {
-          $set: {
-            count: book.count - 1,
-          },
-        },
-
-        { new: true, useFindAndModify: false }
-      );
-
-      await bookInstance.save();
-
-      return res.json({
-        message: `${bookInstance.book.title} has reserved successfully!`,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({ message: `Cannot reserved book` });
-    }
-  }
-
-  async createReview(req, res) {
-    try {
-      const { book, user, text, rating } = req.body;
-
-      const review = new Review({
-        text,
-        book: book._id,
-        user: user._id,
-        rating,
-      });
-
-      await review.save();
-
-      // const data = await Review.aggregate([
-      //   {
-      //     $match: { rating: { $gte: 1 } },
-      //   },
-      //   {
-      //     $unwind: "$book",
-      //   },
-      //   {
-      //     $group: {
-      //       _id: "$book",
-      //       ratingAvg: { $avg: "$rating" },
-      //     },
-      //   },
-      //   {
-      //     $match: {
-      //       _id: new mongoose.Types.ObjectId(book._id),
-      //     },
-      //   },
-      //   {
-      //     $project: {
-      //       _id: 0,
-      //       ratingAvg: { $round: ["$ratingAvg"] },
-      //     },
-      //   },
-      // ]);
-
-      // await Book.findByIdAndUpdate(
-      //   { _id: book._id },
-      //   {
-      //     $set: {
-      //       rating: data[0].ratingAvg,
-      //     },
-      //   },
-      //   { new: true, useFindAndModify: false }
-      // );
-
-      return res.json({
-        message: `Review has created successfully!`,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({ message: "Create review error" });
-    }
-  }
-
-  ///END CREATE///
-
-  ///BGN GET///
   async getBooks(req, res) {
     try {
       const books = await Book.find().populate("author").populate("genre");
@@ -203,62 +42,6 @@ class bookController {
     }
   }
 
-  async getAuthors(req, res) {
-    try {
-      const authors = await Author.find();
-      res.json(authors);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getGenres(req, res) {
-    try {
-      const genres = await Genre.find();
-      res.json(genres);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getReservedBooks(req, res) {
-    try {
-      const reservedBooks = await BookInstance.find()
-        .populate("user")
-        .populate({ path: "book", populate: ["author", "genre"] });
-      res.json(reservedBooks);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getReviews(req, res) {
-    try {
-      const reviews = await Review.find()
-        .populate("user")
-        .populate({ path: "book", populate: ["author", "genre"] });
-      res.json(reviews);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getReviewsBook(req, res) {
-    const { id } = req.params;
-    try {
-      const reviews = await Review.find({ book: id })
-        .populate("user")
-        .populate({ path: "book", populate: ["author", "genre"] });
-
-      res.json(reviews);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  ///END GET///
-
-  ///BGN UPDATE///
   async updateBook(req, res) {
     const { id } = req.params;
     try {
@@ -278,185 +61,53 @@ class bookController {
     }
   }
 
-  async updateAuthor(req, res) {
-    const { id } = req.params;
-    try {
-      await Author.findOneAndUpdate({ _id: id }, req.body, { new: true });
-      res.json({
-        message: "Author was updated successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({ message: `Cannot update author with id: ${id}` });
-    }
-  }
-
-  async updateGenre(req, res) {
-    const { id } = req.params;
-    try {
-      await Genre.findOneAndUpdate({ _id: id }, req.body, { new: true });
-      res.json({
-        message: "Genre was updated successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({ message: `Cannot update genre with id: ${id}` });
-    }
-  }
-
-  async updateReservedBook(req, res) {
-    const { id } = req.params;
-    try {
-      const { book, return_date } = req.body;
-
-      await BookInstance.findOneAndUpdate(
-        { _id: id },
-        {
-          $set: {
-            return_date,
-            status: "Available",
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
-
-      await Book.findByIdAndUpdate(
-        { _id: book._id },
-        {
-          $set: {
-            count: book.count + 1,
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
-
-      res.json({
-        message: "Reserved book was updated successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      res
-        .status(400)
-        .json({ message: `Cannot update reserved book with id: ${id}` });
-    }
-  }
-
-  async updateReview(req, res) {
-    const { id } = req.params;
-    try {
-      const { user, book } = req.body;
-
-      await Review.findOneAndUpdate(
-        { _id: id },
-        { ...req.body, user: user._id, book: [book._id] },
-        { new: true, useFindAndModify: false }
-      );
-
-      res.json({
-        message: "Review book was updated successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      res
-        .status(400)
-        .json({ message: `Cannot update review book with id: ${id}` });
-    }
-  }
-
-  ///END UPDATE///
-
-  ///BGN DELETE///
   async deleteBook(req, res) {
     const { id } = req.params;
     try {
-      const book = await Book.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${book.title}- Author were deleted successfully!`,
-      });
+      const bookAction = await BookActions.findOne({ book: id });
+      const review = await Review.findOne({ book: id });
+
+      if (!bookAction && !review) {
+        const book = await Book.findByIdAndDelete({ _id: id });
+        return res.json({
+          message: `${book.title} were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Book can't be deleted. This entry is linked to other schemes!`,
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete book with id ${id}` });
     }
   }
 
-  async deleteAuthor(req, res) {
-    const { id } = req.params;
+  async deleteManyBooks(req, res) {
     try {
-      const author = await Author.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${author.first_name} ${author.last_name} - Author were deleted successfully!`,
-      });
+      const { ids } = req.body;
+      const bookAction = await BookActions.findOne({ book: { $in: ids } });
+      const review = await Review.findOne({ book: { $in: ids } });
+
+      if (!bookAction && !review) {
+        await Book.deleteMany({
+          _id: { $in: ids },
+        });
+        return res.json({
+          message: `Books with ids [${ids}] were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Book can't be deleted. This entry is linked to other schemes!`,
+        });
+      }
     } catch (e) {
       console.log(e);
-      res.status(400).json({ message: `Cannot delete author with id ${id}` });
+      res.status(400).json({ message: `Cannot delete books` });
     }
   }
 
-  async deleteGenre(req, res) {
-    const { id } = req.params;
-    try {
-      const genre = await Genre.findByIdAndDelete({ _id: id });
-      return res.json({
-        message: `${genre.name} - Genre were deleted successfully!`,
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(400).json({ message: `Cannot delete genre with id ${id}` });
-    }
-  }
-
-  async deleteReservedBook(req, res) {
-    const { id } = req.params;
-    try {
-      const { book } = req.body;
-      const reservedBook = await BookInstance.findByIdAndDelete({ _id: id });
-
-      await Book.findOneAndUpdate(
-        { _id: book._id },
-        {
-          $set: {
-            count: book.count + 1,
-          },
-        },
-
-        { new: true, useFindAndModify: false }
-      );
-
-      return res.json({
-        message: `${reservedBook.book.title} - Reserved book were deleted successfully!`,
-      });
-    } catch (e) {
-      console.log(e);
-      res
-        .status(400)
-        .json({ message: `Cannot delete reserved book with id ${id}` });
-    }
-  }
-
-  async deleteReview(req, res) {
-    const { id } = req.params;
-    try {
-      const { book } = req.body;
-      const reservedBook = await Review.findByIdAndDelete({ _id: id });
-
-      await Book.findOneAndUpdate(
-        { _id: book._id },
-        { ...book, count: book.count + 1 },
-        { new: true, useFindAndModify: false }
-      );
-
-      return res.json({
-        message: `${reservedBook.book.title} - Reserved book were deleted successfully!`,
-      });
-    } catch (e) {
-      console.log(e);
-      res
-        .status(400)
-        .json({ message: `Cannot delete reserved book with id ${id}` });
-    }
-  }
+   getBooksWhichNotReturned
 }
-
-///END DELETE///
 
 module.exports = new bookController();

@@ -2,7 +2,7 @@
   <div>
     <div class="card">
       <Toolbar class="p-mb-4">
-        <template #left>
+        <template #left v-if="showHeaderButtons">
           <Button
             label="New"
             icon="pi pi-plus"
@@ -32,7 +32,8 @@
             label="Export"
             icon="pi pi-upload"
             class="p-button-help"
-            @click="exportCSV($event)"
+            @click="exportCSV(selectedItems)"
+            :disabled="!selectedItems || !selectedItems.length"
           />
         </template>
       </Toolbar>
@@ -44,7 +45,6 @@
         dataKey="_id"
         :paginator="true"
         :rows="10"
-        :filters="filters"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
@@ -60,7 +60,7 @@
             <h5 class="p-mb-2 p-m-md-0 p-as-md-center">{{ title }}</h5>
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText placeholder="Search..." />
+              <InputText placeholder="Search..." v-model.trim="search" />
             </span>
           </div>
         </template>
@@ -72,7 +72,7 @@
         ></Column>
 
         <slot name="content"></slot>
-        <Column :exportable="false">
+        <Column :exportable="false" v-if="showTableButtons">
           <template #body="slotProps">
             <Button
               icon="pi pi-pencil"
@@ -173,6 +173,35 @@ export default {
       type: Boolean,
       default: false,
     },
+
+    searchQuery: {
+      type: String,
+    },
+
+    showTableButtons: {
+      type: Boolean,
+      default: true,
+    },
+
+    showHeaderButtons: {
+      type: Boolean,
+      default: true,
+    },
+
+    typeTableButton: {
+      type: String,
+    },
+  },
+
+  computed: {
+    search: {
+      get() {
+        return this.searchQuery;
+      },
+      set(value) {
+        this.$emit("update:searchQuery", value);
+      },
+    },
   },
 
   methods: {
@@ -188,7 +217,13 @@ export default {
     deleteItem() {
       this.$emit("deleteItem", this.item);
       this.deleteItemDialog = false;
-      this.product = {};
+      this.item = {};
+    },
+
+    deleteSelectedItems() {
+      this.$emit("deleteItems", this.selectedItems);
+      this.deleteItemsDialog = false;
+      this.selectedItems = null;
     },
 
     openNew() {
@@ -207,8 +242,23 @@ export default {
       this.$emit("openEditModal", this.item);
     },
 
-    exportCSV() {
-      this.$refs.dt.exportCSV();
+    exportCSV(arrData) {
+      // this.$refs.dt.exportCSV();
+      if (arrData) {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += [
+          Object.keys(arrData[0]).join(";"),
+          ...arrData.map((item) => Object.values(item).join(";")),
+        ]
+          .join("\n")
+          .replace(/(^\[)|(\]$)/gm, "");
+
+        const data = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", data);
+        link.setAttribute("download", "export.csv");
+        link.click();
+      }
     },
   },
 };

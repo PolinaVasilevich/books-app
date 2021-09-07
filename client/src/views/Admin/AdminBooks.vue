@@ -3,10 +3,14 @@
     <Toast />
     <admin-table
       title="Books"
-      :data="books"
+      :data="searchedItems"
+      v-model:searchQuery="searchQuery"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      @deleteItems="
+        deleteItems($event, '/books/deletemanybooks', this.getBooks)
+      "
     >
       <template #content>
         <Column
@@ -16,7 +20,12 @@
           style="min-width: 10rem"
         ></Column>
 
-        <Column field="author" header="Author" style="min-width: 8rem">
+        <Column
+          field="author.first_name"
+          header="Author"
+          :sortable="true"
+          style="min-width: 8rem"
+        >
           <template #body="slotProps">
             {{
               slotProps.data.author.first_name +
@@ -26,7 +35,7 @@
           </template>
         </Column>
 
-        <Column field="genre" header="Genre">
+        <Column field="genre.name" header="Genre" :sortable="true">
           <template #body="slotProps">
             {{ slotProps.data.genre.name }}
           </template>
@@ -34,16 +43,21 @@
 
         <Column header="Image">
           <template #body="slotProps">
-            <img
-              style="width: 150px"
-              :src="
-                slotProps.data.img
-                  ? slotProps.data.img
-                  : 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'
-              "
-              :alt="slotProps.data.title"
-              class="product-image"
-            />
+            <router-link
+              :to="{
+                name: 'adminBookPage',
+                params: { id: slotProps.data._id },
+              }"
+              ><img
+                style="width: 150px"
+                :src="
+                  slotProps.data.img
+                    ? slotProps.data.img
+                    : 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'
+                "
+                :alt="slotProps.data.title"
+                class="product-image"
+            /></router-link>
           </template>
         </Column>
 
@@ -76,6 +90,7 @@
               typeForm="create"
               v-model:title="data.title"
               v-model:author="data.author"
+              v-model:description="data.description"
               v-model:genre="data.genre"
               v-model:img="data.img"
               v-model:count="data.count"
@@ -102,6 +117,7 @@
               typeForm="update"
               v-model:title="editForm.title"
               v-model:author="editForm.author"
+              v-model:description="editForm.description"
               v-model:genre="editForm.genre"
               v-model:img="editForm.img"
               v-model:count="editForm.count"
@@ -168,6 +184,7 @@ export default {
       data: {
         title: "",
         author: "",
+        description: "",
         genre: "",
         img: "",
         count: 0,
@@ -177,6 +194,7 @@ export default {
         _id: "",
         title: "",
         author: "",
+        description: "",
         genre: "",
         img: "",
         count: 0,
@@ -186,13 +204,11 @@ export default {
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/books/deletebook/${value._id}`, this.getBooks);
-      this.$toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: `${value.username} Deleted`,
-        life: 3000,
-      });
+      this.removeData(
+        `/books/deletebook/${value._id}`,
+        this.getBooks,
+        `${value.title} deleted`
+      );
     },
 
     goToPage(bookID) {
@@ -202,6 +218,7 @@ export default {
     resetForm() {
       this.data.title = "";
       this.data.author = this.authors[0];
+      this.data.description = "";
       this.data.genre = this.genres[0];
       this.data.img = "";
       this.data.count = 0;
@@ -210,9 +227,29 @@ export default {
     resetEditForm() {
       this.editForm.title = this.initialEditForm.title;
       this.editForm.author = this.initialEditForm.author;
+      this.editForm.description = this.initialEditForm.description;
       this.editForm.genre = this.initialEditForm.genre;
       this.editForm.img = this.initialEditForm.img;
       this.editForm.count = this.initialEditForm.count;
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.books.filter((item) => {
+        return (
+          item.title?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          item.author.first_name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.author.last_name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          item.genre.name
+            ?.toLowerCase()
+            .includes(this.searchQuery.toLowerCase())
+        );
+      });
     },
   },
 

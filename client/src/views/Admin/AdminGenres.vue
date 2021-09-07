@@ -3,10 +3,14 @@
     <Toast />
     <admin-table
       title="Genres"
-      :data="genres"
+      v-model:searchQuery="searchQuery"
+      :data="searchedItems"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
+      @deleteItems="
+        deleteItems($event, '/books/deletemanygenres', this.getGenres)
+      "
     >
       <template #content>
         <Column
@@ -99,13 +103,11 @@ export default {
 
   methods: {
     onDeleteData(value) {
-      this.removeData(`/books/deletegenre/${value._id}`, this.getGenres);
-      this.$toast.add({
-        severity: "success",
-        summary: "Successful",
-        detail: `${value.name} Deleted`,
-        life: 3000,
-      });
+      this.removeData(
+        `/books/deletegenre/${value._id}`,
+        this.getGenres,
+        `${value.name} deleted`
+      );
     },
 
     resetForm() {
@@ -114,6 +116,16 @@ export default {
 
     resetEditForm() {
       this.editForm.name = this.initialEditForm.name;
+    },
+  },
+
+  computed: {
+    searchedItems() {
+      return this.genres.filter((item) => {
+        return item.name
+          ?.toLowerCase()
+          .includes(this.searchQuery.toLowerCase());
+      });
     },
   },
 

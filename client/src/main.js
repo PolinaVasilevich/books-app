@@ -3,6 +3,7 @@ import { VuelidatePlugin } from "@vuelidate/core";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
+import BadgeDirective from "primevue/badgedirective";
 
 import App from "./App.vue";
 import router from "./router";
@@ -22,6 +23,7 @@ const app = createApp(App);
 [...components, ...components_primevue].forEach((component) => {
   app.component(component.name, component);
 });
+app.directive("badge", BadgeDirective);
 
 app
   .use(store)

@@ -35,10 +35,10 @@ export default {
       this.displayMessage = false;
     },
 
-    showMessage(value) {
-      this.message = value;
-      this.openMessage();
-    },
+    // showMessage(value) {
+    //   this.message = value;
+    //   this.openMessage();
+    // },
 
     openErrorMessage() {
       this.displayErrorMessage = true;
@@ -48,10 +48,10 @@ export default {
       this.displayErrorMessage = false;
     },
 
-    showErrorMessage(value) {
-      this.message = value;
-      this.openErrorMessage();
-    },
+    // showErrorMessage(value) {
+    //   this.message = value;
+    //   this.openErrorMessage();
+    // },
 
     closeEditForm() {
       this.displayEditForm = false;

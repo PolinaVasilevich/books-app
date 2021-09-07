@@ -19,6 +19,13 @@ import Menu from "primevue/menu";
 
 import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
+import Timeline from "primevue/timeline";
+import TreeTable from "primevue/treetable";
+import Password from "primevue/password";
+import Divider from "primevue/divider";
+import Carousel from "primevue/carousel";
+import Badge from "primevue/badge";
+import SplitButton from "primevue/splitbutton";
 
 export default [
   Dialog,
@@ -41,4 +48,11 @@ export default [
   Menu,
   ConfirmDialog,
   Toast,
+  Timeline,
+  TreeTable,
+  Password,
+  Divider,
+  Carousel,
+  Badge,
+  SplitButton,
 ];

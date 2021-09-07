@@ -1,35 +1,59 @@
 <template>
-  <login-form class="form" @login="onLogin" :inputs="inputs" />
+  <div class="form">
+    <Toast />
+    <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
+      <div class="mkdf-title-wrapper" style="height: 300px">
+        <div class="mkdf-title-inner" style="height: inherit">
+          <div class="mkdf-grid">
+            <!-- <h2 class="mkdf-page-title entry-title" style="color: #ffffff">
+              {{ currentBook.title }}
+            </h2> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <my-form
+      @submitForm="onLogin"
+      :data="data"
+      style="text-align: center"
+      typeForm="login"
+    />
+  </div>
 </template>
 
 <script>
-import LoginForm from "@/components/LoginForm/LoginForm";
+import MyForm from "@/components/MyForm/MyForm";
 
 export default {
-  components: {
-    LoginForm,
+  props: {
+    data: {
+      type: Object,
+    },
   },
+  components: {
+    MyForm,
+  },
+
   methods: {
-    onLogin(user) {
-      this.$store
-        .dispatch("login/login", user)
-        .then(() => {
-          if (user.username === "admin") {
-            this.$router.push(`/admin/adminbooks`);
-          } else {
-            this.$router.push(`/user/${user.username}`);
-          }
-        })
-        .catch((err) => console.log(err));
+    async onLogin(user) {
+      try {
+        await this.$store.dispatch("login/login", user);
+        if (user.username === "admin") {
+          this.$router.push(`/admin/adminbooks`);
+        } else {
+          this.$router.push(`/`);
+        }
+      } catch (error) {
+        console.log(error);
+        this.$toast.add({
+          severity: "error",
+          summary: "Error Message",
+          detail: error.message,
+          life: 3000,
+        });
+      }
     },
   },
 };
 </script>
-
-<style scoped>
-.form {
-  width: 500px;
-  margin: 150px auto;
-  text-align: center;
-}
-</style>

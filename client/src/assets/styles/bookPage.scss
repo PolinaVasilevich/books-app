@@ -1,18 +1,25 @@
+$margin-bottom-field: 10px;
+
 .book-page {
-  padding: 70px 100px;
-  &__content {
+  .book-page__content {
     display: flex;
     align-items: flex-start;
+    margin-top: 50px;
+    padding: 20px 10%;
 
-    &__img {
-      margin-right: 30px;
+    .book-page__content__img-container {
+      margin-right: 40px;
+      position: sticky;
+      top: 20px;
+    }
+    .book-page__content__img {
       display: block;
       object-fit: cover;
-      width: 400px;
-      height: 550px;
+      width: 100%;
+      height: auto;
     }
 
-    &__btn {
+    .book-page__content__btn {
       cursor: pointer;
       border-radius: 15px;
 
@@ -30,16 +37,101 @@
       color: #f66e5e;
     }
 
-    &__info {
+    .book-page__content__info {
+      width: 100%;
+      .book-page__content__info__author {
+        letter-spacing: 0.35em;
+        font-family: josefin sans, sans-serif;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #999;
+        transform: translateY(-3px);
+        display: inline-block;
+      }
+      .book-page__content__info__title {
+        color: #000;
+        width: 100%;
+        // margin: 25px 0;
+        font-size: 2em;
+        margin: -9px 0 0;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+
+        word-wrap: break-word;
+      }
+
       &__text {
-        font-size: 1.2em;
         margin: 0;
+        a {
+          color: #000;
+          &:hover {
+            color: #d14031;
+          }
+        }
+      }
+      &__subtitle {
+        font-family: cormorant garamond, sans-serif;
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        vertical-align: middle;
+        margin: 26px 0 0;
+
+        box-sizing: border-box;
+
+        font-size: 19px;
+        font-weight: 400;
+        line-height: 28px;
+        color: #555;
       }
     }
   }
 }
+.mkdf-has-bg-image {
+  height: 300px;
+  background-image: url(https://chapterone.qodeinteractive.com/wp-content/uploads/2019/07/shop-list-title-area-1.jpg);
+  background-color: #fbf9f6;
+  background-position: center 0;
+  background-repeat: no-repeat;
+  z-index: 101;
+  width: 100%;
+  padding: 0 !important;
+}
 
-.alerts {
-  margin: 0;
-  margin-top: 75px;
+.mkdf-grid {
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reviews {
+  display: table;
+  border-top: 1px solid #e1e1e1;
+  // border-bottom: 1px solid #e1e1e1;
+  margin: 100px 0 50px;
+  padding: 37px 0 45px;
+  width: 100%;
+}
+.alerts,
+.message {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.not-returned-text {
+  color: #d14031;
+}
+
+@media screen and (max-width: 900px) {
+  .book-page {
+    .book-page__content {
+      flex-direction: column;
+      .book-page__content__img-container {
+        position: static;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+  }
 }

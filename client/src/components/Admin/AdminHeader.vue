@@ -26,14 +26,26 @@
         </my-button>
 
         <my-button type="button">
+          <router-link class="router-link" to="/admin/adminreviews"
+            >Reviews</router-link
+          >
+        </my-button>
+
+        <my-button type="button">
           <router-link class="router-link" to="/admin/adminreservedbooks"
             >Reserved books</router-link
           >
         </my-button>
 
         <my-button type="button">
-          <router-link class="router-link" to="/admin/adminreviews"
-            >Reviews</router-link
+          <router-link class="router-link" to="/admin/allbookactions">
+            All book actions</router-link
+          >
+        </my-button>
+
+        <my-button type="button">
+          <router-link class="router-link" to="/admin/adminchart">
+            Statistics</router-link
           >
         </my-button>
       </div>

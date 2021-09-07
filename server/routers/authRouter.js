@@ -15,5 +15,5 @@ router.post(
 
 router.put("/updateuser/:id", controller.updateUser);
 router.delete("/deleteuser/:id", controller.deleteUser);
-
+router.delete("/deletemanyusers", controller.deleteManyUsers);
 module.exports = router;
