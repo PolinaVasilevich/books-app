@@ -64,6 +64,7 @@
       <TreeTable
         :value="searchedItems"
         :expandedKeys="expandedKeys"
+        responsiveLayout="scroll"
         sortMode="single"
       >
         <Column
