@@ -22,6 +22,7 @@ export default {
       isAdmin: "login/isAdmin",
       users: "login/users",
       user: "login/user",
+      status: "login/status",
 
       books: "books/books",
       authors: "books/authors",

@@ -36,9 +36,9 @@ export default {
   },
 
   methods: {
-    async onLogin(user) {
+    onLogin(user) {
       try {
-        await this.$store.dispatch("login/login", user);
+        this.$store.dispatch("login/login", user);
         if (user.username === "admin") {
           this.$router.push(`/admin/adminbooks`);
         } else {
@@ -57,11 +57,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* .form {
-  width: 750px;
-  margin: 50px auto;
-  text-align: center;
-} */
-</style>

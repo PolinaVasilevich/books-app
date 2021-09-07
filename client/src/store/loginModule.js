@@ -94,6 +94,8 @@ export const loginModule = {
         localStorage.setItem("notReturnedBooks", JSON.stringify(books.data));
 
         commit("setNotReturnedBooks", books.data);
+
+        commit("setStatus", "loaded");
       } catch (error) {
         console.log(error);
       }
@@ -104,6 +106,7 @@ export const loginModule = {
         commit("logout");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("status");
         localStorage.removeItem("notReturnedBooks");
       } catch (e) {
         console.log(e);

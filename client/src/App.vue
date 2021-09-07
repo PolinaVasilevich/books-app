@@ -23,12 +23,11 @@
       <nav class="header__nav">
         <div class="nav-list">
           <menu-header
-            v-if="user"
             class="nav-list__menu"
             :isLogin="isLoggedIn"
-            :currentUser="user"
-            :isAdmin="user.isAdmin"
-            @logout="logout"
+            :currentUser="currentUser"
+            :isAdmin="user?.isAdmin"
+            @logout="openModal"
             :notReturnedBooks="notReturnedBooks"
           />
 
@@ -171,6 +170,12 @@ export default {
 
     getBack() {
       this.$router.go(-1);
+    },
+  },
+
+  computed: {
+    currentUser() {
+      return { ...this.user };
     },
   },
 

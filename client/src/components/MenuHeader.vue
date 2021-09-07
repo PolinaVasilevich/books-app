@@ -10,11 +10,22 @@
     />
 
     <Menu
-      id="overlay_menu"
-      ref="menu"
       :model="isAdmin ? headersAdmin : isLogin ? headersAuth : headersNotAuth"
+      ref="menu"
       :popup="true"
-    />
+    >
+      <template #item="{ item }">
+        <Button
+          type="button"
+          :label="item.label"
+          :icon="item.icon"
+          @click="item.command"
+          class="p-button-text p-button-text header__text header__text-button"
+          :badge="item?.isBadge ? notReturnedBooks?.length : ''"
+          badgeClass="p-badge-danger"
+        />
+      </template>
+    </Menu>
   </div>
 </template>
 
@@ -38,13 +49,16 @@ export default {
       type: Array,
     },
   },
+
   data() {
     return {
       headersNotAuth: [
         {
           label: "Home",
           icon: "pi pi-home",
+
           command: () => {
+            this.hide();
             this.$router.push("/");
           },
         },
@@ -52,14 +66,18 @@ export default {
         {
           label: "Login",
           icon: "pi pi-user",
+
           command: () => {
+            this.hide();
             this.$router.push("/login");
           },
         },
         {
           label: "Register",
           icon: "pi pi-power-off",
+
           command: () => {
+            this.hide();
             this.$router.push("/registration");
           },
         },
@@ -67,14 +85,17 @@ export default {
 
       headersAuth: [
         {
-          label: `${this.currentUser?.username} ${
-            this.notReturnedBooks?.length ? this.notReturnedBooks?.length : ""
-          } `,
+          label: `${this.currentUser?.username}  `,
           icon: "pi pi-user",
+          isBadge: true,
           command: () => {
+            this.hide();
             this.$router.push({
               name: "userPage",
-              params: { id: this.currentUser._id },
+              params: {
+                id: this.currentUser._id,
+                notReturned: !!this.notReturnedBooks?.length,
+              },
             });
           },
         },
@@ -82,6 +103,7 @@ export default {
           label: "Home",
           icon: "pi pi-home",
           command: () => {
+            this.hide();
             this.$router.push("/");
           },
         },
@@ -90,6 +112,7 @@ export default {
           label: "My books",
           icon: "pi pi-book",
           command: () => {
+            this.hide();
             this.$router.push({
               name: "userPage",
               params: { id: this.currentUser._id },
@@ -101,6 +124,7 @@ export default {
           label: "Logout",
           icon: "pi pi-power-off",
           command: () => {
+            this.hide();
             this.$emit("logout");
           },
         },
@@ -110,6 +134,7 @@ export default {
           label: this.currentUser?.username,
           icon: "pi pi-user",
           command: () => {
+            this.hide();
             this.$router.push({
               name: "userChartPage",
               params: { id: this.currentUser._id },
@@ -120,6 +145,7 @@ export default {
           label: "Home",
           icon: "pi pi-home",
           command: () => {
+            this.hide();
             this.$router.push("/");
           },
         },
@@ -128,6 +154,7 @@ export default {
           label: "Admin",
           icon: "pi pi-cog",
           command: () => {
+            this.hide();
             this.$router.push("/admin/adminbooks");
           },
         },
@@ -136,6 +163,7 @@ export default {
           label: "Logout",
           icon: "pi pi-power-off",
           command: () => {
+            this.hide();
             this.$emit("logout");
           },
         },
@@ -149,6 +177,10 @@ export default {
     toggle(event) {
       this.$refs.menu.toggle(event);
     },
+
+    hide() {
+      this.$refs.menu.hide();
+    },
   },
 
   mounted() {
@@ -161,4 +193,10 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.p-menuitem:hover {
+  background-color: #f3f3f3 !important;
+  border-color: #f3f3f3 !important;
+}
+</style>
+>
