@@ -5,7 +5,7 @@
       <h2>Reviews</h2>
       <div style="margin: 15px 0">
         <span
-          class="p-input-icon-left app-text"
+          class="p-input-icon-left"
           style="display: inline-block; width: 100%"
         >
           <i class="pi pi-search" />
@@ -13,6 +13,7 @@
             placeholder="Search..."
             v-model="searchQuery"
             style="width: 100%"
+            class="app-text"
           />
         </span>
       </div>

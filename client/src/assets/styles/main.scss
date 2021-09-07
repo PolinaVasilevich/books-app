@@ -186,3 +186,8 @@ body {
   p {
   margin: 0;
 }
+
+.p-link,
+.p-inputtext {
+  font-family: $main-font-family !important;
+}

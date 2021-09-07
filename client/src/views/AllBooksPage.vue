@@ -337,6 +337,7 @@ export default {
     onResize() {
       if (window.innerWidth < 666) {
         this.rows = 4;
+        this.layout = "grid";
       } else if (window.innerWidth < 900 && window.innerWidth > 666) {
         this.rows = 8;
       } else {
