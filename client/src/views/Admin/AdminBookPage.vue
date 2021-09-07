@@ -170,8 +170,15 @@
                     params: { reservedBookTitle: currentBook.title },
                   }"
                   class="router-link"
-                  >Users who reserved this book</router-link
                 >
+                  <Button
+                    type="button"
+                    label="Users who reserved this book"
+                    icon="pi pi-user"
+                    class="p-button-text p-button-raised"
+                    style="margin-top: 20px"
+                  />
+                </router-link>
               </template>
             </admin-form>
           </div>

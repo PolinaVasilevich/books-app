@@ -23,6 +23,7 @@
             placeholder="Search..."
             v-model="searchQuery"
             style="width: 100%"
+            class="app-text"
           />
         </span>
 
