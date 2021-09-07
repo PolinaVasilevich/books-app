@@ -32,7 +32,8 @@
             label="Export"
             icon="pi pi-upload"
             class="p-button-help"
-            @click="exportCSV($event)"
+            @click="exportCSV(selectedItems)"
+            :disabled="!selectedItems || !selectedItems.length"
           />
         </template>
       </Toolbar>
@@ -241,8 +242,23 @@ export default {
       this.$emit("openEditModal", this.item);
     },
 
-    exportCSV() {
-      this.$refs.dt.exportCSV();
+    exportCSV(arrData) {
+      // this.$refs.dt.exportCSV();
+      if (arrData) {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += [
+          Object.keys(arrData[0]).join(";"),
+          ...arrData.map((item) => Object.values(item).join(";")),
+        ]
+          .join("\n")
+          .replace(/(^\[)|(\]$)/gm, "");
+
+        const data = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", data);
+        link.setAttribute("download", "export.csv");
+        link.click();
+      }
     },
   },
 };

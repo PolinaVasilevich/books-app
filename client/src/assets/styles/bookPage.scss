@@ -122,3 +122,16 @@ $margin-bottom-field: 10px;
 .not-returned-text {
   color: #d14031;
 }
+
+@media screen and (max-width: 900px) {
+  .book-page {
+    .book-page__content {
+      flex-direction: column;
+      .book-page__content__img-container {
+        position: static;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+  }
+}

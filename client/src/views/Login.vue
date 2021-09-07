@@ -57,11 +57,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* .form {
-  width: 750px;
-  margin: 50px auto;
-  text-align: center;
-} */
-</style>

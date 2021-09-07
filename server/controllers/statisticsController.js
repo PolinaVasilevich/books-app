@@ -740,6 +740,74 @@ class statisticsController {
       console.log(error);
     }
   }
+
+  async getStatisticsReservedBooksCurrentMonth(req, res) {
+    try {
+      const books = await BookActions.aggregate([
+        {
+          $match: {
+            $or: [
+              { status: "Reserved" },
+              { status: "Returned" },
+              { status: "Canceled" },
+            ],
+
+            $and: [
+              {
+                $expr: {
+                  $eq: [{ $month: "$action_date" }, { $month: new Date() }],
+                },
+              },
+              {
+                $expr: {
+                  $eq: [{ $year: "$action_date" }, { $year: new Date() }],
+                },
+              },
+            ],
+          },
+        },
+
+        {
+          $group: {
+            _id: { status: "$status" },
+            status: { $first: "$status" },
+            count: { $sum: 1 },
+          },
+        },
+
+        { $sort: { count: 1, status: 1 } },
+        {
+          $group: {
+            _id: null,
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            titles: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.status",
+              },
+            },
+            data: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: "$$item.count",
+              },
+            },
+          },
+        },
+      ]);
+      res.json(books[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 module.exports = new statisticsController();

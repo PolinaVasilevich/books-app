@@ -1,0 +1,52 @@
+.arrow {
+  font-size: 1.4em;
+}
+.app__content {
+  flex: 1 0 auto;
+}
+.nav-list__links {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-list__item {
+  padding: 3px 0;
+  transition: opacity 0.5s;
+}
+.nav-list__item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  display: inline-block;
+  width: 1px;
+  height: 13px;
+  background-color: #000;
+}
+
+.hide-search-input {
+  opacity: 0;
+  width: 0;
+  transition: opacity 0.5s;
+}
+
+.show-search-input {
+  opacity: 1;
+  width: 100%;
+}
+
+.nav-list__menu {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .nav-list__links,
+  .nav-list__link-user {
+    display: none;
+  }
+  .nav-list__menu {
+    display: block;
+  }
+}

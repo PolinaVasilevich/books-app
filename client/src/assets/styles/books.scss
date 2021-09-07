@@ -162,7 +162,7 @@
   //   }
   // }
 }
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 900px) and (min-width: 666px) {
   .p-md-4 {
     width: 50% !important;
     // img {
@@ -182,6 +182,7 @@
     width: 100% !important;
   }
   .product-list-item {
+    display: none;
     flex-direction: column;
     align-items: center;
 
@@ -209,6 +210,9 @@
       align-items: center;
       width: 100%;
     }
+  }
+  .books-page__buttons-sort-container {
+    display: none;
   }
 }
 

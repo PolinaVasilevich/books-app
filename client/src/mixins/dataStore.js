@@ -11,6 +11,8 @@ export default {
       getReviews: "books/getReviews",
       getUsers: "login/getUsers",
       getAllBookActions: "books/getAllBookActions",
+      getNotReturnedBooks: "login/getNotReturnedBooks",
+      getReturnTodayBooks: "books/getReturnTodayBooks",
     }),
   },
 
@@ -20,6 +22,7 @@ export default {
       isAdmin: "login/isAdmin",
       users: "login/users",
       user: "login/user",
+      status: "login/status",
 
       books: "books/books",
       authors: "books/authors",
@@ -28,6 +31,9 @@ export default {
       userReservedBooks: "books/userReservedBooks",
       reviews: "books/reviews",
       bookActions: "books/bookActions",
+
+      notReturnedBooks: "login/notReturnedBooks",
+      returnTodayBooks: "books/returnTodayBooks",
     }),
   },
 };

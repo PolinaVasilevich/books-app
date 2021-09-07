@@ -23,6 +23,7 @@
             placeholder="Search..."
             v-model="searchQuery"
             style="width: 100%"
+            class="app-text"
           />
         </span>
 
@@ -53,6 +54,7 @@
                   searchQueryButton?.toLowerCase() === 'returntoday',
               },
             ]"
+            :badge="returnTodayBooks?.length"
             badgeClass="p-badge-danger"
           />
 
@@ -68,7 +70,7 @@
                   searchQueryButton?.toLowerCase() === 'notreturned',
               },
             ]"
-            :badge="badgeNotReturned"
+            :badge="notReturnedBooks?.length"
             badgeClass="p-badge-danger"
           />
         </div>
@@ -106,7 +108,7 @@
             <book-actions-user-page
               :data="item.details"
               :icons="icons"
-              :booksWhichNotReturned="booksWhichNotReturned"
+              :booksWhichNotReturned="notReturnedBooks"
               :isNotReturned="isNotReturned(item)"
             />
           </template>
@@ -141,6 +143,7 @@ import API from "@/utils/api";
 import dataStore from "@/mixins/dataStore.js";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
+
 import BookActionsUserPage from "@/components/BookActionsUserPage";
 import ConfirmDialog from "@/components/UI/ConfirmDialog";
 
@@ -157,10 +160,7 @@ export default {
     return {
       moment: moment,
       displayConfirmDialog: false,
-      badgeMustReturnToday: null,
-      badgeNotReturned: null,
-      booksWhichNotReturned: [],
-      booksWhichMustReturnToday: [],
+
       filteredData: null,
       bookActions: [],
       item: null,
@@ -235,46 +235,13 @@ export default {
       this.item = value;
     },
 
-    getBooksWhichNotReturned() {
-      const today = new Date().setHours(0, 0, 0, 0);
-      const booksWhichNotReturned = this.userReservedBooks.filter((elem) => {
-        return elem.details.filter((innerElem) => {
-          return (
-            innerElem.status === "Received" &&
-            new Date(innerElem.return_date).setHours(0, 0, 0, 0) < today &&
-            new Date(innerElem.return_date).setHours(0, 0, 0, 0) !== today
-          );
-        })?.length;
-      });
-
-      this.booksWhichNotReturned = booksWhichNotReturned;
-      this.badgeNotReturned = booksWhichNotReturned?.length;
-    },
-
-    getBooksWhichMustReturnToday() {
-      const today = new Date().setHours(0, 0, 0, 0);
-      const booksWhichMustReturnToday = this.userReservedBooks.filter(
-        (elem) => {
-          return elem.details.filter((innerElem) => {
-            return (
-              innerElem.status === "Received" &&
-              new Date(innerElem.return_date).setHours(0, 0, 0, 0) === today
-            );
-          })?.length;
-        }
-      );
-
-      this.booksWhichMustReturnToday = [...booksWhichMustReturnToday];
-      this.badgeMustReturnToday = booksWhichMustReturnToday?.length;
-    },
-
     showBooksWhichNotReturned() {
-      this.filteredData = [...this.booksWhichNotReturned];
+      this.filteredData = [...this.notReturnedBooks];
       this.searchQueryButton = "notreturned";
     },
 
     showBooksWhichMustReturnToday() {
-      this.filteredData = [...this.booksWhichMustReturnToday];
+      this.filteredData = [...this.returnTodayBooks];
       this.searchQueryButton = "returntoday";
     },
 
@@ -284,7 +251,7 @@ export default {
     },
 
     isNotReturned(book) {
-      return !!this.booksWhichNotReturned?.filter((item) => {
+      return !!this.notReturnedBooks?.filter((item) => {
         return item.book.title === book.book?.title;
       })?.length;
     },
@@ -310,10 +277,11 @@ export default {
 
   created() {
     this.getReservedBooks();
-    this.getBooksWhichNotReturned();
+    this.getNotReturnedBooks(this.$route.params.id);
+    this.getReturnTodayBooks(this.$route.params.id);
 
     if (this.notReturned) {
-      this.searchQueryButton = "notreturned";
+      this.showBooksWhichNotReturned();
     }
   },
 };

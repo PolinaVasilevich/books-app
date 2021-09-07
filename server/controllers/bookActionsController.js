@@ -181,7 +181,237 @@ class bookController {
       res.status(400).json({ message: `Cannot receive book` });
     }
   }
+
+  async getNotReturnedBooksUser(req, res) {
+    const { userID } = req.params;
+
+    try {
+      const books = await BookActions.aggregate([
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId(userID),
+            isActual: true,
+          },
+        },
+
+        {
+          $group: {
+            _id: "$book",
+            book: { $first: "$book" },
+            user: { $first: "$user" },
+            last_action: { $last: "$action_date" },
+            return_date: { $last: "$return_date" },
+            reservation_number: { $first: "$reservation_number" },
+            details: {
+              $push: {
+                status: "$status",
+                action_date: "$action_date",
+                isActual: "$isActual",
+                return_date: "$return_date",
+              },
+            },
+          },
+        },
+        { $sort: { return_date: 1 } },
+
+        {
+          $addFields: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$return_date",
+              },
+            },
+            today: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: new Date(),
+              },
+            },
+          },
+        },
+
+        {
+          $addFields: {
+            notToday: { $cmp: ["$date", "$today"] },
+          },
+        },
+
+        {
+          $match: {
+            $and: [
+              {
+                return_date: {
+                  $lt: new Date(),
+                },
+              },
+
+              { notToday: { $ne: 0 } },
+            ],
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        {
+          $lookup: {
+            from: "genres",
+            localField: "book.genre",
+            foreignField: "_id",
+            as: "book.genre",
+          },
+        },
+
+        { $unwind: "$book.genre" },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+      ]);
+
+      res.json(books);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getReturnTodayBooks(req, res) {
+    const { userID } = req.params;
+    try {
+      const books = await BookActions.aggregate([
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId(userID),
+            isActual: true,
+          },
+        },
+
+        {
+          $group: {
+            _id: "$book",
+            book: { $first: "$book" },
+            user: { $first: "$user" },
+            last_action: { $last: "$action_date" },
+            return_date: { $last: "$return_date" },
+            reservation_number: { $first: "$reservation_number" },
+            details: {
+              $push: {
+                status: "$status",
+                action_date: "$action_date",
+                isActual: "$isActual",
+                return_date: "$return_date",
+              },
+            },
+          },
+        },
+        { $sort: { return_date: 1 } },
+
+        {
+          $addFields: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$return_date",
+              },
+            },
+            today: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: new Date(),
+              },
+            },
+          },
+        },
+
+        {
+          $addFields: {
+            notToday: { $cmp: ["$date", "$today"] },
+          },
+        },
+
+        {
+          $match: {
+            notToday: { $eq: 0 },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "books",
+            let: { bookObjId: { $toObjectId: "$book" } },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$bookObjId"] } } }],
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        {
+          $lookup: {
+            from: "authors",
+            localField: "book.author",
+            foreignField: "_id",
+            as: "book.author",
+          },
+        },
+
+        { $unwind: "$book.author" },
+
+        {
+          $lookup: {
+            from: "genres",
+            localField: "book.genre",
+            foreignField: "_id",
+            as: "book.genre",
+          },
+        },
+
+        { $unwind: "$book.genre" },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+      ]);
+
+      res.json(books);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }
-///END DELETE///
 
 module.exports = new bookController();
