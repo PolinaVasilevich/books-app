@@ -36,9 +36,9 @@ export default {
   },
 
   methods: {
-    onLogin(user) {
+    async onLogin(user) {
       try {
-        this.$store.dispatch("login/login", user);
+        await this.$store.dispatch("login/login", user);
         if (user.username === "admin") {
           this.$router.push(`/admin/adminbooks`);
         } else {
