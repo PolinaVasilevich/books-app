@@ -6,7 +6,7 @@
       title="Authors"
       v-model:searchQuery="searchQuery"
       :data="searchedAuthors"
-      @openModal="toggleDialog = true"
+      @openModal="displayModal = true"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
       @deleteItems="
@@ -29,28 +29,20 @@
         ></Column>
       </template>
       <template #modal>
-        <modal-form
-          modal-title="Create new record"
-          :displayModal="toggleDialog"
-          @close="toggleDialog = false"
-        >
-          <template #modal-content>
-            <admin-author-form
-              typeForm="create"
-              v-model:first_name="form.first_name"
-              v-model:last_name="form.last_name"
-              :dataForm="form"
-              path="books/author"
-              :callback="this.getAuthors"
-              :textMessage="`${form.first_name} ${form.last_name} created`"
-              @resetForm="resetForm"
-              @closeModal="closeModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-              @submitForm="handleSubmit"
-            />
+        <Dialog v-model:visible="displayModal" style="width: 40vw">
+          <template #header>
+            <h3>Header</h3>
           </template>
-        </modal-form>
+          <admin-author-form />
+        </Dialog>
+
+        <!-- <modal-form
+          modal-title="Create new record"
+          :displayModal="displayModal"
+          @close="displayModal = false"
+        >
+          <template #modal-content> </template>
+        </modal-form> -->
 
         <modal-form
           modal-title="Update record"
@@ -89,7 +81,6 @@ import adminFormMixin from "@/mixins/adminFormMixin.js";
 // import dataStore from "@/mixins/dataStore.js";
 import useAuthors from "@/hooks/Author/useAuthors";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
-import useForm from "@/hooks/useForm";
 
 import toggle from "@/mixins/toggle.js";
 
@@ -107,19 +98,15 @@ export default {
     const { authors, loading } = useAuthors();
     const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
 
-    const { form, resetForm, handleSubmit, toggleDialog } = useForm({
-      first_name: "",
-      last_name: "",
-    });
+    // const { form, resetForm, handleSubmit, toggleDialog } = useForm({
+    //   first_name: "",
+    //   last_name: "",
+    // });
 
     return {
       searchQuery,
       searchedAuthors,
       loading,
-      form,
-      resetForm,
-      handleSubmit,
-      toggleDialog,
     };
   },
   // data() {

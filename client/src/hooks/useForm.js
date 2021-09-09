@@ -1,27 +1,12 @@
-import { ref } from "vue";
-// import useField from "@hooks/Author/useField";
-import useAxios from "@/hooks/useAxios";
+import { reactive } from "vue";
+import useField from "@/hooks/useField";
 
 export default function useForm(init = {}) {
-  const form = ref({});
-  const toggleDialog = ref(false);
-
-  const { fetchData } = useAxios();
+  const form = reactive({});
 
   for (const [key, value] of Object.entries(init)) {
-    form.value[key] = value;
+    form[key] = useField(value);
   }
 
-  const handleSubmit = async () => {
-    toggleDialog.value = false;
-
-    await fetchData({
-      method: "POST",
-      url: "/books/author",
-      data: { ...form.value },
-    });
-    form.value = {};
-  };
-
-  return { form, handleSubmit, toggleDialog };
+  return form;
 }
