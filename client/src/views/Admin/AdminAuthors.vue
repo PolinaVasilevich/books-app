@@ -2,9 +2,10 @@
   <div>
     <Toast />
     <admin-table
+      v-if="!loading"
       title="Authors"
       v-model:searchQuery="searchQuery"
-      :data="searchedItems"
+      :data="searchedAuthors"
       @openModal="openModal"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
@@ -72,41 +73,52 @@
         </modal-form>
       </template>
     </admin-table>
+    <app-loader v-else />
   </div>
 </template>
 
 <script>
 import AdminTable from "@/components/Admin/AdminTable.vue";
+import AppLoader from "@/components/AppLoader";
 
 import ModalForm from "@/components/UI/ModalForm";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 
 import adminFormMixin from "@/mixins/adminFormMixin.js";
-import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
+
+import useAuthors from "@/hooks/Author/useAuthors";
+import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
 
 export default {
   name: "admin-authors",
-  mixins: [toggle, adminFormMixin, dataStore],
+  mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
     ModalForm,
     AdminAuthorForm,
+    AppLoader,
   },
 
-  data() {
-    return {
-      initialEditForm: { first_name: "", last_name: "" },
-      data: {
-        first_name: "",
-        last_name: "",
-      },
+  setup() {
+    const { authors, loading } = useAuthors();
+    const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
 
-      editForm: {
-        _id: "",
-        first_name: "",
-        last_name: "",
-      },
+    const initialEditForm = { first_name: "", last_name: "" };
+
+    const editForm = {
+      _id: "",
+      first_name: "",
+      last_name: "",
+    };
+
+    return {
+      authors,
+      loading,
+      searchQuery,
+      searchedAuthors,
+      initialEditForm,
+      editForm,
     };
   },
 
@@ -128,23 +140,6 @@ export default {
       this.editForm.first_name = this.initialEditForm.first_name;
       this.editForm.last_name = this.initialEditForm.last_name;
     },
-  },
-
-  computed: {
-    searchedItems() {
-      return this.authors.filter((item) => {
-        return (
-          item.first_name
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item.last_name?.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
-      });
-    },
-  },
-
-  mounted() {
-    this.getAuthors();
   },
 };
 </script>

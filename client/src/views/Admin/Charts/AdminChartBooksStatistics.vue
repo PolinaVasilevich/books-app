@@ -1,5 +1,6 @@
 <template>
   <admin-chart-wrapper
+    v-if="topDataAllTime || topDataCurrentMonth"
     :title="title"
     @showAllData="
       selectedItem = 'all';
@@ -26,12 +27,14 @@
       />
     </template>
   </admin-chart-wrapper>
+  <app-loader v-else />
 </template>
 
 <script>
 import AdminChartWrapper from "@/components/AdminChartWrapper.vue";
 import Chart from "@/components/Chart.vue";
 import adminChartMixin from "@/mixins/adminChartMixin";
+import AppLoader from "@/components/AppLoader";
 
 export default {
   name: "admin-chart",
@@ -39,6 +42,7 @@ export default {
   components: {
     Chart,
     AdminChartWrapper,
+    AppLoader,
   },
 
   data() {
