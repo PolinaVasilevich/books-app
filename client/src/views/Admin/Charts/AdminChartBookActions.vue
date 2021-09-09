@@ -1,5 +1,6 @@
 <template>
   <admin-chart-wrapper
+    v-if="topDataCurrentMonth || chart"
     :title="title"
     @showAllData="
       selectedItem = 'all';
@@ -30,10 +31,12 @@
       </div>
     </template>
   </admin-chart-wrapper>
+  <app-loader v-else />
 </template>
 
 <script>
 import API from "@/utils/api";
+import AppLoader from "@/components/AppLoader";
 import Vue3ChartJs from "@j-t-mcc/vue3-chartjs";
 import ChartJsPluginDataLabels from "chartjs-plugin-datalabels";
 Vue3ChartJs.registerGlobalPlugins([ChartJsPluginDataLabels]);
@@ -49,6 +52,7 @@ export default {
     AdminChartWrapper,
     Vue3ChartJs,
     Chart,
+    AppLoader,
   },
 
   data() {

@@ -27,27 +27,12 @@
       />
     </div>
 
-    <div style="position: relative; width: 100%; margin-bottom: 50px">
-      <transition name="fade">
-        <admin-chart-books-statistics
-          v-if="selectedChart === 'book'"
-          style="position: absolute; top: 0; left: 0"
-        />
-      </transition>
+    <div style="position: relative">
+      <admin-chart-books-statistics v-if="selectedChart === 'book'" />
 
-      <transition name="fade">
-        <admin-chart-users-statistics
-          v-if="selectedChart === 'user'"
-          style="position: absolute; top: 0; left: 0"
-        />
-      </transition>
+      <admin-chart-users-statistics v-if="selectedChart === 'user'" />
 
-      <transition name="fade">
-        <admin-chart-book-actions
-          v-if="selectedChart === 'action'"
-          style="position: absolute; top: 0; left: 0"
-        />
-      </transition>
+      <admin-chart-book-actions v-if="selectedChart === 'action'" />
     </div>
   </div>
 </template>
@@ -56,6 +41,7 @@
 import AdminChartBooksStatistics from "@/views/Admin/Charts/AdminChartBooksStatistics";
 import AdminChartUsersStatistics from "@/views/Admin/Charts/AdminChartUsersStatistics";
 import AdminChartBookActions from "@/views/Admin/Charts/AdminChartBookActions";
+// import AppLoader from "@/components/AppLoader";
 
 export default {
   name: "admin-chart",

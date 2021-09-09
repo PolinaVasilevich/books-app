@@ -1,13 +1,5 @@
 <template>
-  <div
-    style="
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    "
-  >
+  <div class="chart-wrapper">
     <slot name="title"></slot>
 
     <div>
