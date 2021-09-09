@@ -1,31 +1,27 @@
 <template>
-  <form @submit.prevent="$emit('submitForm')" @reset.prevent="onReset">
+  <form @submit.prevent="submit" @reset.prevent="onReset">
     <Toast />
     <div class="p-field">
-      <label for="first_name">First name</label>
       <InputText
-        id="first_name"
-        :value="first_name"
-        @input="$emit('update:first_name', $event.target.value)"
-        :class="{ 'p-invalid': v$.form.first_name.$error }"
+        v-model="form.first_name.value"
+        :class="{ 'p-invalid': !form.first_name.valid }"
         required="true"
+        placeholder="Enter first name"
       />
-
-      <small class="p-error" v-if="v$.form.first_name.$error"
+      <small v-if="form.first_name.errors.required" class="p-error"
         >This field is required.</small
       >
     </div>
 
     <div class="p-field">
-      <label for="last_name">Last name</label>
       <InputText
-        id="last_name"
-        :value="last_name"
-        @input="$emit('update:last_name', $event.target.value)"
-        :class="{ 'p-invalid': v$.form.last_name.$errors.length }"
+        v-model="form.last_name.value"
+        :class="{ 'p-invalid': !form.last_name.valid }"
         required="true"
+        placeholder="Enter last name"
       />
-      <small class="p-error" v-if="v$.form.last_name.$errors.length"
+
+      <small v-if="form.last_name.errors.required" class="p-error"
         >This field is required.</small
       >
     </div>
@@ -44,102 +40,31 @@
       />
     </div>
   </form>
-
-  <!-- 
-
-  <admin-form
-    :typeForm="typeForm"
-    :dataForm="dataForm"
-    :path="path"
-    :callback="callback"
-    :isFormValid="isFormValid"
-    :textMessage="textMessage"
-    @showMessage="showMessage"
-    @showErrorMessage="showErrorMessage"
-    @resetForm="$emit('resetForm')"
-  >
-    <template v-slot:input>
-      <div class="p-field">
-        <label for="first_name">First name</label>
-        <InputText
-          id="first_name"
-          :value="first_name"
-          @input="$emit('update:first_name', $event.target.value)"
-          :class="{ 'p-invalid': v$.form.first_name.$error }"
-          required="true"
-        />
-
-        <small class="p-error" v-if="v$.form.first_name.$error"
-          >This field is required.</small
-        >
-      </div>
-
-      <div class="p-field">
-        <label for="last_name">Last name</label>
-        <InputText
-          id="last_name"
-          :value="last_name"
-          @input="$emit('update:last_name', $event.target.value)"
-          :class="{ 'p-invalid': v$.form.last_name.$errors.length }"
-          required="true"
-        />
-        <small class="p-error" v-if="v$.form.last_name.$errors.length"
-          >This field is required.</small
-        >
-      </div>
-    </template>
-  </admin-form> -->
 </template>
 
 <script>
-import useVuelidate from "@vuelidate/core";
-import { required } from "vuelidate/lib/validators";
+import useForm from "@/hooks/useForm";
 
-import toggle from "@/mixins/toggle.js";
-import adminFormData from "@/mixins/adminFormData.js";
-import validationMixin from "@/mixins/validationMixin.js";
-// import AdminForm from "@/components/Admin/Forms/AdminForm";
+const required = (val) => !!val;
+// const minLength = (num) => (val) => val.length >= num;
 
 export default {
   name: "admin-authors-form",
 
-  mixins: [adminFormData, toggle, validationMixin],
-
   setup() {
-    return { v$: useVuelidate() };
-  },
-
-  data() {
-    return {
-      message: "",
-    };
-  },
-
-  props: {
-    first_name: {
-      type: String,
-      required: true,
-    },
-
-    last_name: {
-      type: String,
-      required: true,
-    },
-  },
-
-  validations() {
-    return {
-      form: {
-        first_name: {
-          required,
-        },
-        last_name: {
-          required,
-        },
+    const form = useForm({
+      first_name: {
+        value: "",
+        validators: { required },
       },
-    };
-  },
 
-  methods: {},
+      last_name: {
+        value: "",
+        validators: { required },
+      },
+    });
+
+    return { form };
+  },
 };
 </script>
