@@ -2,10 +2,11 @@
   <div>
     <Toast />
     <admin-table
+      v-if="!loading"
       title="Authors"
       v-model:searchQuery="searchQuery"
-      :data="searchedItems"
-      @openModal="openModal"
+      :data="searchedAuthors"
+      @openModal="toggleDialog = true"
       @openEditModal="editModal"
       @deleteItem="onDeleteData"
       @deleteItems="
@@ -30,22 +31,23 @@
       <template #modal>
         <modal-form
           modal-title="Create new record"
-          :displayModal="displayModal"
-          @close="closeModal"
+          :displayModal="toggleDialog"
+          @close="toggleDialog = false"
         >
           <template #modal-content>
             <admin-author-form
               typeForm="create"
-              v-model:first_name="data.first_name"
-              v-model:last_name="data.last_name"
-              :dataForm="data"
+              v-model:first_name="form.first_name"
+              v-model:last_name="form.last_name"
+              :dataForm="form"
               path="books/author"
               :callback="this.getAuthors"
-              :textMessage="`${data.first_name} ${data.last_name} created`"
+              :textMessage="`${form.first_name} ${form.last_name} created`"
               @resetForm="resetForm"
               @closeModal="closeModal"
               @showMessage="showMessage"
               @showErrorMessage="showErrorMessage"
+              @submitForm="handleSubmit"
             />
           </template>
         </modal-form>
@@ -72,6 +74,8 @@
         </modal-form>
       </template>
     </admin-table>
+
+    <app-loader v-else />
   </div>
 </template>
 
@@ -79,31 +83,59 @@
 import AdminTable from "@/components/Admin/AdminTable.vue";
 import ModalForm from "@/components/UI/ModalForm";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
+import AppLoader from "@/components/AppLoader";
+
 import adminFormMixin from "@/mixins/adminFormMixin.js";
-import dataStore from "@/mixins/dataStore.js";
+// import dataStore from "@/mixins/dataStore.js";
+import useAuthors from "@/hooks/Author/useAuthors";
+import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
+import useForm from "@/hooks/useForm";
+
 import toggle from "@/mixins/toggle.js";
+
 export default {
   name: "admin-authors",
-  mixins: [toggle, adminFormMixin, dataStore],
+  mixins: [toggle, adminFormMixin],
   components: {
     AdminTable,
     ModalForm,
     AdminAuthorForm,
+    AppLoader,
   },
-  data() {
+
+  setup() {
+    const { authors, loading } = useAuthors();
+    const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
+
+    const { form, resetForm, handleSubmit, toggleDialog } = useForm({
+      first_name: "",
+      last_name: "",
+    });
+
     return {
-      initialEditForm: { first_name: "", last_name: "" },
-      data: {
-        first_name: "",
-        last_name: "",
-      },
-      editForm: {
-        _id: "",
-        first_name: "",
-        last_name: "",
-      },
+      searchQuery,
+      searchedAuthors,
+      loading,
+      form,
+      resetForm,
+      handleSubmit,
+      toggleDialog,
     };
   },
+  // data() {
+  //   return {
+  //     initialEditForm: { first_name: "", last_name: "" },
+  //     data: {
+  //       first_name: "",
+  //       last_name: "",
+  //     },
+  //     editForm: {
+  //       _id: "",
+  //       first_name: "",
+  //       last_name: "",
+  //     },
+  //   };
+  // },
   methods: {
     onDeleteData(value) {
       this.removeData(
@@ -112,29 +144,14 @@ export default {
         `${value.first_name} ${value.last_name} deleted`
       );
     },
-    resetForm() {
-      this.data.first_name = "";
-      this.data.last_name = "";
-    },
+    // resetForm() {
+    //   this.data.first_name = "";
+    //   this.data.last_name = "";
+    // },
     resetEditForm() {
       this.editForm.first_name = this.initialEditForm.first_name;
       this.editForm.last_name = this.initialEditForm.last_name;
     },
-  },
-  computed: {
-    searchedItems() {
-      return this.authors.filter((item) => {
-        return (
-          item.first_name
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item.last_name?.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
-      });
-    },
-  },
-  mounted() {
-    this.getAuthors();
   },
 };
 </script>
