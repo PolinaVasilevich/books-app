@@ -4,6 +4,7 @@ export default function useField(field) {
   const valid = ref(true);
   const value = ref(field.value);
   const errors = reactive({});
+  const touched = ref(false);
 
   const reassing = (val) => {
     valid.value = true;
@@ -20,5 +21,5 @@ export default function useField(field) {
   watch(value, reassing);
   reassing(value.value);
 
-  return { value, valid, errors };
+  return { value, valid, errors, touched, blur: () => (touched.value = true) };
 }

@@ -1,27 +1,35 @@
 <template>
-  <form @submit.prevent="submit" @reset.prevent="onReset">
+  <form
+    @submit.prevent="submitForm"
+    @reset.prevent="resetForm"
+    class="admin-form"
+  >
     <Toast />
-    <div class="p-field">
+    <div class="admin-form__field-container">
       <InputText
-        v-model="form.first_name.value"
-        :class="{ 'p-invalid': !form.first_name.valid }"
-        required="true"
+        v-model.trim="form.first_name.value"
+        :class="{
+          'p-invalid': !form.first_name.valid && submitted,
+        }"
+        @blur="form.first_name.blur"
         placeholder="Enter first name"
       />
-      <small v-if="form.first_name.errors.required" class="p-error"
+      <small v-if="form.first_name.errors.required && submitted" class="p-error"
         >This field is required.</small
       >
     </div>
 
-    <div class="p-field">
+    <div class="admin-form__field-container">
       <InputText
-        v-model="form.last_name.value"
-        :class="{ 'p-invalid': !form.last_name.valid }"
-        required="true"
+        v-model.trim="form.last_name.value"
+        :class="{
+          'p-invalid': !form.last_name.valid && submitted,
+        }"
+        @blur="form.last_name.blur"
         placeholder="Enter last name"
       />
 
-      <small v-if="form.last_name.errors.required" class="p-error"
+      <small v-if="form.last_name.errors.required && submitted" class="p-error"
         >This field is required.</small
       >
     </div>
@@ -43,28 +51,44 @@
 </template>
 
 <script>
+import { ref } from "vue";
 import useForm from "@/hooks/useForm";
 
-const required = (val) => !!val;
-// const minLength = (num) => (val) => val.length >= num;
+import { required } from "@/validators/validatorsForm";
 
 export default {
   name: "admin-authors-form",
+  props: {
+    initForm: { type: Object },
+  },
+  emits: ["submitForm"],
+  setup(props, { emit }) {
+    const submitted = ref(false);
 
-  setup() {
-    const form = useForm({
+    const { form, resetForm } = useForm({
+      id: { value: props.initForm._id ?? "" },
       first_name: {
-        value: "",
+        value: props.initForm.first_name,
         validators: { required },
       },
 
       last_name: {
-        value: "",
+        value: props.initForm.last_name,
         validators: { required },
       },
     });
 
-    return { form };
+    const submitForm = async () => {
+      submitted.value = true;
+      if (form.valid) {
+        emit("submitForm", {
+          first_name: form.first_name.value,
+          last_name: form.last_name.value,
+        });
+      }
+    };
+
+    return { form, submitted, submitForm, resetForm };
   },
 };
 </script>

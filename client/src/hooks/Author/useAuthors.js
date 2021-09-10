@@ -1,15 +1,19 @@
-import { onMounted } from "vue";
+import { reactive, toRefs } from "vue";
 import useAxios from "@/hooks/useAxios";
 
 export default function useAuthors() {
-  const { response: authors, loading, error, fetchData } = useAxios();
+  const data = reactive({ authors: [], error: null, loading: false });
 
-  onMounted(async () => {
-    await fetchData({
+  const getData = async () => {
+    const { response, loading, error, fetchData } = useAxios({
       method: "GET",
       url: "/books/allauthors",
     });
-  });
+    fetchData();
+    data.authors = response;
+    data.error = error;
+    data.loading = loading;
+  };
 
-  return { authors, loading, error };
+  return { getData, ...toRefs(data) };
 }
