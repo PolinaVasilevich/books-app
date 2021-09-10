@@ -50,6 +50,7 @@ import { ref, onMounted } from "vue";
 import useAuthors from "@/hooks/Author/useAuthors";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
 import useAxios from "@/hooks/useAxios";
+import { useToast } from "primevue/usetoast";
 
 export default {
   name: "admin-authors",
@@ -61,6 +62,7 @@ export default {
   },
 
   setup() {
+    const toast = useToast();
     const { getData, authors, loading } = useAuthors();
     const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
 
@@ -68,7 +70,7 @@ export default {
     const submitted = ref(false);
     const displayDialog = ref(false);
 
-    const { fetchData } = useAxios();
+    const { fetchData, error } = useAxios();
 
     onMounted(() => {
       getData();
@@ -102,6 +104,25 @@ export default {
           data: { ...initForm.value, ...data },
         });
         getData();
+
+        if (error.value) {
+          error.value.response.data.message
+            ? toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: error.value.response.data.message,
+                life: 3000,
+              })
+            : console.log(error);
+          console.log(error.value);
+        } else {
+          toast.add({
+            severity: "success",
+            summary: "Successful",
+            detail: "Item updated",
+            life: 3000,
+          });
+        }
       } else {
         await fetchData({
           method: "POST",
@@ -109,6 +130,24 @@ export default {
           data,
         });
         getData();
+        if (error.value) {
+          error.value.response.data.message
+            ? toast.add({
+                severity: "error",
+                summary: "Error",
+                detail: error.value.response.data.message,
+                life: 3000,
+              })
+            : console.log(error);
+          console.log(error.value);
+        } else {
+          toast.add({
+            severity: "success",
+            summary: "Successful",
+            detail: "Item created",
+            life: 3000,
+          });
+        }
       }
       displayDialog.value = false;
     };
@@ -119,6 +158,17 @@ export default {
         url: `/books/deleteauthor/${data._id}`,
       });
       getData();
+
+      if (error.value) {
+        console.log(error.value);
+      } else {
+        toast.add({
+          severity: "success",
+          summary: "Successful",
+          detail: "Item deleted",
+          life: 3000,
+        });
+      }
     };
 
     return {
