@@ -6,12 +6,9 @@
       title="Authors"
       v-model:searchQuery="searchQuery"
       :data="searchedAuthors"
-      @openModal="displayModal = true"
-      @openEditModal="editModal"
-      @deleteItem="onDeleteData"
-      @deleteItems="
-        deleteItems($event, '/books/deletemanyauthors', this.getAuthors)
-      "
+      @createNew="createNew"
+      @editItem="editData"
+      @deleteItem="onDelete"
     >
       <template #content>
         <Column
@@ -29,116 +26,115 @@
         ></Column>
       </template>
       <template #modal>
-        <Dialog v-model:visible="displayModal" style="width: 40vw">
-          <template #header>
-            <h3>Header</h3>
-          </template>
-          <admin-author-form />
+        <Dialog
+          v-model:visible="displayDialog"
+          header="Author"
+          :modal="true"
+          style="width: 40vw"
+        >
+          <admin-author-form @submitForm="onSubmit" :initForm="initForm" />
         </Dialog>
-
-        <!-- <modal-form
-          modal-title="Create new record"
-          :displayModal="displayModal"
-          @close="displayModal = false"
-        >
-          <template #modal-content> </template>
-        </modal-form> -->
-
-        <modal-form
-          modal-title="Update record"
-          :displayModal="displayEditModal"
-          @close="closeEditModal"
-        >
-          <template #modal-content>
-            <admin-author-form
-              typeForm="update"
-              v-model:first_name="editForm.first_name"
-              v-model:last_name="editForm.last_name"
-              :dataForm="editForm"
-              :path="`/books/updateauthor/${editForm._id}`"
-              :callback="this.getAuthors"
-              @resetForm="resetEditForm"
-              @closeModal="closeEditModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-            />
-          </template>
-        </modal-form>
       </template>
     </admin-table>
-
     <app-loader v-else />
   </div>
 </template>
 
 <script>
-import AdminTable from "@/components/Admin/AdminTable.vue";
-import ModalForm from "@/components/UI/ModalForm";
+import AdminTable from "@/components/Admin/AdminTable copy";
+
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 import AppLoader from "@/components/AppLoader";
 
-import adminFormMixin from "@/mixins/adminFormMixin.js";
-// import dataStore from "@/mixins/dataStore.js";
+import { ref, onMounted } from "vue";
 import useAuthors from "@/hooks/Author/useAuthors";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
-
-import toggle from "@/mixins/toggle.js";
+import useAxios from "@/hooks/useAxios";
 
 export default {
   name: "admin-authors",
-  mixins: [toggle, adminFormMixin],
+
   components: {
     AdminTable,
-    ModalForm,
     AdminAuthorForm,
     AppLoader,
   },
 
   setup() {
-    const { authors, loading } = useAuthors();
+    const { getData, authors, loading } = useAuthors();
     const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
 
-    // const { form, resetForm, handleSubmit, toggleDialog } = useForm({
-    //   first_name: "",
-    //   last_name: "",
-    // });
+    const initForm = ref({});
+    const submitted = ref(false);
+    const displayDialog = ref(false);
+
+    const { fetchData } = useAxios();
+
+    onMounted(() => {
+      getData();
+    });
+
+    const createNew = () => {
+      initForm.value = {
+        first_name: "",
+        last_name: "",
+      };
+
+      submitted.value = false;
+      displayDialog.value = true;
+    };
+
+    const editData = (value) => {
+      initForm.value = { ...value };
+      displayDialog.value = true;
+    };
+
+    const hideDialog = () => {
+      displayDialog.value = false;
+      submitted.value = false;
+    };
+
+    const onSubmit = async (data) => {
+      if (initForm.value._id) {
+        await fetchData({
+          method: "PUT",
+          url: `/books/updateauthor/${initForm.value._id}`,
+          data: { ...initForm.value, ...data },
+        });
+        getData();
+      } else {
+        await fetchData({
+          method: "POST",
+          url: "/books/author",
+          data,
+        });
+        getData();
+      }
+      displayDialog.value = false;
+    };
+
+    const onDelete = async (data) => {
+      await fetchData({
+        method: "DELETE",
+        url: `/books/deleteauthor/${data._id}`,
+      });
+      getData();
+    };
 
     return {
       searchQuery,
       searchedAuthors,
       loading,
+      initForm,
+      submitted,
+      displayDialog,
+
+      createNew,
+      hideDialog,
+      onSubmit,
+      editData,
+      onDelete,
     };
-  },
-  // data() {
-  //   return {
-  //     initialEditForm: { first_name: "", last_name: "" },
-  //     data: {
-  //       first_name: "",
-  //       last_name: "",
-  //     },
-  //     editForm: {
-  //       _id: "",
-  //       first_name: "",
-  //       last_name: "",
-  //     },
-  //   };
-  // },
-  methods: {
-    onDeleteData(value) {
-      this.removeData(
-        `/books/deleteauthor/${value._id}`,
-        this.getAuthors,
-        `${value.first_name} ${value.last_name} deleted`
-      );
-    },
-    // resetForm() {
-    //   this.data.first_name = "";
-    //   this.data.last_name = "";
-    // },
-    resetEditForm() {
-      this.editForm.first_name = this.initialEditForm.first_name;
-      this.editForm.last_name = this.initialEditForm.last_name;
-    },
   },
 };
 </script>
