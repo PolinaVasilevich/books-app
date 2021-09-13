@@ -20,6 +20,5 @@ export default function useAxios(config = {}) {
     }
   };
 
-  fetch();
   return { response, error, loading, fetch };
 }
