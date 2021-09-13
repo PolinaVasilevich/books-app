@@ -6,8 +6,8 @@
       title="Authors"
       v-model:searchQuery="searchQuery"
       :data="searchedAuthors"
-      @createNew="createNew"
-      @editItem="editData"
+      @createNew="showCreateNewItemDialog"
+      @editItem="showEditItemDialog"
       @deleteItem="onDelete"
     >
       <template #content>
@@ -32,7 +32,7 @@
           :modal="true"
           style="width: 40vw"
         >
-          <admin-author-form @submitForm="onSubmit" :initForm="initForm" />
+          <admin-author-form @submitForm="onSubmit" :initForm="initialForm" />
         </Dialog>
       </template>
     </admin-table>
@@ -46,11 +46,11 @@ import AdminTable from "@/components/Admin/AdminTable copy";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 import AppLoader from "@/components/AppLoader";
 
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import useAuthors from "@/hooks/Author/useAuthors";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
-import useAxios from "@/hooks/useAxios";
-import { useToast } from "primevue/usetoast";
+
+import useAdminForm from "@/hooks/useAdminForm";
 
 export default {
   name: "admin-authors",
@@ -62,128 +62,57 @@ export default {
   },
 
   setup() {
-    const toast = useToast();
     const { getData, authors, loading } = useAuthors();
     const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
-
-    const initForm = ref({});
-    const submitted = ref(false);
-    const displayDialog = ref(false);
-
-    const { fetchData, error } = useAxios();
 
     onMounted(() => {
       getData();
     });
 
-    const createNew = () => {
-      initForm.value = {
-        first_name: "",
-        last_name: "",
-      };
+    const {
+      initialForm,
+      submitted,
+      displayDialog,
+      showCreateNewItemDialog,
+      showEditItemDialog,
+      createNewItem,
+      hideDialog,
 
-      submitted.value = false;
-      displayDialog.value = true;
-    };
-
-    const editData = (value) => {
-      initForm.value = { ...value };
-      displayDialog.value = true;
-    };
-
-    const hideDialog = () => {
-      displayDialog.value = false;
-      submitted.value = false;
-    };
+      updateItem,
+      removeItem,
+    } = useAdminForm({
+      first_name: "",
+      last_name: "",
+    });
 
     const onSubmit = async (data) => {
-      if (initForm.value._id) {
-        await fetchData({
-          method: "PUT",
-          url: `/books/updateauthor/${initForm.value._id}`,
-          data: { ...initForm.value, ...data },
-        });
-        getData();
-
-        if (error.value) {
-          error.value.response.data.message
-            ? toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: error.value.response.data.message,
-                life: 3000,
-              })
-            : console.log(error);
-          console.log(error.value);
-        } else {
-          toast.add({
-            severity: "success",
-            summary: "Successful",
-            detail: "Item updated",
-            life: 3000,
-          });
-        }
+      if (initialForm.value._id) {
+        await updateItem("/books/updateauthor", data);
       } else {
-        await fetchData({
-          method: "POST",
-          url: "/books/author",
-          data,
-        });
-        getData();
-        if (error.value) {
-          error.value.response.data.message
-            ? toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: error.value.response.data.message,
-                life: 3000,
-              })
-            : console.log(error);
-          console.log(error.value);
-        } else {
-          toast.add({
-            severity: "success",
-            summary: "Successful",
-            detail: "Item created",
-            life: 3000,
-          });
-        }
+        await createNewItem("/books/author", data);
       }
+      getData();
       displayDialog.value = false;
     };
 
     const onDelete = async (data) => {
-      await fetchData({
-        method: "DELETE",
-        url: `/books/deleteauthor/${data._id}`,
-      });
+      await removeItem("/books/deleteauthor", data);
       getData();
-
-      if (error.value) {
-        console.log(error.value);
-      } else {
-        toast.add({
-          severity: "success",
-          summary: "Successful",
-          detail: "Item deleted",
-          life: 3000,
-        });
-      }
     };
 
     return {
       searchQuery,
       searchedAuthors,
       loading,
-      initForm,
       submitted,
       displayDialog,
-
-      createNew,
+      initialForm,
+      createNewItem,
       hideDialog,
       onSubmit,
-      editData,
+      showEditItemDialog,
       onDelete,
+      showCreateNewItemDialog,
     };
   },
 };
