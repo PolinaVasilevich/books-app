@@ -1,26 +1,25 @@
-import { toRefs, reactive } from "vue";
+import { ref } from "vue";
 import axios from "axios";
 
 axios.defaults.baseURL = `http://localhost:3000/`;
 
-export default function useAxios(params) {
-  const state = reactive({
-    response: [],
-    error: null,
-    loading: true,
-  });
+export default function useAxios(config = {}) {
+  const response = ref(null);
+  const error = ref(null);
+  const loading = ref(true);
 
-  const fetchData = async (fetchParams) => {
-    state.loading = true;
+  const fetch = async () => {
+    loading.value = true;
     try {
-      const result = await axios.request(fetchParams || params);
-      state.response = result.data;
+      const result = await axios.request({ ...config });
+      response.value = result?.data;
     } catch (errors) {
-      state.error = errors;
+      error.value = errors;
     } finally {
-      state.loading = false;
+      loading.value = false;
     }
   };
 
-  return { ...toRefs(state), fetchData };
+  fetch();
+  return { response, error, loading, fetch };
 }
