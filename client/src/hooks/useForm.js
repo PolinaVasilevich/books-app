@@ -2,19 +2,20 @@ import { reactive, computed } from "vue";
 import useField from "@/hooks/useField";
 
 export default function useForm(init = {}) {
-  const form = reactive({});
-
+  const form = reactive();
+  const initialForm = reactive({});
   const validKey = "valid";
 
   const initForm = () => {
     for (const [key, value] of Object.entries(init)) {
       form[key] = useField(value);
+      initialForm[key] = value.value;
     }
   };
 
-  const withoutValid = (k) => k !== validKey;
-
   initForm();
+
+  const withoutValid = (k) => k !== validKey;
 
   form[validKey] = computed(() => {
     return Object.keys(form)

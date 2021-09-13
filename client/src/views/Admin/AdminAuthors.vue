@@ -88,6 +88,12 @@ export default {
     const onSubmit = async (data) => {
       if (initialForm.value._id) {
         await updateItem("/books/updateauthor", data);
+
+        // const { loading, error } = await useAxios({
+        //   method: "PUT",
+        //   url: `/books/updateauthor/${initialForm.value._id}`,
+        //   data,
+        // });
       } else {
         await createNewItem("/books/author", data);
       }
