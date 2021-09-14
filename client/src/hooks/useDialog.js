@@ -1,3 +1,5 @@
+import { ref } from "vue";
+
 export default function useDialog() {
   const submitted = ref(false);
   const displayDialog = ref(false);
@@ -7,21 +9,15 @@ export default function useDialog() {
     submitted.value = false;
   };
 
-  const showCreateNewItemDialog = () => {
+  const showDialog = () => {
+    displayDialog.value = true;
     submitted.value = false;
-    displayDialog.value = true;
-  };
-
-  const showEditItemDialog = (value) => {
-    initialForm.value = { ...value };
-    displayDialog.value = true;
   };
 
   return {
     submitted,
     displayDialog,
     hideDialog,
-    showCreateNewItemDialog,
-    showEditItemDialog,
+    showDialog,
   };
 }
