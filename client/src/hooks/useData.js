@@ -2,47 +2,56 @@ import { reactive, toRefs } from "vue";
 import useAxios from "@/hooks/useAxios";
 
 export default function useData() {
-  const data = reactive({ data: [], error: null, loading: false });
+  const state = reactive({
+    data: [],
+    error: null,
+    responseMessage: null,
+    loading: false,
+  });
 
   const getData = async (url) => {
-    const { response, loading, error } = await useAxios({
+    const { response, loading, errorMessage, fetch } = useAxios({
       method: "GET",
       url,
     });
-    data.data = response;
-    data.error = error;
-    data.loading = loading;
+    await fetch();
+
+    state.data = response;
+    state.error = errorMessage.value;
+    state.loading = loading;
   };
 
   const createItem = async (url, data) => {
-    const { loading, error } = await useAxios({
+    const { response, errorMessage, fetch } = useAxios({
       method: "POST",
       url,
       data,
     });
-    data.error = error;
-    data.loading = loading;
+    await fetch();
+    state.responseMessage = response.value?.message;
+    state.error = errorMessage.value;
   };
 
   const updateItem = async (url, data) => {
-    const { loading, error } = await useAxios({
+    const { response, errorMessage, fetch } = useAxios({
       method: "PUT",
       url,
       data,
     });
-    data.error = error;
-    data.loading = loading;
+    await fetch();
+    state.responseMessage = response.value?.message;
+    state.error = errorMessage.value;
   };
 
-  const removeItem = async (url, data) => {
-    const { loading, error } = await useAxios({
+  const removeItem = async (url) => {
+    const { response, errorMessage, fetch } = useAxios({
       method: "DELETE",
       url,
-      data,
     });
-    data.error = error;
-    data.loading = loading;
+    await fetch();
+    state.responseMessage = response.value?.message;
+    state.error = errorMessage.value;
   };
 
-  return { getData, createItem, updateItem, removeItem, ...toRefs(data) };
+  return { getData, createItem, updateItem, removeItem, ...toRefs(state) };
 }

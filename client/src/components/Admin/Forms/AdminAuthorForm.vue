@@ -59,21 +59,22 @@ import { required } from "@/validators/validatorsForm";
 export default {
   name: "admin-authors-form",
   props: {
-    initForm: { type: Object },
+    initialForm: { type: Object },
   },
   emits: ["submitForm"],
+
   setup(props, { emit }) {
     const submitted = ref(false);
 
     const { form, resetForm } = useForm({
-      id: { value: props.initForm._id ?? "" },
+      id: { value: props.initialForm._id ?? "" },
       first_name: {
-        value: props.initForm.first_name,
+        value: props.initialForm.first_name,
         validators: { required },
       },
 
       last_name: {
-        value: props.initForm.last_name,
+        value: props.initialForm.last_name,
         validators: { required },
       },
     });

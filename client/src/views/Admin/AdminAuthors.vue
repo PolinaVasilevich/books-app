@@ -6,7 +6,7 @@
       title="Authors"
       v-model:searchQuery="searchQuery"
       :data="searchedAuthors"
-      @createNew="showCreateNewItemDialog"
+      @createNew="showCreateItemDialog"
       @editItem="showEditItemDialog"
       @deleteItem="onDelete"
     >
@@ -32,7 +32,10 @@
           :modal="true"
           style="width: 40vw"
         >
-          <admin-author-form @submitForm="onSubmit" :initForm="initialForm" />
+          <admin-author-form
+            @submitForm="onSubmit"
+            :initialForm="initialForm"
+          />
         </Dialog>
       </template>
     </admin-table>
@@ -46,11 +49,12 @@ import AdminTable from "@/components/Admin/AdminTable copy";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 import AppLoader from "@/components/AppLoader";
 
-import { onMounted } from "vue";
-import useAuthors from "@/hooks/Author/useAuthors";
+import { ref, onMounted } from "vue";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
-
-import useAdminForm from "@/hooks/useAdminForm";
+import useForm from "@/hooks/useForm";
+import useData from "@/hooks/useData";
+import useDialog from "@/hooks/useDialog";
+import useMessage from "@/hooks/useMessage";
 
 export default {
   name: "admin-authors",
@@ -62,63 +66,78 @@ export default {
   },
 
   setup() {
-    const { getData, authors, loading } = useAuthors();
-    const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
-
-    onMounted(() => {
-      getData();
-    });
-
     const {
-      initialForm,
-      submitted,
-      displayDialog,
-      showCreateNewItemDialog,
-      showEditItemDialog,
-      createNewItem,
-      hideDialog,
-
+      data: authors,
+      loading,
+      error,
+      responseMessage,
+      getData,
       updateItem,
       removeItem,
-    } = useAdminForm({
-      first_name: "",
-      last_name: "",
+      createItem,
+    } = useData();
+    const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
+    const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
+    const { showErrorMessage, showSuccessfulMessage } = useMessage();
+
+    const initialForm = ref({});
+
+    onMounted(() => {
+      getData("/books/allauthors");
     });
+
+    const showCreateItemDialog = () => {
+      initialForm.value = { first_name: "", last_name: "" };
+      showDialog();
+    };
+
+    const showEditItemDialog = (value) => {
+      initialForm.value = { ...value };
+      showDialog();
+    };
 
     const onSubmit = async (data) => {
       if (initialForm.value._id) {
-        await updateItem("/books/updateauthor", data);
-
-        // const { loading, error } = await useAxios({
-        //   method: "PUT",
-        //   url: `/books/updateauthor/${initialForm.value._id}`,
-        //   data,
-        // });
+        await updateItem(`/books/updateauthor/${initialForm.value._id}`, {
+          ...initialForm.value,
+          ...data,
+        });
       } else {
-        await createNewItem("/books/author", data);
+        await createItem("/books/author", data);
       }
-      getData();
+
       displayDialog.value = false;
+      getData("/books/allauthors");
+
+      if (error.value) {
+        showErrorMessage(error.value);
+      } else {
+        showSuccessfulMessage(responseMessage.value);
+      }
     };
 
     const onDelete = async (data) => {
-      await removeItem("/books/deleteauthor", data);
-      getData();
+      await removeItem(`/books/deleteauthor/${data._id}`);
+      getData("/books/allauthors");
+      if (error.value) {
+        showErrorMessage(error.value);
+      } else {
+        showSuccessfulMessage(responseMessage);
+      }
     };
 
     return {
       searchQuery,
       searchedAuthors,
       loading,
+      initialForm,
       submitted,
       displayDialog,
-      initialForm,
-      createNewItem,
       hideDialog,
-      onSubmit,
+      showCreateItemDialog,
       showEditItemDialog,
+      onSubmit,
       onDelete,
-      showCreateNewItemDialog,
     };
   },
 };
