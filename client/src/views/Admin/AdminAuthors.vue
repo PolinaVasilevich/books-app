@@ -6,8 +6,8 @@
       title="Authors"
       v-model:searchQuery="searchQuery"
       :data="searchedAuthors"
-      @createNew="showCreateItemDialog"
-      @editItem="showEditItemDialog"
+      @openModal="showCreateItemDialog"
+      @openEditModal="showEditItemDialog"
       @deleteItem="onDelete"
     >
       <template #content>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import AdminTable from "@/components/Admin/AdminTable copy";
+import AdminTable from "@/components/Admin/AdminTable";
 
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 import AppLoader from "@/components/AppLoader";
