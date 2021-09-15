@@ -44,10 +44,10 @@
 </template>
 
 <script lang="ts">
-import AdminTable from "@/components/Admin/AdminTable";
+import AdminTable from "@/components/Admin/AdminTable.vue";
 
-import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
-import AppLoader from "@/components/AppLoader";
+import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm.vue";
+import AppLoader from "@/components/AppLoader.vue";
 
 import { ref, onMounted } from "vue";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
@@ -100,14 +100,14 @@ export default {
     };
 
     const onSubmit = async (data) => {
-      if (initialForm.value._id) {
-        await updateItem(`/books/updateauthor/${initialForm.value._id}`, {
-          ...initialForm.value,
-          ...data,
-        });
-      } else {
-        await createItem("/books/author", data);
-      }
+      // if (initialForm.value.id) {
+      //   await updateItem(`/books/updateauthor/${initialForm.value._id}`, {
+      //     ...initialForm.value,
+      //     ...data,
+      //   });
+      // } else {
+      //   await createItem("/books/author", data);
+      // }
 
       displayDialog.value = false;
       getData("/books/allauthors");
