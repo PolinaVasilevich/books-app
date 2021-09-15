@@ -1,9 +1,15 @@
-import { reactive, computed } from "vue";
+import { ref, reactive, computed } from "vue";
 import useField from "@/hooks/useField";
 
 export default function useForm(init = {}) {
   const form = reactive({});
-  const validKey = "valid";
+  const formData = reactive({});
+  let validForm = ref(false);
+  const submitted = ref(false);
+
+  validForm = computed(() => {
+    return !Object.keys(form).filter((key) => !form[key].valid).length;
+  });
 
   const initForm = () => {
     for (const [key, value] of Object.entries(init)) {
@@ -13,20 +19,23 @@ export default function useForm(init = {}) {
 
   initForm();
 
-  const withoutValid = (k) => k !== validKey;
+  const getFormData = () => {
+    for (const [key, value] of Object.entries(form)) {
+      formData[key] = value.value;
+    }
+  };
 
-  form[validKey] = computed(() => {
-    return Object.keys(form)
-      .filter(withoutValid)
-      .reduce((acc, key) => {
-        acc = form[key].valid;
-        return acc;
-      }, true);
-  });
+  const submitForm = async (emit) => {
+    if (validForm.value) {
+      getFormData();
+      emit("submitForm", formData);
+      submitted.value = true;
+    }
+  };
 
   const resetForm = () => {
     initForm();
   };
 
-  return { form, resetForm };
+  return { form, submitForm, resetForm, validForm };
 }

@@ -8,7 +8,7 @@ export default function useField(field) {
 
   const reassing = (val) => {
     valid.value = true;
-    Object.keys(field.validators ?? {}).map((vname) => {
+    Object.keys(field.validators ?? {}).forEach((vname) => {
       const isValid = field.validators[vname](val);
       errors[vname] = !isValid;
 

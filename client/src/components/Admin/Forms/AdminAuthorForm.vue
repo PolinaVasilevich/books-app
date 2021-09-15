@@ -1,6 +1,6 @@
 <template>
   <form
-    @submit.prevent="submitForm"
+    @submit.prevent="submitForm($emit)"
     @reset.prevent="resetForm"
     class="admin-form"
   >
@@ -64,10 +64,8 @@ export default {
   emits: ["submitForm"],
 
   setup(props, { emit }) {
-    const submitted = ref(false);
-
-    const { form, resetForm } = useForm({
-      id: { value: props.initialForm._id ?? "" },
+    const { form, submitForm, resetForm, submitted, validForm } = useForm({
+      id: { value: props.initialForm._id ?? null },
       first_name: {
         value: props.initialForm.first_name,
         validators: { required },
@@ -79,17 +77,7 @@ export default {
       },
     });
 
-    const submitForm = async () => {
-      submitted.value = true;
-      if (form.valid) {
-        emit("submitForm", {
-          first_name: form.first_name.value,
-          last_name: form.last_name.value,
-        });
-      }
-    };
-
-    return { form, submitted, submitForm, resetForm };
+    return { form, submitted, submitForm, resetForm, validForm };
   },
 };
 </script>
