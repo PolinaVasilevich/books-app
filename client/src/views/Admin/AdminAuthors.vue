@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import AdminTable from "@/components/Admin/AdminTable";
 
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
@@ -55,6 +55,9 @@ import useForm from "@/hooks/useForm";
 import useData from "@/hooks/useData";
 import useDialog from "@/hooks/useDialog";
 import useMessage from "@/hooks/useMessage";
+
+import { Author } from "@/hooks/api.ts";
+import AuthorType from "@/models/authorType.ts";
 
 export default {
   name: "admin-authors",
