@@ -1,5 +1,6 @@
 import { reactive, toRefs } from "vue";
 import useAxios from "@/hooks/useAxios";
+import Author from "@/models/Author.ts";
 
 export default function useAuthor() {
   const state = reactive({
