@@ -1,11 +1,14 @@
 import { reactive, toRefs } from "vue";
-import useAxios from "@/hooks/useAxios.ts";
+import useAxios from "@/hooks/useAxios";
+
+import Author from "@/models/Author";
+import { AxiosState } from "@/hooks/useAxios";
 
 export default function useAuthor() {
-  const state = reactive({
-    data: [],
-    error: null,
-    responseMessage: null,
+  const state = reactive<AxiosState<Author>>({
+    response: [],
+    errorMessage: "",
+    responseMessage: "",
     loading: false,
   });
 
@@ -16,43 +19,42 @@ export default function useAuthor() {
     });
 
     await fetch();
-
-    state.data = response;
-    state.error = errorMessage.value;
-    state.loading = loading;
+    state.response = response.value;
+    state.errorMessage = errorMessage.value;
+    state.loading = loading.value;
   };
 
   const createAuthor = async (author) => {
-    const { response, errorMessage, fetch } = useAxios({
+    const { responseMessage, errorMessage, fetch } = useAxios({
       method: "POST",
       url: "books/author",
       data: author,
     });
 
     await fetch();
-    state.responseMessage = response.value?.message;
-    state.error = errorMessage.value;
+    state.responseMessage = responseMessage.value;
+    state.errorMessage = errorMessage.value;
   };
 
   const updateAuthor = async (id, author) => {
-    const { response, errorMessage, fetch } = useAxios({
+    const { responseMessage, errorMessage, fetch } = useAxios({
       method: "PUT",
       url: `books/updateauthor/${id}`,
       data: author,
     });
     await fetch();
-    state.responseMessage = response.value?.message;
-    state.error = errorMessage.value;
+    state.responseMessage = responseMessage.value;
+    state.errorMessage = errorMessage.value;
   };
 
   const deleteAuthor = async (id) => {
-    const { response, errorMessage, fetch } = useAxios({
+    const { responseMessage, errorMessage, fetch } = useAxios({
       method: "DELETE",
       url: `books/deleteauthor/${id}`,
     });
     await fetch();
-    state.responseMessage = response.value?.message;
-    state.error = errorMessage.value;
+    state.responseMessage = responseMessage.value;
+    state.errorMessage = errorMessage.value;
   };
 
   return {
