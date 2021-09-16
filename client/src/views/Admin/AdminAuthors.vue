@@ -50,9 +50,10 @@ import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
 import AppLoader from "@/components/AppLoader";
 
 import { ref, onMounted } from "vue";
+import useAuthor from "@/hooks/Author/useAuthor";
 import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
 import useForm from "@/hooks/useForm";
-import useData from "@/hooks/useData";
+
 import useDialog from "@/hooks/useDialog";
 import useMessage from "@/hooks/useMessage";
 
@@ -71,11 +72,12 @@ export default {
       loading,
       error,
       responseMessage,
-      getData,
-      updateItem,
-      removeItem,
-      createItem,
-    } = useData();
+      getAuthors,
+      updateAuthor,
+      createAuthor,
+      deleteAuthor,
+    } = useAuthor();
+
     const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
     const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
     const { showErrorMessage, showSuccessfulMessage } = useMessage();
@@ -83,7 +85,7 @@ export default {
     const initialForm = ref({});
 
     onMounted(() => {
-      getData("/books/allauthors");
+      getAuthors();
     });
 
     const showCreateItemDialog = () => {
@@ -98,16 +100,16 @@ export default {
 
     const onSubmit = async (data) => {
       if (initialForm.value._id) {
-        await updateItem(`/books/updateauthor/${initialForm.value._id}`, {
+        await updateAuthor(initialForm.value._id, {
           ...initialForm.value,
           ...data,
         });
       } else {
-        await createItem("/books/author", data);
+        await createAuthor(data);
       }
 
       displayDialog.value = false;
-      getData("/books/allauthors");
+      getAuthors();
 
       if (error.value) {
         showErrorMessage(error.value);
@@ -117,8 +119,8 @@ export default {
     };
 
     const onDelete = async (data) => {
-      await removeItem(`/books/deleteauthor/${data._id}`);
-      getData("/books/allauthors");
+      await deleteAuthor(data._id);
+      getAuthors();
       if (error.value) {
         showErrorMessage(error.value);
       } else {

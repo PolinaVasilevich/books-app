@@ -1,7 +1,7 @@
 import { reactive, toRefs } from "vue";
 import useAxios from "@/hooks/useAxios";
 
-export default function useData() {
+export default function useAuthor() {
   const state = reactive({
     data: [],
     error: null,
@@ -9,11 +9,12 @@ export default function useData() {
     loading: false,
   });
 
-  const getData = async (url) => {
+  const getAuthors = async () => {
     const { response, loading, errorMessage, fetch } = useAxios({
       method: "GET",
-      url,
+      url: "books/allauthors",
     });
+
     await fetch();
 
     state.data = response;
@@ -21,37 +22,44 @@ export default function useData() {
     state.loading = loading;
   };
 
-  const createItem = async (url, data) => {
+  const createAuthor = async (author) => {
     const { response, errorMessage, fetch } = useAxios({
       method: "POST",
-      url,
-      data,
+      url: "books/author",
+      data: author,
     });
+
     await fetch();
     state.responseMessage = response.value?.message;
     state.error = errorMessage.value;
   };
 
-  const updateItem = async (url, data) => {
+  const updateAuthor = async (id, author) => {
     const { response, errorMessage, fetch } = useAxios({
       method: "PUT",
-      url,
-      data,
+      url: `books/updateauthor/${id}`,
+      data: author,
     });
     await fetch();
     state.responseMessage = response.value?.message;
     state.error = errorMessage.value;
   };
 
-  const removeItem = async (url) => {
+  const deleteAuthor = async (id) => {
     const { response, errorMessage, fetch } = useAxios({
       method: "DELETE",
-      url,
+      url: `books/deleteauthor/${id}`,
     });
     await fetch();
     state.responseMessage = response.value?.message;
     state.error = errorMessage.value;
   };
 
-  return { getData, createItem, updateItem, removeItem, ...toRefs(state) };
+  return {
+    getAuthors,
+    createAuthor,
+    updateAuthor,
+    deleteAuthor,
+    ...toRefs(state),
+  };
 }
