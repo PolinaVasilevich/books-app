@@ -54,7 +54,7 @@ import { defineComponent } from "vue";
 
 import useAuthor from "@/hooks/Author/useAuthor.ts";
 import Author from "@/models/Author";
-import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
+import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors.ts";
 import useForm from "@/hooks/useForm";
 
 import useDialog from "@/hooks/useDialog";
