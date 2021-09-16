@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import { VuelidatePlugin } from "@vuelidate/core";
+import VuelidatePlugin from "@vuelidate/core";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
