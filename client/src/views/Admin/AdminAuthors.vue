@@ -49,7 +49,7 @@ import AdminTable from "@/components/Admin/AdminTable.vue";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm.vue";
 import AppLoader from "@/components/AppLoader.vue";
 
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, Ref, onMounted } from "vue";
 import { defineComponent } from "vue";
 
 import useAuthor from "@/hooks/Author/useAuthor.ts";
@@ -85,7 +85,7 @@ export default defineComponent({
     const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
     const { showErrorMessage, showSuccessfulMessage } = useMessage();
 
-    let initialForm = reactive<Author>({
+    let initialForm = ref({
       _id: "",
       first_name: "",
       last_name: "",
@@ -96,18 +96,18 @@ export default defineComponent({
     });
 
     const showCreateItemDialog = () => {
-      initialForm = { _id: "", first_name: "", last_name: "" };
+      initialForm.value = { _id: "", first_name: "", last_name: "" };
       showDialog();
     };
 
     const showEditItemDialog = (value) => {
-      initialForm = { ...value };
+      initialForm.value = { ...value };
       showDialog();
     };
 
     const onSubmit = async (data) => {
-      if (initialForm._id) {
-        await updateAuthor(initialForm._id, {
+      if (initialForm.value._id) {
+        await updateAuthor(initialForm.value._id, {
           ...initialForm,
           ...data,
         });
