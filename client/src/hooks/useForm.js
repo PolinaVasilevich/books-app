@@ -26,10 +26,10 @@ export default function useForm(init = {}) {
   };
 
   const submitForm = async (emit) => {
+    submitted.value = true;
     if (validForm.value) {
       getFormData();
       emit("submitForm", formData);
-      submitted.value = true;
     }
   };
 
@@ -37,5 +37,5 @@ export default function useForm(init = {}) {
     initForm();
   };
 
-  return { form, submitForm, resetForm, validForm };
+  return { form, submitForm, resetForm, validForm, submitted };
 }
