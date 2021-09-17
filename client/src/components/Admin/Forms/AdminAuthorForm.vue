@@ -50,22 +50,22 @@
   </form>
 </template>
 
-<script>
-import { ref } from "vue";
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import useForm from "@/hooks/useForm";
-
+import Author from "@/models/Author";
 import { required } from "@/validators/validatorsForm";
 
-export default {
+export default defineComponent({
   name: "admin-authors-form",
   props: {
-    initialForm: { type: Object },
+    initialForm: { required: true, type: Object as PropType<Author> },
   },
   emits: ["submitForm"],
 
   setup(props, { emit }) {
     const { form, submitForm, resetForm, submitted, validForm } = useForm({
-      id: { value: props.initialForm._id ?? null },
+      id: { value: props.initialForm._id },
       first_name: {
         value: props.initialForm.first_name,
         validators: { required },
@@ -79,5 +79,5 @@ export default {
 
     return { form, submitted, submitForm, resetForm, validForm };
   },
-};
+});
 </script>
