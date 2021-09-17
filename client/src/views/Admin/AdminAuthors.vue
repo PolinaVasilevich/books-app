@@ -100,15 +100,15 @@ export default defineComponent({
       showDialog();
     };
 
-    const showEditItemDialog = (value) => {
+    const showEditItemDialog = (value: Author) => {
       initialForm.value = { ...value };
       showDialog();
     };
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: Author) => {
       if (initialForm.value._id) {
         await updateAuthor(initialForm.value._id, {
-          ...initialForm,
+          ...initialForm.value,
           ...data,
         });
       } else {
@@ -125,7 +125,7 @@ export default defineComponent({
       }
     };
 
-    const onDelete = async (data) => {
+    const onDelete = async (data: Author) => {
       await deleteAuthor(data._id);
       getAuthors();
       if (error.value) {
