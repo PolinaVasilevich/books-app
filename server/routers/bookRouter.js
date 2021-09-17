@@ -5,6 +5,7 @@ const bookController = require("../controllers/bookController");
 const authorController = require("../controllers/authorController");
 const genreController = require("../controllers/genreController");
 const reviewController = require("../controllers/reviewController");
+const libraryController = require("../controllers/libraryController");
 const bookActionsController = require("../controllers/bookActionsController");
 const reservedBooksController = require("../controllers/reservedBooksController");
 const statisticsController = require("../controllers/statisticsController");
@@ -42,6 +43,14 @@ router.post("/review", reviewController.createReview);
 router.put("/updatereview/:id", reviewController.updateReview);
 router.delete("/deletereview/:id", reviewController.deleteReview);
 ////END REVIEW////
+
+////BGN LIBRARY////
+router.get("/libraries", libraryController.getLibraries);
+router.post("/library", libraryController.createLibrary);
+// router.put("/updategenre/:id", genreController.updateGenre);
+// router.delete("/deletegenre/:id", genreController.deleteGenre);
+// router.delete("/deletemanygenres", genreController.deleteManyGenres);
+////END LIBRARY////
 
 ////BGN BOOK ACTIONS////
 router.get("/allbookactions", bookActionsController.getAllBookActions);
