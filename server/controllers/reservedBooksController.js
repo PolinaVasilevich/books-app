@@ -165,6 +165,17 @@ class reservedBooksController {
 
         {
           $lookup: {
+            from: "users",
+            localField: "userAction",
+            foreignField: "_id",
+            as: "userAction",
+          },
+        },
+
+        { $unwind: "$userAction" },
+
+        {
+          $lookup: {
             from: "books",
             localField: "book",
             foreignField: "_id",
@@ -193,6 +204,14 @@ class reservedBooksController {
         { $sort: { last_action: -1 } },
 
         {
+          $project: {
+            _id: 0,
+            items: 1,
+            size_items: { $size: "$items" },
+          },
+        },
+
+        {
           $addFields: {
             data: { $arrayElemAt: ["$items", 0] },
             children: { $slice: ["$items", -1] },
@@ -208,11 +227,12 @@ class reservedBooksController {
 
         {
           $project: {
-            _id: 0,
             data: 1,
             key: 1,
             "children.key": "$data._id",
-            "children.data": 1,
+            "children.data": {
+              $cond: { if: { $gte: ["size_items", 1] }, then: 1, else: 0 },
+            },
           },
         },
       ]);
@@ -285,6 +305,19 @@ class reservedBooksController {
       res
         .status(400)
         .json({ message: `Cannot delete reserved book with id ${id}` });
+    }
+  }
+
+  async getNewReservedBooks(req, res) {
+    try {
+      const reservedBooks = await BookActions.find({
+        isActual: true,
+        status: "Reserved",
+      });
+
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
     }
   }
 }
