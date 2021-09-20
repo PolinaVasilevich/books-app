@@ -48,6 +48,12 @@
             Statistics</router-link
           >
         </my-button>
+
+        <my-button type="button">
+          <router-link class="router-link" to="/admin/adminlibraries">
+            Libraries</router-link
+          >
+        </my-button>
       </div>
     </div>
     <router-view />

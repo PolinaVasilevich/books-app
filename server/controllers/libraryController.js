@@ -4,7 +4,7 @@ const Book = require("../models/Book");
 class libraryController {
   async createLibrary(req, res) {
     try {
-      const { name, address } = req.body;
+      const { name, address, books } = req.body;
       const libraries = await Library.findOne({
         name,
       });
@@ -15,7 +15,7 @@ class libraryController {
           .json({ message: "This library has already been created" });
       }
 
-      const library = new Library({ name, address });
+      const library = new Library({ name, address, books });
       await library.save();
       return res.json({
         message: `Library ${name} has created`,
@@ -28,7 +28,7 @@ class libraryController {
 
   async getLibraries(req, res) {
     try {
-      const library = await Library.find();
+      const library = await Library.find().populate("books.book");
       res.json(library);
     } catch (e) {
       console.log(e);
@@ -48,28 +48,28 @@ class libraryController {
   //   }
   // }
 
-  // async deleteAuthor(req, res) {
-  //   const { id } = req.params;
-  //   try {
-  //     const book = await Book.findOne({
-  //       author: id,
-  //     });
+  async deleteLibrary(req, res) {
+    const { id } = req.params;
+    try {
+      const book = await Book.findOne({
+        author: id,
+      });
 
-  //     if (!book) {
-  //       const author = await Author.findByIdAndDelete({ _id: id });
-  //       return res.json({
-  //         message: `${author.first_name} ${author.last_name} were deleted successfully!`,
-  //       });
-  //     } else {
-  //       return res.status(400).json({
-  //         message: `Author can't be deleted. This entry is linked with ${book.title}!`,
-  //       });
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //     res.status(400).json({ message: `Cannot delete author with id ${id}` });
-  //   }
-  // }
+      if (!book) {
+        const library = await Library.findByIdAndDelete({ _id: id });
+        return res.json({
+          message: `${library.name} were deleted successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `Library can't be deleted. This entry is linked with ${book.title}!`,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot delete library with id ${id}` });
+    }
+  }
 
   // async deleteManyAuthors(req, res) {
   //   try {

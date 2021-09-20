@@ -4,7 +4,6 @@ import store from "@/store";
 import Login from "@/views/Login.vue";
 import Home from "@/views/Home.vue";
 import Registration from "@/views/Registration.vue";
-// import AllBooksPage from "@/views/AllBooksPage.vue";
 import BookPage from "@/views/BookPage.vue";
 
 import UserPage from "@/views/UserPage.vue";
@@ -17,7 +16,7 @@ import AdminUsers from "@/views/Admin/AdminUsers.vue";
 import AdminReservedBooks from "@/views/Admin/AdminReservedBooks.vue";
 import AdminBookActions from "@/views/Admin/AdminBookActions.vue";
 import AdminReviews from "@/views/Admin/AdminReviews.vue";
-
+import AdminLibraries from "@/views/Admin/AdminLibraries.vue";
 import AdminBookPage from "@/views/Admin/AdminBookPage.vue";
 import AdminChart from "@/views/Admin/AdminChart.vue";
 
@@ -122,6 +121,16 @@ const routes = [
         path: "adminchart",
         name: "chart",
         component: AdminChart,
+        meta: {
+          requiresAuth: true,
+          isAdmin: true,
+        },
+      },
+
+      {
+        path: "adminlibraries",
+        name: "libraries",
+        component: AdminLibraries,
         meta: {
           requiresAuth: true,
           isAdmin: true,
