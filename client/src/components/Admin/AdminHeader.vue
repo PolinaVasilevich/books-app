@@ -1,6 +1,6 @@
 <template>
-  <div class="admin-header">
-    <div>
+  <div>
+    <div class="admin-header">
       <div class="admin-header__links">
         <my-button type="button">
           <router-link class="router-link" to="/admin/adminbooks"

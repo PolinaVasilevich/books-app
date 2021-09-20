@@ -1,7 +1,6 @@
 <template>
-  <div>
+  <div class="admin-reserved-books">
     <Toast />
-
     <div class="card">
       <h2>Reserved books</h2>
       <div style="margin: 15px 0">
@@ -24,7 +23,7 @@
           type="button"
           icon="pi pi-plus"
           label="Expand All"
-          @click="expandAll"
+          @click="expandAll(reservedBooks)"
           style="margin-right: 1em"
           class="p-button-text"
         />
@@ -41,29 +40,55 @@
           type="button"
           icon="pi pi-book"
           label="All books"
-          @click="filteredData = null"
-          class="p-button-text"
+          @click="
+            filteredData = null;
+            searchQueryButton = 'all';
+          "
+          :class="[
+            'p-button-text',
+            {
+              'active-search-button':
+                searchQueryButton?.toLowerCase() === 'all',
+            },
+          ]"
         />
 
         <Button
           type="button"
           icon="pi pi-calendar"
           label="Must return today"
-          @click="getBooksWhichMustReturnToday"
-          class="p-button-text"
+          @click="showAllMustReturnTodayBooks"
+          :class="[
+            'p-button-text',
+            {
+              'active-search-button':
+                searchQueryButton?.toLowerCase() === 'returntoday',
+            },
+          ]"
+          :badge="allMustReturnTodayBooks?.length"
+          badgeClass="p-badge-danger"
         />
 
         <Button
           type="button"
           icon="pi pi-calendar"
           label="Not returned"
-          @click="getBooksWhichNotReturned"
-          class="p-button-text"
+          @click="showAllNotReturtedBooks"
+          :class="[
+            'p-button-text',
+            {
+              'active-search-button':
+                searchQueryButton?.toLowerCase() === 'notreturted',
+            },
+          ]"
+          :badge="allNotReturnedBooks?.length"
+          badgeClass="p-badge-danger"
         />
       </div>
 
       <TreeTable
-        :value="searchedItems"
+        v-if="!loading"
+        :value="searchedReservedBooks"
         :expandedKeys="expandedKeys"
         responsiveLayout="scroll"
         sortMode="single"
@@ -75,7 +100,7 @@
           :expander="true"
         >
           <template #body="slotProps">
-            {{ slotProps.node.data.user.username }}
+            {{ slotProps.node.data.userAction.username }}
           </template>
         </Column>
 
@@ -170,7 +195,7 @@
       :text="textDialog"
       :displayConfirmDialog="displayConfirmDialog"
       @hideConfirmDialog="displayConfirmDialog = false"
-      @action="returnBook"
+      @action="onReturnBook"
     />
 
     <Dialog
@@ -211,211 +236,170 @@
 
 <script>
 import moment from "moment";
-import API from "@/utils/api";
+import store from "@/store";
+import { ref, onMounted, computed } from "vue";
+import { mapGetters } from "vuex";
 
-import adminFormMixin from "@/mixins/adminFormMixin.js";
-import dataStore from "@/mixins/dataStore.js";
-import toggle from "@/mixins/toggle.js";
-
+import nodeService from "@/hooks/ReservedBooks/nodeService";
+import useReservedBooks from "@/hooks/ReservedBooks/useReservedBooks";
+import useSearchedReservedBooks from "@/hooks/ReservedBooks/useSearchedReservedBooks";
+import useMessage from "@/hooks/useMessage";
 import ConfirmDialog from "@/components/UI/ConfirmDialog";
 
 export default {
   name: "admin-users",
   components: { ConfirmDialog },
   props: ["reservedBookTitle"],
-  mixins: [toggle, adminFormMixin, dataStore],
 
-  data() {
-    return {
-      moment,
-      dataTable: [],
-      filteredData: null,
-      expandedKeys: {},
-      displayConfirmDialog: false,
-      displayMainDialog: false,
-      textDialog: "",
-      action: "",
-      isExpandAll: false,
-      data: {
-        user: "",
-        book: "",
-        return_date: "",
+  setup() {
+    const data = ref({});
+    const displayConfirmDialog = ref(false);
+    const displayMainDialog = ref(false);
+    const textDialog = ref("");
+    const searchQueryButton = ref("all");
+    const icons = [
+      {
+        status: "Reserved",
+        icon: "pi pi-user",
+        color: "#FF9800",
       },
+      {
+        status: "Received",
+        icon: "pi pi-book",
+        color: "#0288D1",
+      },
+      {
+        status: "Returned",
+        icon: "pi pi-shopping-cart",
+        color: "#FF9800",
+      },
+      {
+        status: "Canceled",
+        icon: "pi pi-times",
+        color: "#D32F2F",
+      },
+    ];
 
-      icons: [
-        {
-          status: "Reserved",
-          icon: "pi pi-user",
-          color: "#FF9800",
-        },
+    const { isExpandAll, expandedKeys, expandAll, collapseAll } = nodeService();
 
-        {
-          status: "Received",
-          icon: "pi pi-book",
-          color: "#0288D1",
-        },
+    const { showErrorMessage, showSuccessfulMessage } = useMessage();
 
-        {
-          status: "Returned",
-          icon: "pi pi-shopping-cart",
-          color: "#FF9800",
-        },
+    const {
+      data: reservedBooks,
+      allMustReturnTodayBooks,
+      allNotReturnedBooks,
+      loading,
+      error,
+      responseMessage,
+      getReservedBooks,
+      giveOutBook,
+      returnBook,
+      getAllNotReturnedBooks,
+      getAllMustReturnTodayBooks,
+    } = useReservedBooks();
 
-        {
-          status: "Canceled",
-          icon: "pi pi-times",
-          color: "#D32F2F",
-        },
-      ],
+    const { searchQuery, searchedReservedBooks, filteredData } =
+      useSearchedReservedBooks(reservedBooks);
+
+    onMounted(() => {
+      getReservedBooks();
+      getAllNotReturnedBooks();
+      getAllMustReturnTodayBooks();
+    });
+
+    const currentUser = computed(() => {
+      return store.getters["login/user"];
+    });
+
+    const showAllNotReturtedBooks = () => {
+      searchQueryButton.value = "notreturted";
+      filteredData.value = [...allNotReturnedBooks.value];
     };
-  },
 
-  methods: {
-    confirmGiveOutBook(book, user, reservation_number) {
-      this.data = {
+    const showAllMustReturnTodayBooks = () => {
+      searchQueryButton.value = "returntoday";
+      filteredData.value = [...allMustReturnTodayBooks.value];
+    };
+
+    const confirmGiveOutBook = (book, user, reservation_number) => {
+      data.value = {
         book,
         user,
         reservation_number,
         return_date: moment(new Date()).format("YYYY-MM-DDTHH:mm"),
       };
-      this.displayMainDialog = true;
-    },
+      displayMainDialog.value = true;
+    };
 
-    onGiveOutBook() {
-      this.displayMainDialog = false;
-      this.giveOutBook();
-    },
+    const confirmReturnBook = (book, user) => {
+      data.value = { book, user };
+      textDialog.value = `return the book ${book.title}`;
+      displayConfirmDialog.value = true;
+    };
 
-    async giveOutBook() {
-      try {
-        await API.post(`/books/giveoutbook`, {
-          book: this.data.book,
-          user: this.data.user,
-          userAction: this.user,
-          reservation_number: this.data.reservation_number,
-          return_date: this.data.return_date,
-        });
+    const onReturnBook = async () => {
+      const { book, user } = data.value;
 
-        this.getDataTable();
-        this.showMessage("Book gave out");
-      } catch (error) {
-        console.log(error);
-        this.getDataTable();
-        this.showErrorMessage(error.response.data.message);
-      }
-    },
-
-    confirmReturnBook(book, user) {
-      this.data = { book, user };
-      this.textDialog = `return the book ${book.title}`;
-      this.displayConfirmDialog = true;
-    },
-
-    async returnBook() {
-      try {
-        await API.post(`/books/returnbook`, {
-          book: this.data.book,
-          user: this.data.user,
-          userAction: this.user,
-        });
-        this.getDataTable();
-        this.showMessage("Book returned");
-      } catch (error) {
-        console.log(error);
-        this.getDataTable();
-        this.showErrorMessage(error.response.data.message);
-      }
-
-      this.displayConfirmDialog = false;
-    },
-
-    async getDataTable() {
-      try {
-        const data = await API.get("/books/modifiedreservedbooks");
-        this.dataTable = data.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
-    expandAll() {
-      for (let node of this.dataTable) {
-        this.expandNode(node);
-      }
-      this.isExpandAll = true;
-
-      this.expandedKeys = { ...this.expandedKeys };
-    },
-
-    collapseAll() {
-      this.expandedKeys = {};
-      this.isExpandAll = false;
-    },
-
-    expandNode(node) {
-      if (node.children && node.children.length) {
-        this.expandedKeys[node.key] = true;
-
-        for (let child of node.children) {
-          this.expandNode(child);
-        }
-      }
-    },
-
-    getBooksWhichNotReturned() {
-      const today = new Date().setHours(0, 0, 0, 0);
-      const booksWhichNotReturned = this.dataTable.filter(
-        (elem) =>
-          elem.data.status === "Received" &&
-          new Date(elem.data.return_date).setHours(0, 0, 0, 0) < today &&
-          new Date(elem.data.return_date).setHours(0, 0, 0, 0) !== today
-      );
-
-      this.filteredData = [...booksWhichNotReturned];
-    },
-
-    getBooksWhichMustReturnToday() {
-      const today = new Date().setHours(0, 0, 0, 0);
-      const booksWhichMustReturnToday = this.dataTable.filter((elem) => {
-        return (
-          elem.data.status === "Received" &&
-          today === new Date(elem.data.return_date).setHours(0, 0, 0, 0)
-        );
+      await returnBook({
+        book,
+        user,
+        userAction: currentUser.value,
       });
 
-      this.filteredData = [...booksWhichMustReturnToday];
-    },
-  },
-
-  computed: {
-    searchedItems() {
-      if (this.filteredData) {
-        return [...this.filteredData];
+      getReservedBooks();
+      displayConfirmDialog.value = false;
+      if (error.value) {
+        showErrorMessage(error.value);
+      } else {
+        showSuccessfulMessage(responseMessage);
       }
-      return this.dataTable.filter((item) => {
-        return (
-          item?.data.book?.title
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item?.user?.username
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item?.data?.reservation_number
-            ?.toLowerCase()
-            ?.includes(this.searchQuery.toLowerCase())
-        );
+    };
+
+    const onGiveOutBook = async () => {
+      const { book, user, reservation_number, return_date } = data.value;
+
+      await giveOutBook({
+        book,
+        user,
+        userAction: currentUser.value,
+        reservation_number,
+        return_date,
       });
-    },
-  },
 
-  created() {
-    this.getDataTable();
-    this.getBooks();
-    this.getUsers();
+      getReservedBooks();
+      displayMainDialog.value = false;
+      if (error.value) {
+        showErrorMessage(error.value);
+      } else {
+        showSuccessfulMessage(responseMessage);
+      }
+    };
 
-    if (this.reservedBookTitle) {
-      this.searchQuery = this.reservedBookTitle;
-    }
+    return {
+      moment,
+      textDialog,
+      data,
+      filteredData,
+      displayConfirmDialog,
+      displayMainDialog,
+      icons,
+      isExpandAll,
+      expandedKeys,
+      expandAll,
+      collapseAll,
+      searchQuery,
+      searchedReservedBooks,
+      reservedBooks,
+      onReturnBook,
+      confirmReturnBook,
+      confirmGiveOutBook,
+      onGiveOutBook,
+      allMustReturnTodayBooks,
+      allNotReturnedBooks,
+      showAllNotReturtedBooks,
+      showAllMustReturnTodayBooks,
+      searchQueryButton,
+    };
   },
 };
 </script>

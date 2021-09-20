@@ -70,10 +70,22 @@ router.get(
   "/return-today-books/:userID",
   bookActionsController.getReturnTodayBooks
 );
+
+router.get(
+  "/all-not-returned-books",
+  bookActionsController.getAllNotReturnedBooks
+);
+
+router.get(
+  "/all-return-today-books",
+  bookActionsController.getAllReturnTodayBooks
+);
+
 ////END BOOK ACTIONS////
 
 ////BGN RESERVED BOOKS////
 router.get("/allreservedbooks", reservedBooksController.getReservedBooks);
+router.get("/new-reserved-books", reservedBooksController.getNewReservedBooks);
 router.get(
   "/modifiedreservedbooks",
   reservedBooksController.getModifiedReservedBooks
