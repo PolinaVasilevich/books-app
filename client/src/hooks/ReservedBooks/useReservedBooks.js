@@ -52,6 +52,19 @@ export default function useReservedBooks() {
     state.loadingMustReturnTodayBooks = loading;
   };
 
+  const getCountNewReservedBooks = async () => {
+    const { response, loading, errorMessage, fetch } = useAxios({
+      method: "GET",
+      url: "books/new-reserved-books",
+    });
+
+    await fetch();
+
+    state.data = response;
+    state.error = errorMessage.value;
+    state.loading = loading;
+  };
+
   const giveOutBook = async (book) => {
     const { response, errorMessage, fetch } = useAxios({
       method: "POST",
@@ -82,6 +95,8 @@ export default function useReservedBooks() {
     returnBook,
     getAllNotReturnedBooks,
     getAllMustReturnTodayBooks,
+    getCountNewReservedBooks,
+
     ...toRefs(state),
   };
 }
