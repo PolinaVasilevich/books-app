@@ -90,6 +90,8 @@ router.get(
   "/modifiedreservedbooks",
   reservedBooksController.getModifiedReservedBooks
 );
+
+router.get("/new-reserved-books", reservedBooksController.getNewReservedBooks);
 router.get("/reservedbooks/:id", reservedBooksController.getUserReservedBooks);
 
 router.put(
