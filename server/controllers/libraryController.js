@@ -71,6 +71,35 @@ class libraryController {
     }
   }
 
+  async addBooksToLibrary(req, res) {
+    const { id } = req.params;
+    try {
+      const library = await Library.findOne({
+        _id: id,
+      });
+
+      if (!library) {
+        return res.status(400).json({
+          message: `Library with id ${id} does not exist!`,
+        });
+      }
+
+      const { books } = req.body;
+
+      await Library.findOneAndUpdate(
+        { _id: id },
+        { books: [...books] },
+        { new: true }
+      );
+      res.json({
+        message: "Book was added successfully",
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400).json({ message: `Cannot add books to library` });
+    }
+  }
+
   // async deleteManyAuthors(req, res) {
   //   try {
   //     const { ids } = req.body;
