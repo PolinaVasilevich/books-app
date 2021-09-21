@@ -347,6 +347,8 @@ export default {
       });
 
       getReservedBooks();
+      getAllNotReturnedBooks();
+      getAllMustReturnTodayBooks();
       displayConfirmDialog.value = false;
       if (error.value) {
         showErrorMessage(error.value);
@@ -367,6 +369,8 @@ export default {
       });
 
       getReservedBooks();
+      getAllNotReturnedBooks();
+      getAllMustReturnTodayBooks();
       displayMainDialog.value = false;
       if (error.value) {
         showErrorMessage(error.value);
