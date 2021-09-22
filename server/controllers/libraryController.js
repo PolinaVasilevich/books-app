@@ -84,16 +84,32 @@ class libraryController {
         });
       }
 
-      const { books } = req.body;
+      const data = req.body;
 
-      await Library.findOneAndUpdate(
-        { _id: id },
-        { books: [...books] },
-        { new: true }
-      );
-      res.json({
-        message: "Book was added successfully",
+      const bookToLibrary = await Library.find({
+        _id: id,
+        "books.book": data.book._id,
       });
+
+      if (bookToLibrary?.length) {
+        await Library.updateOne(
+          { _id: id, "books.book": data.book._id },
+          { $set: { "books.$.count": data.count } }
+        );
+
+        res.json({
+          message: "Book was updated successfully",
+        });
+      } else {
+        await Library.findOneAndUpdate(
+          { _id: id },
+          { $push: { books: data } },
+          { new: true }
+        );
+        res.json({
+          message: "Book was added successfully",
+        });
+      }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot add books to library` });
