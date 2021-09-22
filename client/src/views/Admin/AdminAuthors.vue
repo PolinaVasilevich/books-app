@@ -43,21 +43,24 @@
   </div>
 </template>
 
-<script>
-import AdminTable from "@/components/Admin/AdminTable";
+<script lang="ts">
+import AdminTable from "@/components/Admin/AdminTable.vue";
 
-import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
-import AppLoader from "@/components/AppLoader";
+import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm.vue";
+import AppLoader from "@/components/AppLoader.vue";
 
-import { ref, onMounted } from "vue";
-import useAuthor from "@/hooks/Author/useAuthor";
-import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors";
+import { reactive, ref, Ref, onMounted } from "vue";
+import { defineComponent } from "vue";
+
+import useAuthor from "@/hooks/Author/useAuthor.ts";
+import Author from "@/models/Author";
+import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors.ts";
 import useForm from "@/hooks/useForm";
 
 import useDialog from "@/hooks/useDialog";
 import useMessage from "@/hooks/useMessage";
 
-export default {
+export default defineComponent({
   name: "admin-authors",
 
   components: {
@@ -68,9 +71,9 @@ export default {
 
   setup() {
     const {
-      data: authors,
+      response: authors,
       loading,
-      error,
+      errorMessage: error,
       responseMessage,
       getAuthors,
       updateAuthor,
@@ -82,23 +85,27 @@ export default {
     const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
     const { showErrorMessage, showSuccessfulMessage } = useMessage();
 
-    const initialForm = ref({});
+    let initialForm = ref({
+      _id: "",
+      first_name: "",
+      last_name: "",
+    });
 
     onMounted(() => {
       getAuthors();
     });
 
     const showCreateItemDialog = () => {
-      initialForm.value = { first_name: "", last_name: "" };
+      initialForm.value = { _id: "", first_name: "", last_name: "" };
       showDialog();
     };
 
-    const showEditItemDialog = (value) => {
+    const showEditItemDialog = (value: Author) => {
       initialForm.value = { ...value };
       showDialog();
     };
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: Author) => {
       if (initialForm.value._id) {
         await updateAuthor(initialForm.value._id, {
           ...initialForm.value,
@@ -114,11 +121,11 @@ export default {
       if (error.value) {
         showErrorMessage(error.value);
       } else {
-        showSuccessfulMessage(responseMessage.value);
+        showSuccessfulMessage(responseMessage);
       }
     };
 
-    const onDelete = async (data) => {
+    const onDelete = async (data: Author) => {
       await deleteAuthor(data._id);
       getAuthors();
       if (error.value) {
@@ -142,5 +149,5 @@ export default {
       onDelete,
     };
   },
-};
+});
 </script>
