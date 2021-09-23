@@ -1,6 +1,6 @@
 const Library = require("../models/Library");
 const Book = require("../models/Book");
-
+const mongoose = require("mongoose");
 class libraryController {
   async createLibrary(req, res) {
     try {
@@ -28,8 +28,35 @@ class libraryController {
 
   async getLibraries(req, res) {
     try {
-      const library = await Library.find().populate("books.book");
-      res.json(library);
+      const libraries = await Library.find().populate("books.book");
+
+      res.json(libraries);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  async getLibrariesByBook(req, res) {
+    const { id } = req.params;
+    try {
+      const libraries = await Library.aggregate([
+        { $unwind: "$books" },
+        {
+          $match: {
+            "books.book": new mongoose.Types.ObjectId(id),
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            name: 1,
+            address: 1,
+            book_count: "$books.count",
+          },
+        },
+      ]);
+
+      res.json(libraries);
     } catch (e) {
       console.log(e);
     }

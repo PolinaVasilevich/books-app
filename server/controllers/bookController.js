@@ -64,17 +64,17 @@ class bookController {
         // {
         //   $lookup: {
         //     from: "libraries",
-        //     // let: { bookID: "$_id" },
         //     localField: "libraries",
         //     foreignField: "book._id",
-        //     // pipeline: [
-        //     //   {
-        //     //     $match: {
-        //     //       $expr: { $eq: ["$book._id", "$$bookID"] },
-        //     //     },
-        //     //   },
+        //     as: "libraries",
+        //   },
+        // },
 
-        //     // ],
+        // {
+        //   $lookup: {
+        //     from: "libraries",
+        //     localField: "libraries",
+        //     foreignField: "book._id",
         //     as: "libraries",
         //   },
         // },
@@ -82,22 +82,45 @@ class bookController {
         {
           $lookup: {
             from: "libraries",
-            let: { id: "$_id" },
+            let: { bookId: "$_id" },
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: ["$$id", "$book._id"] },
+                  $expr: {
+                    $in: ["$$bookId", "$books.book"],
+                  },
                 },
               },
-              { $count: "count" },
+              { $unwind: "$books" },
+              { $match: { $expr: { $eq: ["$books.book", "$$bookId"] } } },
+              {
+                $group: {
+                  _id: "$books.book",
+                  count: { $sum: "$books.count" },
+                },
+              },
             ],
-            as: "count",
+            as: "result",
           },
         },
 
-        // { $addFields: {
-        //   "linkCount": { "$sum": "$linkCount.count" }
-        // }}
+        // {
+        //   $set: {
+        //     count: { $first: "$result.count" },
+        //   },
+        // },
+
+        {
+          $set: {
+            count: {
+              $cond: [
+                { $gt: [{ $size: "$result" }, 0] },
+                { $first: "$result.count" },
+                0,
+              ],
+            },
+          },
+        },
       ]);
 
       res.json(books);

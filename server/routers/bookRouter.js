@@ -46,6 +46,7 @@ router.delete("/deletereview/:id", reviewController.deleteReview);
 
 ////BGN LIBRARY////
 router.get("/libraries", libraryController.getLibraries);
+router.get("/libraries-book/:id", libraryController.getLibrariesByBook);
 router.post("/library", libraryController.createLibrary);
 router.put("/library/add-books/:id", libraryController.addBooksToLibrary);
 router.delete("/delete-library/:id", libraryController.deleteLibrary);
