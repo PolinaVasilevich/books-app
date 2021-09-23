@@ -3,7 +3,7 @@ const crypto = require("crypto");
 
 const BookActions = require("../models/BookActions");
 const Book = require("../models/Book");
-const reservedBooksController = require("../controllers/reservedBooksController");
+const Library = require("../models/Library");
 class bookController {
   async getAllBookActions(req, res) {
     try {
@@ -21,11 +21,11 @@ class bookController {
 
   async reserveBook(req, res) {
     try {
-      const { user, book } = req.body;
+      const { user, book, libraryID } = req.body;
 
-      if (!book.count) {
-        return res.status(400).send({ message: "The book is out of stock. " });
-      }
+      // if (!book.count) {
+      //   return res.status(400).send({ message: "The book is out of stock. " });
+      // }
 
       // const reservedBook = await BookActions.findOne({
       //   user: user._id,
@@ -49,18 +49,38 @@ class bookController {
         action_date: Date.now(),
       });
 
-      await Book.findOneAndUpdate(
-        { _id: book._id },
+      // await Book.findOneAndUpdate(
+      //   { _id: book._id },
+      //   {
+      //     $set: {
+      //       count: book.count - 1,
+      //     },
+      //   },
+
+      //   { new: true, useFindAndModify: false }
+      // );
+
+      // await Library.findOneAndUpdate(
+      //   { _id: libraryID, "books.book": book._id },
+      //   {
+      //     $set: {
+      //       count: books.count - 1,
+      //     },
+      //   },
+
+      //   { new: true, useFindAndModify: false }
+      // );
+
+      // await bookAction.save();
+
+      await Library.updateOne(
         {
-          $set: {
-            count: book.count - 1,
-          },
+          _id: libraryID,
+          books: { $elemMatch: { book: book._id } },
         },
 
-        { new: true, useFindAndModify: false }
+        { $inc: { "books.count": -1 } }
       );
-
-      await bookAction.save();
 
       return res.json({
         message: `${bookAction.book.title} has reserved successfully!`,

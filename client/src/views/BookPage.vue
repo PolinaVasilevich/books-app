@@ -71,13 +71,22 @@
               {{ currentBook?.count }} IN STOCK
             </p>
           </div> -->
+          <div>
+            <Dropdown
+              v-model="selectedLibrary"
+              :options="libraries"
+              optionLabel="name"
+              placeholder="Select a library"
+              style="width: 50%"
+            />
+          </div>
 
           <Button
             v-if="!currentBook.count && !isReserved"
             :label="'out of stock'.toUpperCase()"
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
-            :disabled="!currentBook.count || !currentBook.count || isReserved"
+            :disabled="!currentBook.count || isReserved"
             icon="pi pi-book"
             style="margin: 50px 0"
           />
@@ -89,9 +98,11 @@
             :label="'Reserve book'.toUpperCase()"
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
-            :disabled="!currentBook.count || isReserved || isDisabled"
+            :disabled="
+              !currentBook.count || isReserved || isDisabled || !selectedLibrary
+            "
             icon="pi pi-book"
-            style="margin: 50px 0"
+            style="margin: 30px 0"
           />
 
           <Button
@@ -115,9 +126,13 @@
                 >{{ currentBook.genre?.name }}</router-link
               >
             </p>
-            <p class="book-page__content__info__text">
+            <!-- <p class="book-page__content__info__text">
               Count:
               {{ currentBook?.count }}
+            </p> -->
+            <p class="book-page__content__info__text" v-if="selectedLibrary">
+              Count:
+              {{ selectedLibrary?.book_count }}
             </p>
           </div>
           <div class="reviews">
@@ -201,6 +216,8 @@ export default {
   mixins: [toggle, adminFormMixin, dataStore],
   data() {
     return {
+      libraries: [],
+      selectedLibrary: null,
       isReserved: false,
       isDisabled: false,
       isUserReview: false,
@@ -286,6 +303,7 @@ export default {
           await API.post(`books/reservebook`, {
             user: this.user,
             book: this.currentBook,
+            libraryID: this.selectedLibrary._id,
           });
 
           this.isDisabled = true;
@@ -348,10 +366,22 @@ export default {
         this.getReviewsBook();
       }
     },
+
+    async getLibrariesByBook() {
+      try {
+        const data = await API.get(
+          `/books/libraries-book/${this.$route.params.id}`
+        );
+        this.libraries = data.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   created() {
     this.getBooks();
+    this.getLibrariesByBook();
     this.getCurrentBook();
     this.getReviewsBook();
     this.getReservedBooks();
