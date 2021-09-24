@@ -71,35 +71,36 @@
               {{ currentBook?.count }} IN STOCK
             </p>
           </div> -->
-          <div>
+          <div v-if="libraries.length && !isReserved">
             <Dropdown
               v-model="selectedLibrary"
               :options="libraries"
               optionLabel="name"
               placeholder="Select a library"
-              style="width: 50%"
+              style="width: 70%"
+              :disabled="isDisabled"
             />
           </div>
 
           <Button
-            v-if="!currentBook.count && !isReserved"
+            v-if="!libraries.length && !isReserved"
             :label="'out of stock'.toUpperCase()"
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
-            :disabled="!currentBook.count || isReserved"
+            :disabled="!libraries.length || isReserved"
             icon="pi pi-book"
             style="margin: 50px 0"
           />
 
           <Button
             v-if="
-              isLoggedIn && !user.isAdmin && currentBook.count && !isReserved
+              isLoggedIn && !user.isAdmin && libraries.length && !isReserved
             "
             :label="'Reserve book'.toUpperCase()"
             class="p-button-warning"
             @click="onReserveBook(currentBook, user)"
             :disabled="
-              !currentBook.count || isReserved || isDisabled || !selectedLibrary
+              !libraries.length || isReserved || isDisabled || !selectedLibrary
             "
             icon="pi pi-book"
             style="margin: 30px 0"
@@ -109,7 +110,7 @@
             v-if="isLoggedIn && !user.isAdmin && isReserved"
             :label="'You reserved this book'.toUpperCase()"
             class="p-button-warning"
-            :disabled="!currentBook.count || isReserved"
+            :disabled="!libraries.length || isReserved"
             icon="pi pi-book"
             style="margin: 50px 0"
           />
@@ -275,7 +276,7 @@ export default {
             item.book._id === bookID &&
             item.user._id === userID &&
             item.details.filter(
-              (detail) => detail.isActual && detail.status === " Reserved"
+              (detail) => detail.isActual && detail.status === "Reserved"
             )
           );
         });
@@ -309,6 +310,7 @@ export default {
           this.isDisabled = true;
           this.getBooks();
           this.getReservedBooks();
+          this.getLibrariesByBook();
           this.showMessage("Book reserved");
         } catch (error) {
           console.log(error);

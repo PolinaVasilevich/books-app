@@ -6,7 +6,7 @@
   >
     <Toast />
     <div class="admin-form__field-container">
-      <div class="p-float-label">
+      <div class="p-float-label" v-if="!initialForm.library">
         <Dropdown
           id="book"
           v-model="book"
@@ -16,7 +16,7 @@
           placeholder="Select a book"
           required
         />
-        <label for="book">Books</label>
+        <!-- <label for="book">Books</label> -->
       </div>
     </div>
 
@@ -37,12 +37,12 @@
         class="p-button-text btn-form"
         type="submit"
       />
-      <Button
+      <!-- <Button
         label="Reset"
         icon="pi pi-times"
         class="p-button-text btn-form"
         type="reset"
-      />
+      /> -->
     </div>
   </form>
 </template>
@@ -58,22 +58,19 @@ export default defineComponent({
   name: "admin-library-add-book-form",
   props: {
     books: { required: true, type: Object as PropType<Book> },
+    initialForm: { required: true, type: Object as PropType<BookLibrary> },
   },
   emits: ["submitForm"],
 
   setup(props, { emit }) {
-    const form = reactive({
-      book: {},
-      count: null,
-    });
+    const form = reactive({ ...props.initialForm });
 
     const submitForm = () => {
       emit("submitForm", form);
     };
 
     const resetForm = () => {
-      form.book = {};
-      form.count = null;
+      // form.value = { ...props.initialForm };
     };
 
     return { ...toRefs(form), submitForm, resetForm };

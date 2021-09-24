@@ -48,10 +48,9 @@
         class="form-control input"
         type="text"
         placeholder="Enter image"
-        required
       />
 
-      <input
+      <!-- <input
         :value="count"
         @input="$emit('update:count', $event.target.value)"
         class="form-control input"
@@ -59,7 +58,7 @@
         placeholder="Enter count"
         min="0"
         required
-      />
+      /> -->
     </template>
   </admin-form>
 </template>

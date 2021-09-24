@@ -165,7 +165,7 @@
                   slotProps.node.data.book,
                   slotProps.node.data.user,
                   slotProps.node.data.reservation_number,
-                  slotProps.node.data.status
+                  slotProps.node.data?.library
                 )
               "
             />
@@ -181,8 +181,7 @@
                 confirmReturnBook(
                   slotProps.node.data.book,
                   slotProps.node.data.user,
-                  slotProps.node.data.reservation_number,
-                  slotProps.node.data.status
+                  slotProps.node.data?.library
                 )
               "
             />
@@ -321,35 +320,38 @@ export default {
       filteredData.value = [...allMustReturnTodayBooks.value];
     };
 
-    const confirmGiveOutBook = (book, user, reservation_number) => {
+    const confirmGiveOutBook = (book, user, reservation_number, library) => {
       data.value = {
         book,
         user,
         reservation_number,
+        library,
         return_date: moment(new Date()).format("YYYY-MM-DDTHH:mm"),
       };
       displayMainDialog.value = true;
     };
 
-    const confirmReturnBook = (book, user) => {
-      data.value = { book, user };
+    const confirmReturnBook = (book, user, library) => {
+      data.value = { book, user, library };
       textDialog.value = `return the book ${book.title}`;
       displayConfirmDialog.value = true;
     };
 
     const onReturnBook = async () => {
-      const { book, user } = data.value;
+      const { book, user, library } = data.value;
 
       await returnBook({
         book,
         user,
         userAction: currentUser.value,
+        libraryID: library,
       });
 
       getReservedBooks();
       getAllNotReturnedBooks();
       getAllMustReturnTodayBooks();
       displayConfirmDialog.value = false;
+
       if (error.value) {
         showErrorMessage(error.value);
       } else {
@@ -358,7 +360,8 @@ export default {
     };
 
     const onGiveOutBook = async () => {
-      const { book, user, reservation_number, return_date } = data.value;
+      const { book, user, reservation_number, return_date, library } =
+        data.value;
 
       await giveOutBook({
         book,
@@ -366,6 +369,7 @@ export default {
         userAction: currentUser.value,
         reservation_number,
         return_date,
+        libraryID: library,
       });
 
       getReservedBooks();

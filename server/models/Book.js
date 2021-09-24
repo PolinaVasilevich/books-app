@@ -10,7 +10,7 @@ const BookSchema = new Schema({
   author: { type: Schema.ObjectId, ref: "Author", required: true },
   count: {
     type: Number,
-    required: true,
+    default: 0,
   },
   description: { type: String },
   genre: { type: Schema.ObjectId, ref: "Genre" },

@@ -351,9 +351,15 @@ export default {
       if (this.searchQuery) {
         return this.books.filter((book) => {
           return (
-            book.title?.toLowerCase().includes(this.searchQuery) ||
-            book.author.first_name?.toLowerCase().includes(this.searchQuery) ||
-            book.author.last_name?.toLowerCase().includes(this.searchQuery)
+            book.title
+              ?.toLowerCase()
+              .includes(this.searchQuery.toLowerCase()) ||
+            book.author.first_name
+              ?.toLowerCase()
+              .includes(this.searchQuery.toLowerCase()) ||
+            book.author.last_name
+              ?.toLowerCase()
+              .includes(this.searchQuery.toLowerCase())
           );
         });
       } else {

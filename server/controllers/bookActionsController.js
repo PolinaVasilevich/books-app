@@ -44,6 +44,7 @@ class bookController {
         book,
         user,
         userAction: user,
+        library: libraryID,
         reservation_number,
         status: "Reserved",
         action_date: Date.now(),
@@ -60,30 +61,21 @@ class bookController {
       //   { new: true, useFindAndModify: false }
       // );
 
-      // await Library.findOneAndUpdate(
-      //   { _id: libraryID, "books.book": book._id },
-      //   {
-      //     $set: {
-      //       count: books.count - 1,
-      //     },
-      //   },
-
-      //   { new: true, useFindAndModify: false }
-      // );
-
-      // await bookAction.save();
-
       await Library.updateOne(
         {
           _id: libraryID,
-          books: { $elemMatch: { book: book._id } },
+          "books.book": book._id,
         },
 
-        { $inc: { "books.count": -1 } }
+        {
+          $inc: { "books.$.count": -1 },
+        }
       );
 
+      await bookAction.save();
+
       return res.json({
-        message: `${bookAction.book.title} has reserved successfully!`,
+        message: `The book has reserved successfully!`,
       });
     } catch (error) {
       console.log(error);
@@ -93,13 +85,20 @@ class bookController {
 
   async giveOutBook(req, res) {
     try {
-      const { user, book, userAction, return_date, reservation_number } =
-        req.body;
+      const {
+        user,
+        book,
+        userAction,
+        return_date,
+        reservation_number,
+        libraryID,
+      } = req.body;
       const bookAction = new BookActions({
         book,
         user,
         userAction,
         return_date,
+        library: libraryID,
         reservation_number,
         status: "Received",
         action_date: Date.now(),
@@ -108,7 +107,7 @@ class bookController {
       await bookAction.save();
 
       return res.json({
-        message: `${bookAction.book.title} has received successfully!`,
+        message: `${book.title} has received successfully!`,
       });
     } catch (error) {
       console.log(error);
@@ -118,11 +117,12 @@ class bookController {
 
   async returnBook(req, res) {
     try {
-      const { user, book, userAction } = req.body;
+      const { user, book, userAction, libraryID } = req.body;
 
       const bookAction = new BookActions({
         book: book,
         user: user,
+        library: libraryID,
         userAction: userAction,
         status: "Returned",
         isActual: false,
@@ -137,15 +137,26 @@ class bookController {
         }
       );
 
-      await Book.findOneAndUpdate(
-        { _id: book._id },
+      // await Book.findOneAndUpdate(
+      //   { _id: book._id },
+      //   {
+      //     $set: {
+      //       count: book.count + 1,
+      //     },
+      //   },
+
+      //   { new: true, useFindAndModify: false }
+      // );
+
+      await Library.updateOne(
         {
-          $set: {
-            count: book.count + 1,
-          },
+          _id: new mongoose.Types.ObjectId(libraryID),
+          "books.book": book._id,
         },
 
-        { new: true, useFindAndModify: false }
+        {
+          $inc: { "books.$.count": 1 },
+        }
       );
 
       await bookAction.save();
@@ -161,7 +172,7 @@ class bookController {
 
   async cancelBook(req, res) {
     try {
-      const { user, book, userAction } = req.body;
+      const { user, book, userAction, libraryID } = req.body;
 
       const bookAction = new BookActions({
         book,
@@ -180,21 +191,21 @@ class bookController {
         }
       );
 
-      await Book.findOneAndUpdate(
-        { _id: new mongoose.Types.ObjectId(book._id) },
+      await Library.updateOne(
         {
-          $set: {
-            count: book.count + 1,
-          },
+          _id: libraryID,
+          "books.book": book._id,
         },
 
-        { new: true, useFindAndModify: false }
+        {
+          $inc: { "books.$.count": 1 },
+        }
       );
 
       await bookAction.save();
 
       return res.json({
-        message: `${bookAction.book.title} has received successfully!`,
+        message: `${book.title} has received successfully!`,
       });
     } catch (error) {
       console.log(error);

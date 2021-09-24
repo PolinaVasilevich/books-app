@@ -28,7 +28,55 @@ class libraryController {
 
   async getLibraries(req, res) {
     try {
-      const libraries = await Library.find().populate("books.book");
+      const libraries = await Library.aggregate([
+        {
+          $addFields: {
+            books: {
+              $filter: {
+                input: "$books",
+                as: "item",
+                cond: {
+                  $gt: ["$$item.count", 0],
+                },
+              },
+            },
+          },
+        },
+
+        {
+          $addFields: {
+            "books.library": "$_id",
+          },
+        },
+        {
+          $unwind: "$books",
+        },
+        {
+          $lookup: {
+            from: "books",
+            localField: "books.book",
+            foreignField: "_id",
+            as: "books.book",
+          },
+        },
+
+        {
+          $unwind: "$books.book",
+        },
+
+        {
+          $group: {
+            _id: "$_id",
+            name: { $first: "$name" },
+            address: { $first: "$address" },
+            books: {
+              $push: "$books",
+            },
+          },
+        },
+
+        { $sort: { name: 1 } },
+      ]);
 
       res.json(libraries);
     } catch (e) {
@@ -43,12 +91,13 @@ class libraryController {
         {
           $match: {
             "books.book": new mongoose.Types.ObjectId(id),
+            "books.count": { $gt: 0 },
           },
         },
 
         {
           $project: {
-            _id: 0,
+            _id: 1,
             name: 1,
             address: 1,
             book_count: "$books.count",

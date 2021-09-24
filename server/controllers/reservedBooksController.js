@@ -25,6 +25,7 @@ class reservedBooksController {
             user: { $first: "$user" },
             last_action: { $last: "$action_date" },
             reservation_number: { $first: "$reservation_number" },
+            library: { $first: "$library" },
             details: {
               $push: {
                 status: "$status",
@@ -129,6 +130,7 @@ class reservedBooksController {
                 status: "$status",
                 action_date: "$action_date",
                 userAction: "$userAction",
+                library: "$library",
                 reservation_number: "$reservation_number",
                 return_date: "$return_date",
               },

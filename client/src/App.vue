@@ -59,7 +59,7 @@
               ></span
             >
 
-            <span v-if="!isLoggedIn" class="nav-list__item"
+            <!-- <span v-if="!isLoggedIn" class="nav-list__item"
               ><router-link class="header__link header__text" to="/registration"
                 >Register</router-link
               ></span
@@ -70,13 +70,9 @@
               class="nav-list__item header__link header__text"
               @click="openModal"
               >Logout</span
-            >
+            > -->
 
-            <div
-              v-if="isLoggedIn"
-              class="nav-list__item"
-              style="margin-left: 0"
-            >
+            <div v-if="isLoggedIn" class="nav-list__item" style="margin: 0">
               <router-link
                 :to="{
                   name: 'userPage',
@@ -94,11 +90,25 @@
                     p-button-text p-button-text
                     header__text header__text-button
                   "
+                  style="padding-right: 0"
                   :badge="notReturnedBooks?.length"
                   badgeClass="p-badge-danger"
                 />
               </router-link>
             </div>
+
+            <span v-if="!isLoggedIn" class="nav-list__item"
+              ><router-link class="header__link header__text" to="/registration"
+                >Register</router-link
+              ></span
+            >
+
+            <span
+              v-else
+              class="nav-list__item header__link header__text"
+              @click="openModal"
+              >Logout</span
+            >
           </div>
         </div>
       </nav>

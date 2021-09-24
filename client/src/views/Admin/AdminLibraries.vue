@@ -61,10 +61,11 @@
               <Column field="book.title" header="Title" sortable></Column>
               <Column field="count" header="Count" sortable></Column>
               <Column>
-                <template #body>
+                <template #body="slotProps">
                   <Button
                     icon="pi pi-pencil"
                     class="p-button-rounded p-button-warning p-mr-2"
+                    @click="handleEditForm(slotProps.data)"
                   />
                 </template>
               </Column>
@@ -76,13 +77,16 @@
     <div>
       <Dialog
         v-model:visible="displayDialog"
-        header="Library"
+        :header="
+          !initialForm.library ? 'Add a book to library' : `Enter count of book`
+        "
         :modal="true"
         style="width: 40vw"
       >
         <admin-library-book-form
           @submitForm="onAddBookToLibrary"
           :books="books"
+          :initialForm="initialForm"
         />
       </Dialog>
     </div>
@@ -112,6 +116,11 @@ export default {
 
     const expandedRows = ref([]);
     const selectedLibrary = ref(null);
+    const initialForm = ref({
+      book: {},
+      count: null,
+    });
+
     const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
     const { showErrorMessage, showSuccessfulMessage } = useMessage();
     const {
@@ -133,7 +142,17 @@ export default {
     } = useBooks();
 
     const onAddBookToLibrary = async (form) => {
-      await addBookToLibrary(selectedLibrary.value._id, form);
+      if (form.library) {
+        await addBookToLibrary(form.library, {
+          book: { ...form.book },
+          count: form.count,
+        });
+      } else {
+        console.log(form);
+        await addBookToLibrary(selectedLibrary.value._id, form);
+        console.log(form);
+      }
+
       hideDialog();
       getLibraries();
       if (error) {
@@ -144,8 +163,17 @@ export default {
     };
 
     const handleAddBook = (library) => {
+      initialForm.value = {
+        book: {},
+        count: null,
+      };
       showDialog();
       selectedLibrary.value = library;
+    };
+
+    const handleEditForm = (value) => {
+      initialForm.value = { ...value };
+      showDialog();
     };
 
     return {
@@ -157,6 +185,8 @@ export default {
       selectedLibrary,
       handleAddBook,
       onAddBookToLibrary,
+      handleEditForm,
+      initialForm,
     };
   },
 };

@@ -142,7 +142,7 @@
                   />
                 </p>
 
-                <p
+                <!-- <p
                   class="
                     flex-container
                     book-info-text-container
@@ -162,7 +162,7 @@
                     min="1"
                     required
                   />
-                </p>
+                </p> -->
 
                 <router-link
                   :to="{
