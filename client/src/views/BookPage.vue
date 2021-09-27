@@ -289,10 +289,12 @@ export default {
 
     async checkUserReviewBook() {
       try {
-        const userReviews = await API.get(
-          `books/userreviewsbook/${this.$route.params.id}&${this.user._id}`
-        );
-        this.isUserReview = !!userReviews.data.length;
+        if (this.user._id) {
+          const userReviews = await API.get(
+            `books/userreviewsbook/${this.$route.params.id}&${this.user._id}`
+          );
+          this.isUserReview = !!userReviews.data.length;
+        }
       } catch (error) {
         console.log(error);
       }
@@ -387,7 +389,7 @@ export default {
     this.getCurrentBook();
     this.getReviewsBook();
     this.getReservedBooks();
-    this.checkReserveBook(this.currentBook._id, this.user._id);
+    this.checkReserveBook(this.currentBook._id, this.user?._id);
     this.checkUserReviewBook();
   },
 };

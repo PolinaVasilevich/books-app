@@ -49,8 +49,7 @@ import AdminTable from "@/components/Admin/AdminTable.vue";
 import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm.vue";
 import AppLoader from "@/components/AppLoader.vue";
 
-import { reactive, ref, Ref, onMounted } from "vue";
-import { defineComponent } from "vue";
+import { reactive, ref, Ref, onMounted, defineComponent } from "vue";
 
 import useAuthor from "@/hooks/Author/useAuthor.ts";
 import Author from "@/models/Author";

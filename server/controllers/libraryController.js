@@ -1,5 +1,6 @@
 const Library = require("../models/Library");
 const Book = require("../models/Book");
+const BookActions = require("../models/BookActions");
 const mongoose = require("mongoose");
 class libraryController {
   async createLibrary(req, res) {
@@ -42,14 +43,19 @@ class libraryController {
             },
           },
         },
-
         {
           $addFields: {
             "books.library": "$_id",
+            isExpandable: {
+              $cond: [{ $eq: [{ $size: "$books" }, 0] }, false, true],
+            },
           },
         },
         {
-          $unwind: "$books",
+          $unwind: {
+            path: "$books",
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -61,7 +67,10 @@ class libraryController {
         },
 
         {
-          $unwind: "$books.book",
+          $unwind: {
+            path: "$books.book",
+            preserveNullAndEmptyArrays: true,
+          },
         },
 
         {
@@ -69,6 +78,7 @@ class libraryController {
             _id: "$_id",
             name: { $first: "$name" },
             address: { $first: "$address" },
+            isExpandable: { $first: "$isExpandable" },
             books: {
               $push: "$books",
             },
@@ -127,23 +137,73 @@ class libraryController {
   async deleteLibrary(req, res) {
     const { id } = req.params;
     try {
-      const book = await Book.findOne({
-        author: id,
-      });
+      const books = await Library.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(id) },
+        },
+        {
+          $project: {
+            _id: 0,
+            size_books: {
+              $size: "$books",
+            },
+          },
+        },
+      ]);
 
-      if (!book) {
+      if (!books[0].size_books) {
         const library = await Library.findByIdAndDelete({ _id: id });
         return res.json({
           message: `${library.name} were deleted successfully!`,
         });
       } else {
         return res.status(400).json({
-          message: `Library can't be deleted. This entry is linked with ${book.title}!`,
+          message: `Library can't be deleted. This entry is linked with other entries!`,
         });
       }
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: `Cannot delete library with id ${id}` });
+    }
+  }
+
+  async deleteBookLibrary(req, res) {
+    const { libraryid, bookid } = req.params;
+    try {
+      const library = await Library.findOne({
+        _id: libraryid,
+      });
+
+      if (!library) {
+        return res.status(400).json({
+          message: `Library with id ${libraryid} does not exist!`,
+        });
+      }
+
+      const book = await BookActions.findOne({
+        "book._id": bookid,
+        isActual: true,
+      });
+
+      if (!book) {
+        await Library.updateOne(
+          { _id: libraryid },
+          { $pull: { books: { book: bookid } } }
+        );
+
+        return res.json({
+          message: `The book with id ${bookid} were deleted to library successfully!`,
+        });
+      } else {
+        return res.status(400).json({
+          message: `The book with id ${bookid} can't be deleted. This entry is linked with ${book.title}!`,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      res
+        .status(400)
+        .json({ message: `Cannot delete book from library with id ${id}` });
     }
   }
 
@@ -177,7 +237,7 @@ class libraryController {
           message: "Book was updated successfully",
         });
       } else {
-        await Library.findOneAndUpdate(
+        await Library.updateOne(
           { _id: id },
           { $push: { books: data } },
           { new: true }

@@ -50,6 +50,10 @@ router.get("/libraries-book/:id", libraryController.getLibrariesByBook);
 router.post("/library", libraryController.createLibrary);
 router.put("/library/add-books/:id", libraryController.addBooksToLibrary);
 router.delete("/delete-library/:id", libraryController.deleteLibrary);
+router.delete(
+  "/delete-book-library/:libraryid&:bookid",
+  libraryController.deleteBookLibrary
+);
 // router.put("/updategenre/:id", genreController.updateGenre);
 
 // router.delete("/deletemanygenres", genreController.deleteManyGenres);

@@ -37,12 +37,12 @@
         class="p-button-text btn-form"
         type="submit"
       />
-      <!-- <Button
+      <Button
         label="Reset"
         icon="pi pi-times"
         class="p-button-text btn-form"
         type="reset"
-      /> -->
+      />
     </div>
   </form>
 </template>
