@@ -25,15 +25,20 @@ const LibrarySchema = new Schema({
 });
 
 LibrarySchema.pre("save", async function (next) {
-  const loc = await geoCoder.geocode(this.address);
+  const loc = await geoCoder.geocode({
+    postalCode: "220118",
+    city: "Minsk",
+    street: "ул.Восточная",
+  });
+
+  console.log(loc[0]);
 
   this.location = {
     type: "Point",
-    coordinates: [loc[0].latitude, loc[0].longitude],
+    coordinates: [loc[0].longitude, loc[0].latitude],
     formattedAddress: loc[0].formattedAddress,
   };
 
-  this.address = undefined;
   next();
 });
 

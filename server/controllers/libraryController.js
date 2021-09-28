@@ -108,10 +108,21 @@ class libraryController {
         },
 
         {
+          $addFields: {
+            "options.position": {
+              lat: { $arrayElemAt: ["$location.coordinates", 0] },
+              lng: { $arrayElemAt: ["$location.coordinates", 1] },
+            },
+            "options.title": "$name",
+          },
+        },
+
+        {
           $project: {
             _id: 1,
             name: 1,
             address: 1,
+            options: 1,
             book_count: "$books.count",
           },
         },
@@ -211,6 +222,7 @@ class libraryController {
 
   async addBooksToLibrary(req, res) {
     const { id } = req.params;
+
     try {
       const library = await Library.findOne({
         _id: id,
@@ -222,17 +234,17 @@ class libraryController {
         });
       }
 
-      const data = req.body;
+      const { book, count } = req.body;
 
       const bookToLibrary = await Library.find({
         _id: id,
-        "books.book": data.book._id,
+        "books.book": book._id,
       });
 
       if (bookToLibrary?.length) {
         await Library.updateOne(
-          { _id: id, "books.book": data.book._id },
-          { $set: { "books.$.count": data.count } }
+          { _id: id, "books.book": book._id },
+          { $set: { "books.$.count": count } }
         );
 
         res.json({
@@ -241,7 +253,7 @@ class libraryController {
       } else {
         await Library.updateOne(
           { _id: id },
-          { $push: { books: data } },
+          { $push: { books: { book, count } } },
           { new: true }
         );
         res.json({

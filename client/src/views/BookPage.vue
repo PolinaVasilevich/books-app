@@ -1,6 +1,7 @@
 <template>
   <div class="book-page">
     <Toast />
+
     <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
       <div class="mkdf-title-wrapper" style="height: 300px">
         <div class="mkdf-title-inner" style="height: inherit">
@@ -13,6 +14,10 @@
       </div>
     </div>
     <div>
+      <div class="map">
+        <map-loader :mapOptions="libraries" />
+      </div>
+
       <div class="book-page__content">
         <div class="book-page__content__img-container">
           <img
@@ -204,7 +209,7 @@
 
 <script>
 import API from "../utils/api";
-
+import MapLoader from "@/components/MapLoader";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
@@ -213,7 +218,7 @@ import ReviewList from "@/components/Reviews/ReviewList";
 import ConfirmDialog from "@/components/UI/ConfirmDialog";
 
 export default {
-  components: { ReviewList, ConfirmDialog },
+  components: { ReviewList, ConfirmDialog, MapLoader },
   mixins: [toggle, adminFormMixin, dataStore],
   data() {
     return {

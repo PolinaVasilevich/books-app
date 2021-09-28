@@ -169,7 +169,7 @@ export default defineComponent({
     const actionDelete = ref<any>(null);
     const displayConfirmDialog = ref(false);
     const deleteItem = ref<any>(null);
-    const selectedLibrary = ref(null);
+    const selectedLibrary = ref<any>(null);
 
     const initialForm = ref({
       _id: "",
@@ -225,7 +225,7 @@ export default defineComponent({
           count: form.count,
         });
       } else {
-        // await addBookToLibrary(selectedLibrary.value._id, form);
+        await addBookToLibrary(selectedLibrary.value._id, form);
       }
 
       hideDialog();
