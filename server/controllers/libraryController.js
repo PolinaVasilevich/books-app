@@ -2,6 +2,7 @@ const Library = require("../models/Library");
 const Book = require("../models/Book");
 const BookActions = require("../models/BookActions");
 const mongoose = require("mongoose");
+
 class libraryController {
   async createLibrary(req, res) {
     try {
@@ -79,6 +80,7 @@ class libraryController {
             name: { $first: "$name" },
             address: { $first: "$address" },
             isExpandable: { $first: "$isExpandable" },
+            location: { $first: "$location" },
             books: {
               $push: "$books",
             },
