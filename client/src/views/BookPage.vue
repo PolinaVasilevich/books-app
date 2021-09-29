@@ -14,8 +14,72 @@
       </div>
     </div>
     <div>
-      <div class="map">
+      <div class="book__map-wrapper">
         <map-loader :mapOptions="libraries" />
+        <div class="book__libraries-block libraries-block">
+          <div class="libraries-block__libraries">
+            <div class="libraries-block__header">
+              <div class="libraries-block__search-input">
+                <span
+                  class="p-input-icon-left"
+                  style="display: inline-block; width: 100%"
+                >
+                  <i class="pi pi-search" />
+                  <InputText
+                    placeholder="Search..."
+                    v-model="searchQuery"
+                    style="width: 100%"
+                    class="app-text"
+                  />
+                </span>
+              </div>
+            </div>
+            <div class="libraries-block__libraries-list libraries-list">
+              <div class="libraries-list__content custom-scroll">
+                <div class="libraries-list__items">
+                  <div
+                    class="libraries-list__item libraries-item"
+                    v-for="library in libraries"
+                    :key="library.name"
+                  >
+                    <Button
+                      class="p-button-text libraries-item__button"
+                      :label="library.name"
+                    />
+                    <div class="libraries-item__content">
+                      <div class="libraries-item__text item-text">
+                        <i class="pi pi-book item-text__icon"> </i>
+                        <span>Count: {{ library.book_count }}</span>
+                      </div>
+
+                      <Button
+                        class="p-button-text"
+                        :label="library.address"
+                        icon="pi pi-map-marker"
+                      />
+                      <Button
+                        v-if="
+                          isLoggedIn &&
+                          !user.isAdmin &&
+                          libraries.length &&
+                          !isReserved
+                        "
+                        :label="'Reserve book'.toUpperCase()"
+                        class="p-button-warning"
+                        @click="onReserveBook(currentBook, user)"
+                        :disabled="
+                          !libraries.length || isReserved || isDisabled
+                        "
+                        icon="pi pi-book"
+                        style="margin: 10px"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="book-page__content">
@@ -400,4 +464,88 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style lang="scss">
+.custom-scroll::-webkit-scrollbar {
+  width: 12px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #919191;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  min-height: 30px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #fff;
+}
+.book__map-wrapper {
+  height: 676px;
+  margin: 0 auto 64px;
+  max-width: 1366px;
+  position: relative;
+
+  .book__libraries-block {
+    left: 8px;
+    position: absolute;
+    top: 8px;
+
+    .libraries-block__search-input {
+      padding: 10px;
+    }
+
+    .libraries-block__libraries {
+      background-color: #fff;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      height: 660px;
+      margin-right: 8px;
+      width: 380px;
+
+      .libraries-list {
+        display: flex;
+        overflow: hidden;
+
+        .libraries-list__content {
+          overflow-y: auto;
+
+          .libraries-item__button {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+
+            .p-button-label {
+              font-size: 1.2rem;
+              font-weight: bold;
+            }
+          }
+
+          .libraries-item__button:hover {
+            background: none;
+          }
+
+          .libraries-item__content {
+            margin-bottom: 14px;
+            width: 100%;
+
+            .libraries-item__text {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              overflow: hidden;
+              padding-left: 16px;
+              position: relative;
+              text-align: left;
+
+              .item-text__icon {
+                margin-right: 0.5rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>

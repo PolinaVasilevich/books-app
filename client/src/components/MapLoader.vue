@@ -1,8 +1,8 @@
 <template>
   <GoogleMap
     api-key="AIzaSyAfm1nAFdquZWc1I4Srn1_kmc0K-izNh8s"
-    style="width: 100%; height: 500px"
-    :zoom="15"
+    style="width: 100%; height: 700px"
+    :zoom="11"
     :center="center"
   >
     <Marker

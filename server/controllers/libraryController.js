@@ -110,8 +110,8 @@ class libraryController {
         {
           $addFields: {
             "options.position": {
-              lat: { $arrayElemAt: ["$location.coordinates", 0] },
-              lng: { $arrayElemAt: ["$location.coordinates", 1] },
+              lng: { $arrayElemAt: ["$location.coordinates", 0] },
+              lat: { $arrayElemAt: ["$location.coordinates", 1] },
             },
             "options.title": "$name",
           },
