@@ -479,10 +479,11 @@ export default {
 .custom-scroll::-webkit-scrollbar-track {
   background: #fff;
 }
+
 .book__map-wrapper {
   height: 676px;
-  margin: 0 auto 64px;
-  max-width: 1366px;
+  // margin: 0 auto 64px;
+  // max-width: 1366px;
   position: relative;
 
   .book__libraries-block {
