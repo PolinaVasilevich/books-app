@@ -1,46 +1,53 @@
 <template>
-  <GoogleMap
-    api-key="AIzaSyAfm1nAFdquZWc1I4Srn1_kmc0K-izNh8s"
-    style="width: 100%; height: 700px"
-    :zoom="11"
-    :center="center"
+  <GMapMap
+    style="width: 100vw; height: 700px"
+    :zoom="zoomMap"
+    :center="currentPoint"
   >
-    <Marker
+    <GMapMarker
       :key="gmp.name"
       v-for="gmp in mapOptions"
       :options="gmp.options"
-      @click="center = gmp.options"
+      @click="changeCurrentPoint(gmp)"
+      :clickable="true"
+      :draggable="true"
+      :icon="gmp._id === currentLibraryID ? activeIcon : defaultIcon"
     />
-  </GoogleMap>
+  </GMapMap>
 </template>
 
 <script>
 import { defineComponent, ref, onMounted } from "vue";
-import { GoogleMap, Marker } from "vue3-google-map";
 
 export default defineComponent({
   props: {
     mapOptions: { type: Array, required: true },
+    currentPoint: { type: Object },
+    currentLibraryID: { type: [String, Number] },
   },
-  components: { GoogleMap, Marker },
 
-  setup() {
-    const center = ref(null);
+  emits: ["changeCurrentPoint"],
 
-    const setLocationLatLng = () => {
-      navigator.geolocation.getCurrentPosition((geolocation) => {
-        center.value = {
-          lat: geolocation.coords.latitude,
-          lng: geolocation.coords.longitude,
-        };
-      });
+  setup(props, { emit }) {
+    const zoomMap = ref(12);
+
+    const defaultIcon = {
+      url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+      scaledSize: { width: 40, height: 40 },
+      // labelOrigin: { x: 16, y: -10 },
     };
 
-    onMounted(() => {
-      setLocationLatLng();
-    });
+    const activeIcon = {
+      url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+      scaledSize: { width: 45, height: 45 },
+    };
 
-    return { center };
+    const changeCurrentPoint = (point) => {
+      emit("changeCurrentPoint", point);
+      zoomMap.value = 15;
+    };
+
+    return { zoomMap, defaultIcon, activeIcon, changeCurrentPoint };
   },
 });
 </script>

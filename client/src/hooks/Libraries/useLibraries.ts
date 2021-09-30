@@ -25,6 +25,21 @@ export default function useAuthor() {
     state.loading = loading.value;
   };
 
+  const getLibrariesByBook = async (bookID) => {
+    try {
+      const { response, loading, errorMessage, fetch } = useAxios({
+        method: "GET",
+        url: `/books/libraries-book/${bookID}`,
+      });
+      await fetch();
+      state.response = response.value;
+      state.errorMessage = errorMessage.value;
+      state.loading = loading.value;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addLibrary = async (data: Library) => {
     const { responseMessage, errorMessage, fetch } = useAxios({
       method: "POST",
@@ -75,6 +90,7 @@ export default function useAuthor() {
 
   return {
     getLibraries,
+    getLibrariesByBook,
     addBookToLibrary,
     addLibrary,
     deleteBookLibrary,

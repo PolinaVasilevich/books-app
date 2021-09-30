@@ -2,20 +2,21 @@
   <div class="book-page">
     <Toast />
 
-    <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
+    <div v-if="!user.isAdmin" class="mkdf-has-bg-image" data-height="300">
       <div class="mkdf-title-wrapper" style="height: 300px">
         <div class="mkdf-title-inner" style="height: inherit">
-          <div class="mkdf-grid">
-            <!-- <h2 class="mkdf-page-title entry-title" style="color: #ffffff">
-              {{ currentBook.title }}
-            </h2> -->
-          </div>
+          <div class="mkdf-grid"></div>
         </div>
       </div>
     </div>
     <div>
       <div class="book__map-wrapper">
-        <map-loader :mapOptions="libraries" />
+        <map-loader
+          :mapOptions="libraries"
+          :currentPoint="currentPoint"
+          @changeCurrentPoint="setSelectedLibrary"
+          :currentLibraryID="selectedLibrary?._id"
+        />
         <div class="book__libraries-block libraries-block">
           <div class="libraries-block__libraries">
             <div class="libraries-block__header">
@@ -34,17 +35,33 @@
                 </span>
               </div>
             </div>
+
             <div class="libraries-block__libraries-list libraries-list">
               <div class="libraries-list__content custom-scroll">
                 <div class="libraries-list__items">
                   <div
                     class="libraries-list__item libraries-item"
-                    v-for="library in libraries"
+                    :class="{
+                      'libraries-item--selected':
+                        library._id === selectedLibrary?._id,
+                    }"
+                    v-for="(library, i) in libraries"
                     :key="library.name"
+                    :id="library._id"
+                    :ref="
+                      (el) => {
+                        if (el) divs[i] = el;
+                      }
+                    "
                   >
                     <Button
-                      class="p-button-text libraries-item__button"
+                      class="
+                        p-button-text
+                        libraries-item__button
+                        item-button__title
+                      "
                       :label="library.name"
+                      @click="setSelectedLibrary(library)"
                     />
                     <div class="libraries-item__content">
                       <div class="libraries-item__text item-text">
@@ -53,10 +70,16 @@
                       </div>
 
                       <Button
-                        class="p-button-text"
+                        class="
+                          p-button-text
+                          libraries-item__button
+                          item-button__address
+                        "
                         :label="library.address"
                         icon="pi pi-map-marker"
+                        @click="setSelectedLibrary(library)"
                       />
+
                       <Button
                         v-if="
                           isLoggedIn &&
@@ -66,7 +89,7 @@
                         "
                         :label="'Reserve book'.toUpperCase()"
                         class="p-button-warning"
-                        @click="onReserveBook(currentBook, user)"
+                        @click="onReserveBook(library)"
                         :disabled="
                           !libraries.length || isReserved || isDisabled
                         "
@@ -191,20 +214,18 @@
                 style="text-decoration: none"
                 :to="{
                   name: 'books',
-                  params: { bookGenre: currentBook.genre.name },
+                  params: { bookGenre: currentBook.genre?.name },
                 }"
                 >{{ currentBook.genre?.name }}</router-link
               >
             </p>
-            <!-- <p class="book-page__content__info__text">
-              Count:
-              {{ currentBook?.count }}
-            </p> -->
+
             <p class="book-page__content__info__text" v-if="selectedLibrary">
               Count:
               {{ selectedLibrary?.book_count }}
             </p>
           </div>
+
           <div class="reviews">
             <Button
               :label="
@@ -223,7 +244,6 @@
               :items="reviewsBook"
               :currentUser="user"
               typeForm="update"
-              :callback="this.getReviewsBook"
               :bookTitle="currentBook?.title"
               @deleteReview="confirmDelete($event)"
             />
@@ -272,6 +292,15 @@
 </template>
 
 <script>
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useRoute } from "vue-router";
+import useLibraries from "@/hooks/Libraries/useLibraries";
+import useReservedBooks from "@/hooks/ReservedBooks/useReservedBooks";
+import useGeolocation from "@/hooks/useGeolocation";
+import useMessage from "@/hooks/useMessage";
+import useDialog from "@/hooks/useDialog";
+
 import API from "../utils/api";
 import MapLoader from "@/components/MapLoader";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
@@ -283,64 +312,84 @@ import ConfirmDialog from "@/components/UI/ConfirmDialog";
 
 export default {
   components: { ReviewList, ConfirmDialog, MapLoader },
-  mixins: [toggle, adminFormMixin, dataStore],
-  data() {
-    return {
-      libraries: [],
-      selectedLibrary: null,
-      isReserved: false,
-      isDisabled: false,
-      isUserReview: false,
-      editDataFormID: null,
-      displayConfirmDialog: false,
-      review: null,
-      reviewsBook: [],
-      currentBook: {},
-      data: {
-        text: "",
-        rating: 0,
-      },
-    };
-  },
+  mixins: [toggle, adminFormMixin],
 
-  methods: {
-    async getReservedBooks() {
-      try {
-        if (this.user._id) {
-          await this.$store.dispatch(
-            "books/getUserReservedBooks",
-            this.user._id
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
+  setup() {
+    const store = useStore();
+    const route = useRoute();
 
-    getCurrentBook() {
-      const book = this.books.find(
-        (book) => book._id === this.$route.params.id
-      );
+    const reviewsBook = ref([]);
+    const selectedLibrary = ref(null);
+    const activePointMap = ref(null);
+    const review = ref(null);
+    const currentBook = ref({});
+    const editDataFormID = ref(null);
+    const isReserved = ref(false);
+    const isDisabled = ref(false);
+    const isUserReview = ref(false);
+    const displayConfirmDialog = ref(false);
+    const displayModal = ref(false);
+
+    const divs = ref([]);
+    const selectedElem = ref(null);
+    const data = ref({
+      text: "",
+      rating: 0,
+    });
+
+    const {
+      response: libraries,
+      loading,
+      errorMessage,
+      responseMessage,
+      getLibrariesByBook,
+    } = useLibraries();
+
+    const {
+      error: errorMessageReserveBook,
+      responseMessage: responseMessageReserveBook,
+      reserveBook,
+    } = useReservedBooks();
+
+    const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
+    const { showErrorMessage, showSuccessfulMessage } = useMessage();
+
+    const { currentPoint, setCurrentPoint } = useGeolocation();
+
+    const user = computed(() => store.getters["login/user"]);
+    const isLoggedIn = computed(() => store.getters["login/isLoggedIn"]);
+
+    const books = computed(() => store.getters["books/books"]);
+    const reviews = computed(() => store.getters["books/reviews"]);
+    const userReservedBooks = computed(
+      () => store.getters["books/userReservedBooks"]
+    );
+
+    const getBooks = async () => await store.dispatch("books/getBooks");
+    const getReviews = async () => await store.dispatch("books/getReviews");
+    const getUserReservedBooks = async () =>
+      await store.dispatch("books/getUserReservedBooks", user.value._id);
+
+    const getCurrentBook = () => {
+      const book = books.value.find((book) => book._id === route.params.id);
 
       if (book) {
-        this.currentBook = book;
+        currentBook.value = book;
       }
-    },
+    };
 
-    async getReviewsBook() {
+    const getReviewsBook = async () => {
       try {
-        const reviewsBook = await API.get(
-          `books/reviewsBook/${this.$route.params.id}`
-        );
-        this.reviewsBook = reviewsBook.data;
+        const response = await API.get(`books/reviewsBook/${route.params.id}`);
+        reviewsBook.value = response.data;
       } catch (error) {
         console.log(error);
       }
-    },
+    };
 
-    checkReserveBook(bookID, userID) {
+    const checkReserveBook = (bookID, userID) => {
       try {
-        const books = this.userReservedBooks.filter((item) => {
+        const books = userReservedBooks.value.filter((item) => {
           return (
             item.book._id === bookID &&
             item.user._id === userID &&
@@ -350,116 +399,155 @@ export default {
           );
         });
 
-        this.isReserved = !!books.length;
+        isReserved.value = !!books.length;
       } catch (error) {
         console.log(error);
       }
-    },
+    };
 
-    async checkUserReviewBook() {
+    const getUserReviewBook = async () => {
       try {
-        if (this.user._id) {
+        if (user.value._id) {
           const userReviews = await API.get(
-            `books/userreviewsbook/${this.$route.params.id}&${this.user._id}`
+            `books/userreviewsbook/${route.params.id}&${user.value._id}`
           );
-          this.isUserReview = !!userReviews.data.length;
+          isUserReview.value = !!userReviews.data.length;
         }
       } catch (error) {
         console.log(error);
       }
-    },
+    };
 
-    async onReserveBook() {
-      if (this.currentBook.count) {
-        try {
-          await API.post(`books/reservebook`, {
-            user: this.user,
-            book: this.currentBook,
-            libraryID: this.selectedLibrary._id,
-          });
+    const onReserveBook = async (library) => {
+      if (currentBook.value.count) {
+        await reserveBook({
+          book: currentBook.value,
+          user: user.value,
+          libraryID: library._id,
+        });
 
-          this.isDisabled = true;
-          this.getBooks();
-          this.getReservedBooks();
-          this.getLibrariesByBook();
-          this.showMessage("Book reserved");
-        } catch (error) {
-          console.log(error);
-          this.getBooks();
-          this.getReservedBooks();
-          this.showErrorMessage(error.response.data.message);
+        isDisabled.value = true;
+        displayConfirmDialog.value = false;
+
+        getBooks();
+        getUserReservedBooks();
+        getLibrariesByBook(route.params.id);
+
+        console.log(responseMessageReserveBook.value);
+
+        if (errorMessageReserveBook.value) {
+          showErrorMessage(errorMessageReserveBook.value);
+        } else {
+          showSuccessfulMessage(responseMessageReserveBook);
         }
       }
-    },
+    };
 
-    async saveReview() {
+    const saveReview = async () => {
       try {
         await API.post("books/review", {
-          ...this.data,
-          book: this.currentBook,
-          user: this.user,
+          ...data.value,
+          book: currentBook.value,
+          user: user.value,
         });
-        this.getBooks();
-        this.getReviewsBook();
-        this.isUserReview = true;
-        this.showMessage("Your review added");
+        getBooks();
+        getReviewsBook();
+        isUserReview.value = true;
+
+        showSuccessfulMessage("Your review added");
       } catch (error) {
         console.log(error);
-        this.showErrorMessage(error.response.data.message);
-        this.getBooks();
-        this.getReviewsBook();
+        showErrorMessage(error.response.data.message);
+        getBooks();
+        getReviewsBook();
       }
-    },
+    };
 
-    onSave() {
-      this.saveReview();
-      this.resetForm();
-      this.closeModal();
-    },
+    const onSave = () => {
+      saveReview();
+      resetForm();
+      displayModal.value = false;
+    };
 
-    resetForm() {
-      this.data.text = "";
-      this.data.rating = 0;
-    },
+    const resetForm = () => {
+      data.value.text = "";
+      data.value.rating = 0;
+    };
 
-    confirmDelete(review) {
-      this.displayConfirmDialog = true;
-      this.review = review;
-    },
+    const confirmDelete = (reviewID) => {
+      displayConfirmDialog.value = true;
+      review.value = reviewID;
+    };
 
-    async onDeleteReview() {
-      this.displayConfirmDialog = false;
+    const onDeleteReview = async () => {
+      displayConfirmDialog.value = false;
+
       try {
-        await API.delete(`/books/deletereview/${this.review}`);
-        this.getReviewsBook();
-        this.showMessage(`Review with id ${this.review} deleted`);
+        await API.delete(`/books/deletereview/${review.value}`);
+        getReviewsBook();
+        showSuccessfulMessage(`Review with id ${review.value} deleted`);
       } catch (error) {
         console.log(error);
-        this.showErrorMessage(error.response.data.message);
-        this.getReviewsBook();
+        showErrorMessage(error.response.data.message);
+        getReviewsBook();
       }
-    },
+    };
 
-    async getLibrariesByBook() {
-      try {
-        const data = await API.get(
-          `/books/libraries-book/${this.$route.params.id}`
-        );
-        this.libraries = data.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-  },
+    const setSelectedLibrary = (library) => {
+      setCurrentPoint(library.options.position);
+      selectedLibrary.value = { ...library };
 
-  created() {
-    this.getBooks();
-    this.getLibrariesByBook();
-    this.getCurrentBook();
-    this.getReviewsBook();
-    this.getReservedBooks();
-    this.checkReserveBook(this.currentBook._id, this.user?._id);
-    this.checkUserReviewBook();
+      // divs.value.forEach((item) => {
+      //   if (item.id === library._id) {
+      //     selectedElem.value = item;
+      //   }
+      // });
+
+      // if (selectedElem.value) {
+      //   selectedElem.value.scrollTop();
+      // }
+    };
+
+    onMounted(async () => {
+      getBooks();
+      getReviews();
+      getUserReservedBooks();
+
+      getLibrariesByBook(route.params.id);
+      getCurrentBook();
+      checkReserveBook(currentBook.value._id, user.value?._id);
+      getUserReviewBook();
+      getReviewsBook();
+    });
+
+    return {
+      books,
+      reviews,
+      userReservedBooks,
+      libraries,
+      isLoggedIn,
+      user,
+      selectedLibrary,
+      activePointMap,
+      isReserved,
+      isDisabled,
+      isUserReview,
+      editDataFormID,
+      displayConfirmDialog,
+      review,
+      reviewsBook,
+      currentBook,
+      data,
+      onReserveBook,
+      confirmDelete,
+      onDeleteReview,
+      saveReview,
+      onSave,
+      displayModal,
+      currentPoint,
+      setSelectedLibrary,
+      divs,
+    };
   },
 };
 </script>
@@ -482,8 +570,6 @@ export default {
 
 .book__map-wrapper {
   height: 676px;
-  // margin: 0 auto 64px;
-  // max-width: 1366px;
   position: relative;
 
   .book__libraries-block {
@@ -508,17 +594,39 @@ export default {
         display: flex;
         overflow: hidden;
 
+        .libraries-item {
+          margin: 10px;
+          align-items: flex-start;
+          border-radius: 4px;
+          padding: 5px;
+          transition: 0.2s ease;
+        }
+
+        .libraries-item--selected {
+          background-color: #dde7ff;
+        }
+
         .libraries-list__content {
+          width: 100%;
           overflow-y: auto;
 
           .libraries-item__button {
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
+          }
 
+          .item-button__title {
             .p-button-label {
               font-size: 1.2rem;
               font-weight: bold;
+            }
+          }
+
+          .item-button__address:hover {
+            .p-button-label,
+            .p-button-icon {
+              color: #d32f2f;
             }
           }
 

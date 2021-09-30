@@ -48,7 +48,7 @@
             <span v-if="isLoggedIn && !user.isAdmin" class="nav-list__item"
               ><router-link
                 class="header__link header__text"
-                :to="{ name: 'userPage', params: { id: user._id } }"
+                :to="{ name: 'userPage', params: { id: user?._id } }"
                 >My books</router-link
               ></span
             >
@@ -77,7 +77,7 @@
                 :to="{
                   name: 'userPage',
                   params: {
-                    id: user._id,
+                    id: user?._id,
                     notReturned: !!notReturnedBooks?.length,
                   },
                 }"

@@ -89,10 +89,23 @@ export default function useReservedBooks() {
     state.error = errorMessage.value;
   };
 
+  const reserveBook = async (data) => {
+    const { response, errorMessage, fetch } = useAxios({
+      method: "POST",
+      url: "books/reservebook",
+      data,
+    });
+
+    await fetch();
+    state.responseMessage = response.value?.message;
+    state.error = errorMessage.value;
+  };
+
   return {
     getReservedBooks,
     giveOutBook,
     returnBook,
+    reserveBook,
     getAllNotReturnedBooks,
     getAllMustReturnTodayBooks,
     getCountNewReservedBooks,
