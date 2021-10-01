@@ -44,7 +44,7 @@ export default defineComponent({
 
     const changeCurrentPoint = (point) => {
       emit("changeCurrentPoint", point);
-      zoomMap.value = 15;
+      zoomMap.value = 13;
     };
 
     return { zoomMap, defaultIcon, activeIcon, changeCurrentPoint };

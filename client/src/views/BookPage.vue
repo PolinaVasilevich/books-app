@@ -334,7 +334,7 @@
                   :id="library._id"
                   :ref="
                     (el) => {
-                      if (el) divs[i] = el;
+                      if (el) listRefs[i] = el;
                     }
                   "
                 >
@@ -389,7 +389,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watchEffect } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import useLibraries from "@/hooks/Libraries/useLibraries";
@@ -430,7 +430,7 @@ export default {
     const displayConfirmReserveDialog = ref(false);
     const displayModal = ref(false);
 
-    const divs = ref([]);
+    const listRefs = ref([]);
     const selectedElem = ref(null);
     const data = ref({
       text: "",
@@ -602,20 +602,30 @@ export default {
       setCurrentPoint(library.options.position);
       selectedLibrary.value = { ...library };
 
-      // divs.value.forEach((item) => {
+      /////
+      // listRefs.value.forEach((item) => {
       //   if (item.id === library._id) {
       //     selectedElem.value = item;
       //   }
       // });
 
       // if (selectedElem.value) {
-      //   selectedElem.value.scrollTop();
+      //   selectedElem.value.scrollIntoView({
+      //     block: "start",
+      //     behavior: "smooth",
+      //   });
       // }
+
+      ////
     };
 
     const scrollToMap = () => {
       map.value.scrollIntoView();
     };
+
+    watchEffect(() => {
+      setCurrentPoint(selectedLibrary.value?.options.position);
+    });
 
     onMounted(async () => {
       getBooks();
@@ -655,7 +665,7 @@ export default {
       displayModal,
       currentPoint,
       setSelectedLibrary,
-      divs,
+      listRefs,
       map,
       scrollToMap,
       displayConfirmReserveDialog,
