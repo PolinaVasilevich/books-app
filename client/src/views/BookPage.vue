@@ -10,101 +10,6 @@
       </div>
     </div>
     <div>
-      <div class="book__map-wrapper">
-        <map-loader
-          :mapOptions="libraries"
-          :currentPoint="currentPoint"
-          @changeCurrentPoint="setSelectedLibrary"
-          :currentLibraryID="selectedLibrary?._id"
-        />
-        <div class="book__libraries-block libraries-block">
-          <div class="libraries-block__libraries">
-            <div class="libraries-block__header">
-              <div class="libraries-block__search-input">
-                <span
-                  class="p-input-icon-left"
-                  style="display: inline-block; width: 100%"
-                >
-                  <i class="pi pi-search" />
-                  <InputText
-                    placeholder="Search..."
-                    v-model="searchQuery"
-                    style="width: 100%"
-                    class="app-text"
-                  />
-                </span>
-              </div>
-            </div>
-
-            <div class="libraries-block__libraries-list libraries-list">
-              <div class="libraries-list__content custom-scroll">
-                <div class="libraries-list__items">
-                  <div
-                    class="libraries-list__item libraries-item"
-                    :class="{
-                      'libraries-item--selected':
-                        library._id === selectedLibrary?._id,
-                    }"
-                    v-for="(library, i) in libraries"
-                    :key="library.name"
-                    :id="library._id"
-                    :ref="
-                      (el) => {
-                        if (el) divs[i] = el;
-                      }
-                    "
-                  >
-                    <Button
-                      class="
-                        p-button-text
-                        libraries-item__button
-                        item-button__title
-                      "
-                      :label="library.name"
-                      @click="setSelectedLibrary(library)"
-                    />
-                    <div class="libraries-item__content">
-                      <div class="libraries-item__text item-text">
-                        <i class="pi pi-book item-text__icon"> </i>
-                        <span>Count: {{ library.book_count }}</span>
-                      </div>
-
-                      <Button
-                        class="
-                          p-button-text
-                          libraries-item__button
-                          item-button__address
-                        "
-                        :label="library.address"
-                        icon="pi pi-map-marker"
-                        @click="setSelectedLibrary(library)"
-                      />
-
-                      <Button
-                        v-if="
-                          isLoggedIn &&
-                          !user.isAdmin &&
-                          libraries.length &&
-                          !isReserved
-                        "
-                        :label="'Reserve book'.toUpperCase()"
-                        class="p-button-warning"
-                        @click="onReserveBook(library)"
-                        :disabled="
-                          !libraries.length || isReserved || isDisabled
-                        "
-                        icon="pi pi-book"
-                        style="margin: 10px"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="book-page__content">
         <div class="book-page__content__img-container">
           <img
@@ -163,7 +68,7 @@
               {{ currentBook?.count }} IN STOCK
             </p>
           </div> -->
-          <div v-if="libraries.length && !isReserved">
+          <!-- <div v-if="libraries.length && !isReserved">
             <Dropdown
               v-model="selectedLibrary"
               :options="libraries"
@@ -205,10 +110,10 @@
             :disabled="!libraries.length || isReserved"
             icon="pi pi-book"
             style="margin: 50px 0"
-          />
+          /> -->
 
           <div>
-            <p class="book-page__content__info__text">
+            <p class="book-page__content__info__text" style="font-size: 1.2rem">
               Genre:
               <router-link
                 style="text-decoration: none"
@@ -220,11 +125,92 @@
               >
             </p>
 
-            <p class="book-page__content__info__text" v-if="selectedLibrary">
+            <!-- <p class="book-page__content__info__text" v-if="selectedLibrary">
               Count:
               {{ selectedLibrary?.book_count }}
-            </p>
+            </p> -->
           </div>
+
+          <Button
+            v-if="!libraries.length && !isReserved"
+            :label="'out of stock'.toUpperCase()"
+            class="p-button-warning"
+            :disabled="!libraries.length || isReserved"
+            icon="pi pi-book"
+            style="margin: 20px 0"
+          />
+
+          <!-- <Button
+            v-if="
+              isLoggedIn && !user.isAdmin && libraries.length && !isReserved
+            "
+            :label="'Reserve book'.toUpperCase()"
+            class="p-button-warning"
+            @click="onReserveBook(currentBook, user)"
+            :disabled="
+              !libraries.length || isReserved || isDisabled || !selectedLibrary
+            "
+            icon="pi pi-book"
+            style="margin: 20px 0"
+          /> -->
+
+          <div
+            v-if="libraries.length && !isReserved"
+            style="margin-top: 10px"
+            class="select-library"
+          >
+            <Dropdown
+              v-model="selectedLibrary"
+              :options="libraries"
+              optionLabel="name"
+              placeholder="Select a library"
+              style="width: 70%"
+              :disabled="isDisabled"
+            />
+          </div>
+
+          <Button
+            v-if="
+              isLoggedIn && !user.isAdmin && libraries.length && !isReserved
+            "
+            :label="'Reserve book'.toUpperCase()"
+            class="p-button-warning select-library-button"
+            :disabled="!libraries.length || isReserved || isDisabled"
+            style="margin: 20px 0"
+            ref="scrollToMapButton"
+            icon="pi pi-book"
+            @click="scrollToMap"
+          />
+
+          <Button
+            v-if="
+              isLoggedIn && !user.isAdmin && libraries.length && !isReserved
+            "
+            :label="'Reserve book'.toUpperCase()"
+            class="p-button-warning select-library"
+            :disabled="!libraries.length || isReserved || isDisabled"
+            style="margin: 20px 0"
+            icon="pi pi-book"
+            @click="confirmReserveBook(library)"
+          />
+
+          <Button
+            v-if="isLoggedIn && !user.isAdmin && isReserved"
+            :label="'You reserved this book'.toUpperCase()"
+            class="p-button-warning"
+            :disabled="!libraries.length || isReserved"
+            icon="pi pi-book"
+            style="margin: 20px 0"
+          />
+
+          <map-loader
+            style="margin-left: -12.5%"
+            class="select-library"
+            :mapOptions="searchedLibraries"
+            :currentPoint="currentPoint"
+            @changeCurrentPoint="setSelectedLibrary"
+            :currentLibraryID="selectedLibrary?._id"
+          />
 
           <div class="reviews">
             <Button
@@ -252,6 +238,13 @@
               :displayConfirmDialog="displayConfirmDialog"
               @hideConfirmDialog="displayConfirmDialog = false"
               @action="onDeleteReview"
+            />
+
+            <confirm-dialog
+              text="reserve this book"
+              :displayConfirmDialog="displayConfirmReserveDialog"
+              @hideConfirmDialog="displayConfirmReserveDialog = false"
+              @action="onReserveBook"
             />
 
             <Dialog
@@ -288,6 +281,110 @@
         </div>
       </div>
     </div>
+    <h2
+      class="select-library-title"
+      ref="map"
+      style="
+        margin: 30px 0 30px;
+        padding-left: 10%;
+        font-size: 2rem;
+        font-weight: bold;
+      "
+    >
+      Select a library
+    </h2>
+    <div class="book__map-wrapper">
+      <map-loader
+        :mapOptions="searchedLibraries"
+        :currentPoint="currentPoint"
+        @changeCurrentPoint="setSelectedLibrary"
+        :currentLibraryID="selectedLibrary?._id"
+      />
+
+      <div class="book__libraries-block libraries-block">
+        <div class="libraries-block__libraries">
+          <div class="libraries-block__header">
+            <div class="libraries-block__search-input">
+              <span
+                class="p-input-icon-left"
+                style="display: inline-block; width: 100%"
+              >
+                <i class="pi pi-search" />
+                <InputText
+                  placeholder="Search..."
+                  v-model="searchQuery"
+                  style="width: 100%"
+                  class="app-text"
+                />
+              </span>
+            </div>
+          </div>
+
+          <div class="libraries-block__libraries-list libraries-list">
+            <div class="libraries-list__content custom-scroll">
+              <div class="libraries-list__items">
+                <div
+                  class="libraries-list__item libraries-item"
+                  :class="{
+                    'libraries-item--selected':
+                      library._id === selectedLibrary?._id,
+                  }"
+                  v-for="(library, i) in searchedLibraries"
+                  :key="library.name"
+                  :id="library._id"
+                  :ref="
+                    (el) => {
+                      if (el) divs[i] = el;
+                    }
+                  "
+                >
+                  <Button
+                    class="
+                      p-button-text
+                      libraries-item__button
+                      item-button__title
+                    "
+                    :label="library.name"
+                    @click="setSelectedLibrary(library)"
+                  />
+                  <div class="libraries-item__content">
+                    <div class="libraries-item__text item-text">
+                      <i class="pi pi-book item-text__icon"> </i>
+                      <span>Count: {{ library.book_count }}</span>
+                    </div>
+
+                    <Button
+                      class="
+                        p-button-text
+                        libraries-item__button
+                        item-button__address
+                      "
+                      :label="library.address"
+                      icon="pi pi-map-marker"
+                      @click="setSelectedLibrary(library)"
+                    />
+
+                    <Button
+                      v-if="
+                        isLoggedIn &&
+                        !user.isAdmin &&
+                        libraries.length &&
+                        !isReserved
+                      "
+                      :label="'Reserve book'.toUpperCase()"
+                      class="p-button-warning"
+                      @click="confirmReserveBook(library)"
+                      :disabled="!libraries.length || isReserved || isDisabled"
+                      style="margin: 10px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -296,6 +393,7 @@ import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import useLibraries from "@/hooks/Libraries/useLibraries";
+import useSearchedLibraries from "@/hooks/Libraries/useSearchedLibraries";
 import useReservedBooks from "@/hooks/ReservedBooks/useReservedBooks";
 import useGeolocation from "@/hooks/useGeolocation";
 import useMessage from "@/hooks/useMessage";
@@ -304,7 +402,6 @@ import useDialog from "@/hooks/useDialog";
 import API from "../utils/api";
 import MapLoader from "@/components/MapLoader";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
-import dataStore from "@/mixins/dataStore.js";
 import toggle from "@/mixins/toggle.js";
 
 import ReviewList from "@/components/Reviews/ReviewList";
@@ -315,6 +412,8 @@ export default {
   mixins: [toggle, adminFormMixin],
 
   setup() {
+    const map = ref(null);
+
     const store = useStore();
     const route = useRoute();
 
@@ -328,6 +427,7 @@ export default {
     const isDisabled = ref(false);
     const isUserReview = ref(false);
     const displayConfirmDialog = ref(false);
+    const displayConfirmReserveDialog = ref(false);
     const displayModal = ref(false);
 
     const divs = ref([]);
@@ -344,6 +444,8 @@ export default {
       responseMessage,
       getLibrariesByBook,
     } = useLibraries();
+
+    const { searchQuery, searchedLibraries } = useSearchedLibraries(libraries);
 
     const {
       error: errorMessageReserveBook,
@@ -418,22 +520,20 @@ export default {
       }
     };
 
-    const onReserveBook = async (library) => {
+    const onReserveBook = async () => {
       if (currentBook.value.count) {
         await reserveBook({
           book: currentBook.value,
           user: user.value,
-          libraryID: library._id,
+          libraryID: selectedLibrary.value._id,
         });
 
         isDisabled.value = true;
-        displayConfirmDialog.value = false;
+        displayConfirmReserveDialog.value = false;
 
         getBooks();
         getUserReservedBooks();
         getLibrariesByBook(route.params.id);
-
-        console.log(responseMessageReserveBook.value);
 
         if (errorMessageReserveBook.value) {
           showErrorMessage(errorMessageReserveBook.value);
@@ -441,6 +541,11 @@ export default {
           showSuccessfulMessage(responseMessageReserveBook);
         }
       }
+    };
+
+    const confirmReserveBook = (library) => {
+      displayConfirmReserveDialog.value = true;
+      selectedLibrary.value = { ...library };
     };
 
     const saveReview = async () => {
@@ -508,6 +613,10 @@ export default {
       // }
     };
 
+    const scrollToMap = () => {
+      map.value.scrollIntoView();
+    };
+
     onMounted(async () => {
       getBooks();
       getReviews();
@@ -547,6 +656,12 @@ export default {
       currentPoint,
       setSelectedLibrary,
       divs,
+      map,
+      scrollToMap,
+      displayConfirmReserveDialog,
+      confirmReserveBook,
+      searchQuery,
+      searchedLibraries,
     };
   },
 };
@@ -568,8 +683,13 @@ export default {
   background: #fff;
 }
 
+.select-library {
+  display: none !important;
+}
+
 .book__map-wrapper {
-  height: 676px;
+  margin-top: 30px;
+  // height: 700px;
   position: relative;
 
   .book__libraries-block {
@@ -588,7 +708,7 @@ export default {
       flex-direction: column;
       height: 660px;
       margin-right: 8px;
-      width: 380px;
+      width: 360px;
 
       .libraries-list {
         display: flex;
@@ -598,7 +718,7 @@ export default {
           margin: 10px;
           align-items: flex-start;
           border-radius: 4px;
-          padding: 5px;
+          // padding: 5px;
           transition: 0.2s ease;
         }
 
@@ -641,7 +761,7 @@ export default {
             .libraries-item__text {
               display: flex;
               justify-content: flex-start;
-              align-items: center;
+              // align-items: center;
               overflow: hidden;
               padding-left: 16px;
               position: relative;
@@ -655,6 +775,18 @@ export default {
         }
       }
     }
+  }
+}
+
+@media screen and (max-width: 756px) {
+  .select-library {
+    display: block !important;
+  }
+
+  .book__map-wrapper,
+  .select-library-title,
+  .select-library-button {
+    display: none !important;
   }
 }
 </style>
