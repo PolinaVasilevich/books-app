@@ -1,14 +1,16 @@
 import { onMounted, ref } from "vue";
 
 export default function useGeolocation() {
-  const currentPoint = ref({});
+  const currentPoint = ref({ lat: 51.093048, lng: 6.84212 });
 
   const setLocationLatLng = () => {
     navigator.geolocation.getCurrentPosition((geolocation) => {
-      currentPoint.value = {
-        lat: geolocation.coords.latitude,
-        lng: geolocation.coords.longitude,
-      };
+      if (geolocation) {
+        currentPoint.value = {
+          lat: geolocation.coords.latitude,
+          lng: geolocation.coords.longitude,
+        };
+      }
     });
   };
 

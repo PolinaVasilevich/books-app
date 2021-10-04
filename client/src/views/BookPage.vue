@@ -623,15 +623,14 @@ export default {
       map.value.scrollIntoView();
     };
 
-    watchEffect(() => {
-      setCurrentPoint(selectedLibrary.value?.options.position);
-    });
+    // watchEffect(() => {
+    //   setCurrentPoint(selectedLibrary.value?.options.position);
+    // });
 
     onMounted(async () => {
       getBooks();
       getReviews();
       getUserReservedBooks();
-
       getLibrariesByBook(route.params.id);
       getCurrentBook();
       checkReserveBook(currentBook.value._id, user.value?._id);
