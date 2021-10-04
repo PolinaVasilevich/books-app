@@ -5,13 +5,13 @@
     :center="currentPoint"
   >
     <GMapMarker
-      :key="gmp.name"
-      v-for="gmp in mapOptions"
-      :options="gmp.options"
-      @click="changeCurrentPoint(gmp)"
+      :key="m.name"
+      v-for="m in markers"
+      :options="m.options"
+      @click="changeCurrentPoint(m)"
       :clickable="true"
       :draggable="true"
-      :icon="gmp._id === currentLibraryID ? activeIcon : defaultIcon"
+      :icon="m._id === currentLibraryID ? activeIcon : defaultIcon"
     />
   </GMapMap>
 </template>
@@ -21,7 +21,7 @@ import { defineComponent, ref, onMounted } from "vue";
 
 export default defineComponent({
   props: {
-    mapOptions: { type: Array, required: true },
+    markers: { type: Array, required: true },
     currentPoint: { type: Object },
     currentLibraryID: { type: [String, Number] },
   },

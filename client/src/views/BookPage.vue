@@ -203,10 +203,10 @@
             style="margin: 20px 0"
           />
 
-          <map-loader
+          <Map
             style="margin-left: -12.5%"
             class="select-library"
-            :mapOptions="searchedLibraries"
+            :markers="searchedLibraries"
             :currentPoint="currentPoint"
             @changeCurrentPoint="setSelectedLibrary"
             :currentLibraryID="selectedLibrary?._id"
@@ -294,8 +294,8 @@
       Select a library
     </h2>
     <div class="book__map-wrapper">
-      <map-loader
-        :mapOptions="searchedLibraries"
+      <Map
+        :markers="searchedLibraries"
         :currentPoint="currentPoint"
         @changeCurrentPoint="setSelectedLibrary"
         :currentLibraryID="selectedLibrary?._id"
@@ -388,8 +388,8 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted, computed, watchEffect } from "vue";
+<script lang="ts">
+import { ref, onMounted, computed, watchEffect, defineComponent } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import useLibraries from "@/hooks/Libraries/useLibraries";
@@ -400,28 +400,36 @@ import useMessage from "@/hooks/useMessage";
 import useDialog from "@/hooks/useDialog";
 
 import API from "../utils/api";
-import MapLoader from "@/components/MapLoader";
+import Map from "@/components/Map.vue";
 import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
-import ReviewList from "@/components/Reviews/ReviewList";
-import ConfirmDialog from "@/components/UI/ConfirmDialog";
+import ReviewList from "@/components/Reviews/ReviewList.vue";
+import ConfirmDialog from "@/components/UI/ConfirmDialog.vue";
 
-export default {
-  components: { ReviewList, ConfirmDialog, MapLoader },
+import Book from "@/models/Book";
+import Library from "@/models/Library";
+
+export default defineComponent({
+  components: { ReviewList, ConfirmDialog, Map },
   mixins: [toggle, adminFormMixin],
 
   setup() {
-    const map = ref(null);
+    const map = ref<any>({});
 
     const store = useStore();
     const route = useRoute();
 
     const reviewsBook = ref([]);
-    const selectedLibrary = ref(null);
+    const selectedLibrary = ref<Library>({
+      _id: "",
+      name: "",
+      address: "",
+    });
     const activePointMap = ref(null);
-    const review = ref(null);
-    const currentBook = ref({});
+    const review = ref({});
+    const currentBook = ref<any>({});
+
     const editDataFormID = ref(null);
     const isReserved = ref(false);
     const isDisabled = ref(false);
@@ -456,7 +464,8 @@ export default {
     const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
     const { showErrorMessage, showSuccessfulMessage } = useMessage();
 
-    const { currentPoint, setCurrentPoint } = useGeolocation();
+    const { currentPoint, setCurrentPoint, setLocationLatLng } =
+      useGeolocation();
 
     const user = computed(() => store.getters["login/user"]);
     const isLoggedIn = computed(() => store.getters["login/isLoggedIn"]);
@@ -489,7 +498,10 @@ export default {
       }
     };
 
-    const checkReserveBook = (bookID, userID) => {
+    const checkReserveBook = (
+      bookID: string | number,
+      userID: string | number
+    ) => {
       try {
         const books = userReservedBooks.value.filter((item) => {
           return (
@@ -579,7 +591,7 @@ export default {
       data.value.rating = 0;
     };
 
-    const confirmDelete = (reviewID) => {
+    const confirmDelete = (reviewID: string | number) => {
       displayConfirmDialog.value = true;
       review.value = reviewID;
     };
@@ -598,8 +610,8 @@ export default {
       }
     };
 
-    const setSelectedLibrary = (library) => {
-      setCurrentPoint(library.options.position);
+    const setSelectedLibrary = (library: Library) => {
+      setCurrentPoint(library?.options?.position);
       selectedLibrary.value = { ...library };
 
       /////
@@ -631,11 +643,12 @@ export default {
       getBooks();
       getReviews();
       getUserReservedBooks();
-      getLibrariesByBook(route.params.id);
+      await getLibrariesByBook(route.params.id);
       getCurrentBook();
-      checkReserveBook(currentBook.value._id, user.value?._id);
+      checkReserveBook(currentBook.value._id, user.value._id);
       getUserReviewBook();
       getReviewsBook();
+      setLocationLatLng(libraries);
     });
 
     return {
@@ -673,7 +686,7 @@ export default {
       searchedLibraries,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">
