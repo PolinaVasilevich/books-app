@@ -5,6 +5,7 @@ const bookController = require("../controllers/bookController");
 const authorController = require("../controllers/authorController");
 const genreController = require("../controllers/genreController");
 const reviewController = require("../controllers/reviewController");
+const libraryController = require("../controllers/libraryController");
 const bookActionsController = require("../controllers/bookActionsController");
 const reservedBooksController = require("../controllers/reservedBooksController");
 const statisticsController = require("../controllers/statisticsController");
@@ -43,6 +44,21 @@ router.put("/updatereview/:id", reviewController.updateReview);
 router.delete("/deletereview/:id", reviewController.deleteReview);
 ////END REVIEW////
 
+////BGN LIBRARY////
+router.get("/libraries", libraryController.getLibraries);
+router.get("/libraries-book/:id", libraryController.getLibrariesByBook);
+router.post("/library", libraryController.createLibrary);
+router.put("/library/add-books/:id", libraryController.addBooksToLibrary);
+router.delete("/delete-library/:id", libraryController.deleteLibrary);
+router.delete(
+  "/delete-book-library/:libraryid&:bookid",
+  libraryController.deleteBookLibrary
+);
+// router.put("/updategenre/:id", genreController.updateGenre);
+
+// router.delete("/deletemanygenres", genreController.deleteManyGenres);
+////END LIBRARY////
+
 ////BGN BOOK ACTIONS////
 router.get("/allbookactions", bookActionsController.getAllBookActions);
 router.post("/reservebook", bookActionsController.reserveBook);
@@ -59,14 +75,28 @@ router.get(
   "/return-today-books/:userID",
   bookActionsController.getReturnTodayBooks
 );
+
+router.get(
+  "/all-not-returned-books",
+  bookActionsController.getAllNotReturnedBooks
+);
+
+router.get(
+  "/all-return-today-books",
+  bookActionsController.getAllReturnTodayBooks
+);
+
 ////END BOOK ACTIONS////
 
 ////BGN RESERVED BOOKS////
 router.get("/allreservedbooks", reservedBooksController.getReservedBooks);
+router.get("/new-reserved-books", reservedBooksController.getNewReservedBooks);
 router.get(
   "/modifiedreservedbooks",
   reservedBooksController.getModifiedReservedBooks
 );
+
+router.get("/new-reserved-books", reservedBooksController.getNewReservedBooks);
 router.get("/reservedbooks/:id", reservedBooksController.getUserReservedBooks);
 
 router.put(

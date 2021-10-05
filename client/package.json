@@ -8,12 +8,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fawmi/vue-google-maps": "^0.9.3",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/vue-fontawesome": "^3.0.0-4",
+    "@googlemaps/js-api-loader": "^1.12.4",
     "@j-t-mcc/vue3-chartjs": "^1.1.4",
-    "@vuelidate/core": "^2.0.0-alpha.24",
-    "@vuelidate/validators": "^2.0.0-alpha.19",
+    "@vuelidate/core": "^2.0.0-alpha.25",
+    "@vuelidate/validators": "^2.0.0-alpha.21",
     "axios": "^0.21.1",
     "bootstrap-icons": "^1.5.0",
     "chart.js": "^3.5.1",
@@ -28,25 +30,31 @@
     "vue-chart-3": "^0.5.7",
     "vue-datetime": "^1.0.0-beta.14",
     "vue-router": "^4.0.0-0",
+    "vue3-google-map": "^0.8.2",
     "vuelidate": "^0.7.6",
     "vuex": "^4.0.0-0",
     "weekstart": "^1.1.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-typescript": "^4.5.13",
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^7.0.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
     "prettier": "^2.2.1",
     "sass": "^1.26.5",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^8.0.2",
+    "typescript": "^4.1.6"
   },
   "eslintConfig": {
     "root": true,
@@ -56,10 +64,11 @@
     "extends": [
       "plugin:vue/vue3-essential",
       "eslint:recommended",
-      "@vue/prettier"
+      "@vue/prettier",
+      "@vue/typescript"
     ],
     "parserOptions": {
-      "parser": "babel-eslint"
+      "parser": "@typescript-eslint/parser"
     },
     "rules": {}
   },

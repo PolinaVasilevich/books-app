@@ -1,97 +1,83 @@
 <template>
-  <admin-form
-    :typeForm="typeForm"
-    :dataForm="dataForm"
-    :path="path"
-    :callback="callback"
-    :isFormValid="isFormValid"
-    :textMessage="textMessage"
-    @showMessage="showMessage"
-    @showErrorMessage="showErrorMessage"
-    @resetForm="$emit('resetForm')"
+  <form
+    @submit.prevent="submitForm($emit)"
+    @reset.prevent="resetForm"
+    class="admin-form"
   >
-    <template v-slot:input>
-      <div class="p-field">
-        <label for="first_name">First name</label>
-        <InputText
-          id="first_name"
-          :value="first_name"
-          @input="$emit('update:first_name', $event.target.value)"
-          :class="{ 'p-invalid': v$.form.first_name.$error }"
-          required="true"
-        />
+    <Toast />
+    <div class="admin-form__field-container">
+      <InputText
+        v-model.trim="form.first_name.value"
+        :class="{
+          'p-invalid': !form.first_name.valid && submitted,
+        }"
+        @blur="form.first_name.blur"
+        placeholder="Enter first name"
+      />
+      <small v-if="form.first_name.errors.required && submitted" class="p-error"
+        >This field is required.</small
+      >
+    </div>
 
-        <small class="p-error" v-if="v$.form.first_name.$error"
-          >This field is required.</small
-        >
-      </div>
+    <div class="admin-form__field-container">
+      <InputText
+        v-model.trim="form.last_name.value"
+        :class="{
+          'p-invalid': !form.last_name.valid && submitted,
+        }"
+        @blur="form.last_name.blur"
+        placeholder="Enter last name"
+      />
 
-      <div class="p-field">
-        <label for="last_name">Last name</label>
-        <InputText
-          id="last_name"
-          :value="last_name"
-          @input="$emit('update:last_name', $event.target.value)"
-          :class="{ 'p-invalid': v$.form.last_name.$errors.length }"
-          required="true"
-        />
-        <small class="p-error" v-if="v$.form.last_name.$errors.length"
-          >This field is required.</small
-        >
-      </div>
-    </template>
-  </admin-form>
+      <small v-if="form.last_name.errors.required && submitted" class="p-error"
+        >This field is required.</small
+      >
+    </div>
+    <div class="btns">
+      <Button
+        label="Save"
+        icon="pi pi-check"
+        class="p-button-text btn-form"
+        type="submit"
+      />
+      <Button
+        label="Reset"
+        icon="pi pi-times"
+        class="p-button-text btn-form"
+        type="reset"
+      />
+    </div>
+  </form>
 </template>
 
-<script>
-import useVuelidate from "@vuelidate/core";
-import { required } from "vuelidate/lib/validators";
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import useForm from "@/hooks/useForm";
+import Author from "@/models/Author";
+import { required } from "@/validators/validatorsForm";
 
-import toggle from "@/mixins/toggle.js";
-import adminFormData from "@/mixins/adminFormData.js";
-import validationMixin from "@/mixins/validationMixin.js";
-import AdminForm from "@/components/Admin/Forms/AdminForm";
-
-export default {
+export default defineComponent({
   name: "admin-authors-form",
-  components: { AdminForm },
-  mixins: [adminFormData, toggle, validationMixin],
-
-  setup() {
-    return { v$: useVuelidate() };
-  },
-
-  data() {
-    return {
-      message: "",
-    };
-  },
-
   props: {
-    first_name: {
-      type: String,
-      required: true,
-    },
-
-    last_name: {
-      type: String,
-      required: true,
-    },
+    initialForm: { required: true, type: Object as PropType<Author> },
   },
+  emits: ["submitForm"],
 
-  validations() {
-    return {
-      form: {
-        first_name: {
-          required,
-        },
-        last_name: {
-          required,
-        },
+  setup(props, { emit }) {
+    const { form, submitForm, resetForm, submitted, validForm } = useForm({
+      id: { value: props.initialForm._id },
+      first_name: {
+        value: props.initialForm.first_name,
+        validators: { required },
       },
-    };
-  },
 
-  methods: {},
-};
+      last_name: {
+        value: props.initialForm.last_name,
+        validators: { required },
+      },
+    });
+
+    return { form, submitted, submitForm, resetForm, validForm };
+  },
+});
 </script>

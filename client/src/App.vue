@@ -48,7 +48,7 @@
             <span v-if="isLoggedIn && !user.isAdmin" class="nav-list__item"
               ><router-link
                 class="header__link header__text"
-                :to="{ name: 'userPage', params: { id: user._id } }"
+                :to="{ name: 'userPage', params: { id: user?._id } }"
                 >My books</router-link
               ></span
             >
@@ -58,6 +58,44 @@
                 >Login</router-link
               ></span
             >
+
+            <!-- <span v-if="!isLoggedIn" class="nav-list__item"
+              ><router-link class="header__link header__text" to="/registration"
+                >Register</router-link
+              ></span
+            >
+
+            <span
+              v-else
+              class="nav-list__item header__link header__text"
+              @click="openModal"
+              >Logout</span
+            > -->
+
+            <div v-if="isLoggedIn" class="nav-list__item" style="margin: 0">
+              <router-link
+                :to="{
+                  name: 'userPage',
+                  params: {
+                    id: user?._id,
+                    notReturned: !!notReturnedBooks?.length,
+                  },
+                }"
+              >
+                <Button
+                  type="button"
+                  :label="user.username"
+                  icon="pi pi-user"
+                  class="
+                    p-button-text p-button-text
+                    header__text header__text-button
+                  "
+                  style="padding-right: 0"
+                  :badge="notReturnedBooks?.length"
+                  badgeClass="p-badge-danger"
+                />
+              </router-link>
+            </div>
 
             <span v-if="!isLoggedIn" class="nav-list__item"
               ><router-link class="header__link header__text" to="/registration"
@@ -71,35 +109,6 @@
               @click="openModal"
               >Logout</span
             >
-
-            <div
-              v-if="isLoggedIn"
-              class="nav-list__item"
-              :key="componentKey"
-              style="margin-left: 0"
-            >
-              <router-link
-                :to="{
-                  name: 'userPage',
-                  params: {
-                    id: user._id,
-                    notReturned: !!notReturnedBooks?.length,
-                  },
-                }"
-              >
-                <Button
-                  type="button"
-                  :label="user.username"
-                  icon="pi pi-user"
-                  class="
-                    p-button-text p-button-text
-                    header__text header__text-button
-                  "
-                  :badge="notReturnedBooks?.length"
-                  badgeClass="p-badge-danger"
-                />
-              </router-link>
-            </div>
           </div>
         </div>
       </nav>

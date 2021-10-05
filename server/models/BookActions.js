@@ -4,6 +4,7 @@ const BookActionsSchema = new Schema({
   book: { type: Schema.ObjectId, ref: "Book", required: true },
   user: { type: Schema.ObjectId, ref: "User", require: true },
   userAction: { type: Schema.ObjectId, ref: "User", require: true },
+  library: { type: Schema.ObjectId, ref: "Library" },
   status: {
     type: String,
     required: true,

@@ -119,7 +119,7 @@
               icon="pi pi-times"
               label="Cancel reservation"
               class="p-button-warning"
-              @click="showConfirmDialog(item.book)"
+              @click="showConfirmDialog(item)"
             />
           </template>
         </Card>
@@ -202,12 +202,13 @@ export default {
       }
     },
 
-    async cancelReserve(book) {
+    async cancelReserve(value) {
       try {
         await API.post(`books/cancelbook`, {
           user: this.user,
           userAction: this.user,
-          book,
+          book: value.book,
+          libraryID: value.library,
         });
         this.getReservedBooks();
 

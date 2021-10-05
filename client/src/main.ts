@@ -1,9 +1,10 @@
 import { createApp } from "vue";
-import { VuelidatePlugin } from "@vuelidate/core";
+import VuelidatePlugin from "@vuelidate/core";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import BadgeDirective from "primevue/badgedirective";
+import VueGoogleMaps from "@fawmi/vue-google-maps";
 
 import App from "./App.vue";
 import router from "./router";
@@ -32,4 +33,9 @@ app
   .use(PrimeVue)
   .use(ConfirmationService)
   .use(ToastService)
+  .use(VueGoogleMaps, {
+    load: {
+      key: "AIzaSyAfm1nAFdquZWc1I4Srn1_kmc0K-izNh8s",
+    },
+  })
   .mount("#app");

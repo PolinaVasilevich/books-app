@@ -32,7 +32,6 @@ export default {
   components: {
     ReviewItem,
   },
-  data() {},
 
   props: {
     items: {

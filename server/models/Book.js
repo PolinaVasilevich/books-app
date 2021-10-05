@@ -10,11 +10,13 @@ const BookSchema = new Schema({
   author: { type: Schema.ObjectId, ref: "Author", required: true },
   count: {
     type: Number,
-    required: true,
+    default: 0,
   },
   description: { type: String },
   genre: { type: Schema.ObjectId, ref: "Genre" },
   rating: { type: Number, default: 0 },
+
+  libraries: [{ type: Schema.ObjectId, ref: "Library" }],
 });
 
 BookSchema.virtual("url").get(function () {

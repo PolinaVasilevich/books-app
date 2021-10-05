@@ -3,7 +3,7 @@ const crypto = require("crypto");
 
 const BookActions = require("../models/BookActions");
 const Book = require("../models/Book");
-
+const Library = require("../models/Library");
 class bookController {
   async getAllBookActions(req, res) {
     try {
@@ -21,11 +21,11 @@ class bookController {
 
   async reserveBook(req, res) {
     try {
-      const { user, book } = req.body;
+      const { user, book, libraryID } = req.body;
 
-      if (!book.count) {
-        return res.status(400).send({ message: "The book is out of stock. " });
-      }
+      // if (!book.count) {
+      //   return res.status(400).send({ message: "The book is out of stock. " });
+      // }
 
       // const reservedBook = await BookActions.findOne({
       //   user: user._id,
@@ -44,26 +44,38 @@ class bookController {
         book,
         user,
         userAction: user,
+        library: libraryID,
         reservation_number,
         status: "Reserved",
         action_date: Date.now(),
       });
 
-      await Book.findOneAndUpdate(
-        { _id: book._id },
+      // await Book.findOneAndUpdate(
+      //   { _id: book._id },
+      //   {
+      //     $set: {
+      //       count: book.count - 1,
+      //     },
+      //   },
+
+      //   { new: true, useFindAndModify: false }
+      // );
+
+      await Library.updateOne(
         {
-          $set: {
-            count: book.count - 1,
-          },
+          _id: libraryID,
+          "books.book": book._id,
         },
 
-        { new: true, useFindAndModify: false }
+        {
+          $inc: { "books.$.count": -1 },
+        }
       );
 
       await bookAction.save();
 
       return res.json({
-        message: `${bookAction.book.title} has reserved successfully!`,
+        message: `The book has reserved successfully!`,
       });
     } catch (error) {
       console.log(error);
@@ -73,13 +85,20 @@ class bookController {
 
   async giveOutBook(req, res) {
     try {
-      const { user, book, userAction, return_date, reservation_number } =
-        req.body;
+      const {
+        user,
+        book,
+        userAction,
+        return_date,
+        reservation_number,
+        libraryID,
+      } = req.body;
       const bookAction = new BookActions({
         book,
         user,
         userAction,
         return_date,
+        library: libraryID,
         reservation_number,
         status: "Received",
         action_date: Date.now(),
@@ -88,7 +107,7 @@ class bookController {
       await bookAction.save();
 
       return res.json({
-        message: `${bookAction.book.title} has received successfully!`,
+        message: `${book.title} has received successfully!`,
       });
     } catch (error) {
       console.log(error);
@@ -98,11 +117,12 @@ class bookController {
 
   async returnBook(req, res) {
     try {
-      const { user, book, userAction } = req.body;
+      const { user, book, userAction, libraryID } = req.body;
 
       const bookAction = new BookActions({
         book: book,
         user: user,
+        library: libraryID,
         userAction: userAction,
         status: "Returned",
         isActual: false,
@@ -117,21 +137,32 @@ class bookController {
         }
       );
 
-      await Book.findOneAndUpdate(
-        { _id: book._id },
+      // await Book.findOneAndUpdate(
+      //   { _id: book._id },
+      //   {
+      //     $set: {
+      //       count: book.count + 1,
+      //     },
+      //   },
+
+      //   { new: true, useFindAndModify: false }
+      // );
+
+      await Library.updateOne(
         {
-          $set: {
-            count: book.count + 1,
-          },
+          _id: new mongoose.Types.ObjectId(libraryID),
+          "books.book": book._id,
         },
 
-        { new: true, useFindAndModify: false }
+        {
+          $inc: { "books.$.count": 1 },
+        }
       );
 
       await bookAction.save();
 
       return res.json({
-        message: `${bookAction.book.title} has returned successfully!`,
+        message: `${book.title} has returned successfully!`,
       });
     } catch (error) {
       console.log(error);
@@ -141,7 +172,7 @@ class bookController {
 
   async cancelBook(req, res) {
     try {
-      const { user, book, userAction } = req.body;
+      const { user, book, userAction, libraryID } = req.body;
 
       const bookAction = new BookActions({
         book,
@@ -160,21 +191,21 @@ class bookController {
         }
       );
 
-      await Book.findOneAndUpdate(
-        { _id: new mongoose.Types.ObjectId(book._id) },
+      await Library.updateOne(
         {
-          $set: {
-            count: book.count + 1,
-          },
+          _id: libraryID,
+          "books.book": book._id,
         },
 
-        { new: true, useFindAndModify: false }
+        {
+          $inc: { "books.$.count": 1 },
+        }
       );
 
       await bookAction.save();
 
       return res.json({
-        message: `${bookAction.book.title} has received successfully!`,
+        message: `${book.title} has received successfully!`,
       });
     } catch (error) {
       console.log(error);
@@ -408,6 +439,249 @@ class bookController {
       ]);
 
       res.json(books);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getAllNotReturnedBooks(req, res) {
+    try {
+      const reservedBooks = await BookActions.aggregate([
+        {
+          $match: {
+            isActual: true,
+          },
+        },
+        {
+          $addFields: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$return_date",
+              },
+            },
+            today: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: new Date(),
+              },
+            },
+          },
+        },
+
+        {
+          $addFields: {
+            notToday: { $cmp: ["$date", "$today"] },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "userAction",
+            foreignField: "_id",
+            as: "userAction",
+          },
+        },
+
+        { $unwind: "$userAction" },
+
+        {
+          $lookup: {
+            from: "books",
+            localField: "book",
+            foreignField: "_id",
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        { $sort: { action_date: -1 } },
+
+        {
+          $set: {
+            data: "$$ROOT",
+          },
+        },
+
+        {
+          $group: {
+            _id: { user: "$user", book: "$book" },
+            last_action: { $first: "$action_date" },
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        { $sort: { last_action: -1 } },
+
+        {
+          $addFields: {
+            data: { $arrayElemAt: ["$items", 0] },
+            children: { $slice: ["$items", -1] },
+          },
+        },
+
+        {
+          $set: {
+            "data.key": "$data._id",
+            key: "$data._id",
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            data: 1,
+            key: 1,
+            "children.key": "$data._id",
+            "children.data": 1,
+          },
+        },
+
+        {
+          $match: {
+            $and: [
+              {
+                "data.return_date": {
+                  $lt: new Date(),
+                },
+              },
+
+              { "data.notToday": { $ne: 0 } },
+            ],
+          },
+        },
+      ]);
+
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getAllReturnTodayBooks(req, res) {
+    try {
+      const reservedBooks = await BookActions.aggregate([
+        {
+          $match: {
+            isActual: true,
+          },
+        },
+        {
+          $addFields: {
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$return_date",
+              },
+            },
+            today: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: new Date(),
+              },
+            },
+          },
+        },
+
+        {
+          $addFields: {
+            notToday: { $cmp: ["$date", "$today"] },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        { $unwind: "$user" },
+
+        {
+          $lookup: {
+            from: "users",
+            localField: "userAction",
+            foreignField: "_id",
+            as: "userAction",
+          },
+        },
+
+        { $unwind: "$userAction" },
+
+        {
+          $lookup: {
+            from: "books",
+            localField: "book",
+            foreignField: "_id",
+            as: "book",
+          },
+        },
+
+        { $unwind: "$book" },
+
+        { $sort: { action_date: -1 } },
+
+        {
+          $set: {
+            data: "$$ROOT",
+          },
+        },
+
+        {
+          $group: {
+            _id: { user: "$user", book: "$book" },
+            last_action: { $first: "$action_date" },
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        { $sort: { last_action: -1 } },
+
+        {
+          $addFields: {
+            data: { $arrayElemAt: ["$items", 0] },
+            children: { $slice: ["$items", -1] },
+          },
+        },
+
+        {
+          $set: {
+            "data.key": "$data._id",
+            key: "$data._id",
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            data: 1,
+            key: 1,
+            "children.key": "$data._id",
+            "children.data": 1,
+          },
+        },
+        {
+          $match: {
+            "data.notToday": { $eq: 0 },
+          },
+        },
+      ]);
+
+      res.json(reservedBooks);
     } catch (e) {
       console.log(e);
     }

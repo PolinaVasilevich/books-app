@@ -6,17 +6,14 @@ export default {
 
     dataForm: {
       type: Object,
-      required: true,
     },
 
     path: {
       type: String,
-      required: true,
     },
 
     callback: {
       type: Function,
-      required: true,
     },
 
     textMessage: {

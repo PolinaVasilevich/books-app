@@ -1,3 +1,8 @@
 module.exports = {
   secret: "SECRET_KEY_RANDOM",
+  // GEOCODER_API_KEY: "33omGpbNgqoZluNPuhAXdAGXfdL44L6r",
+  // GEOCODER_API_KEY: "f8Mnsv3CLN43Te6atqOwcY0ItFhCXhKL",
+  // GEOCODER_API_KEY: "pk.572e5979e90d4207a112ed3b0909c2f6",
+  GEOCODER_API_KEY:
+    "pk.eyJ1IjoicHZhc2lsZXZpY2giLCJhIjoiY2t1NDAybnF0MHVuYzMxbzZodHNqbWJ2MSJ9.amrRoh1z6PBsFTttYe1IJg",
 };

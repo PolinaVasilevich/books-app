@@ -1,5 +1,6 @@
 const Book = require("../models/Book");
 const Review = require("../models/Review");
+const Library = require("../models/Library");
 const BookActions = require("../models/BookActions");
 
 class bookController {
@@ -35,7 +36,93 @@ class bookController {
 
   async getBooks(req, res) {
     try {
-      const books = await Book.find().populate("author").populate("genre");
+      // const books = await Book.find().populate("author").populate("genre");
+
+      const books = await Book.aggregate([
+        {
+          $lookup: {
+            from: "authors",
+            localField: "author",
+            foreignField: "_id",
+            as: "author",
+          },
+        },
+
+        { $unwind: "$author" },
+
+        {
+          $lookup: {
+            from: "genres",
+            localField: "genre",
+            foreignField: "_id",
+            as: "genre",
+          },
+        },
+
+        { $unwind: "$genre" },
+
+        // {
+        //   $lookup: {
+        //     from: "libraries",
+        //     localField: "libraries",
+        //     foreignField: "book._id",
+        //     as: "libraries",
+        //   },
+        // },
+
+        // {
+        //   $lookup: {
+        //     from: "libraries",
+        //     localField: "libraries",
+        //     foreignField: "book._id",
+        //     as: "libraries",
+        //   },
+        // },
+
+        {
+          $lookup: {
+            from: "libraries",
+            let: { bookId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $in: ["$$bookId", "$books.book"],
+                  },
+                },
+              },
+              { $unwind: "$books" },
+              { $match: { $expr: { $eq: ["$books.book", "$$bookId"] } } },
+              {
+                $group: {
+                  _id: "$books.book",
+                  count: { $sum: "$books.count" },
+                },
+              },
+            ],
+            as: "result",
+          },
+        },
+
+        // {
+        //   $set: {
+        //     count: { $first: "$result.count" },
+        //   },
+        // },
+
+        {
+          $set: {
+            count: {
+              $cond: [
+                { $gt: [{ $size: "$result" }, 0] },
+                { $first: "$result.count" },
+                0,
+              ],
+            },
+          },
+        },
+      ]);
+
       res.json(books);
     } catch (e) {
       console.log(e);
@@ -107,7 +194,7 @@ class bookController {
     }
   }
 
-   getBooksWhichNotReturned
+  getBooksWhichNotReturned;
 }
 
 module.exports = new bookController();

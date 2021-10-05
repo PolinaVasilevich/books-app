@@ -2,15 +2,13 @@
   <div>
     <Toast />
     <admin-table
+      v-if="!loading"
       title="Authors"
       v-model:searchQuery="searchQuery"
-      :data="searchedItems"
-      @openModal="openModal"
-      @openEditModal="editModal"
-      @deleteItem="onDeleteData"
-      @deleteItems="
-        deleteItems($event, '/books/deletemanyauthors', this.getAuthors)
-      "
+      :data="searchedAuthors"
+      @openModal="showCreateItemDialog"
+      @openEditModal="showEditItemDialog"
+      @deleteItem="onDelete"
     >
       <template #content>
         <Column
@@ -28,113 +26,127 @@
         ></Column>
       </template>
       <template #modal>
-        <modal-form
-          modal-title="Create new record"
-          :displayModal="displayModal"
-          @close="closeModal"
+        <Dialog
+          v-model:visible="displayDialog"
+          header="Author"
+          :modal="true"
+          style="width: 40vw"
         >
-          <template #modal-content>
-            <admin-author-form
-              typeForm="create"
-              v-model:first_name="data.first_name"
-              v-model:last_name="data.last_name"
-              :dataForm="data"
-              path="books/author"
-              :callback="this.getAuthors"
-              :textMessage="`${data.first_name} ${data.last_name} created`"
-              @resetForm="resetForm"
-              @closeModal="closeModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-            />
-          </template>
-        </modal-form>
-
-        <modal-form
-          modal-title="Update record"
-          :displayModal="displayEditModal"
-          @close="closeEditModal"
-        >
-          <template #modal-content>
-            <admin-author-form
-              typeForm="update"
-              v-model:first_name="editForm.first_name"
-              v-model:last_name="editForm.last_name"
-              :dataForm="editForm"
-              :path="`/books/updateauthor/${editForm._id}`"
-              :callback="this.getAuthors"
-              @resetForm="resetEditForm"
-              @closeModal="closeEditModal"
-              @showMessage="showMessage"
-              @showErrorMessage="showErrorMessage"
-            />
-          </template>
-        </modal-form>
+          <admin-author-form
+            @submitForm="onSubmit"
+            :initialForm="initialForm"
+          />
+        </Dialog>
       </template>
     </admin-table>
+    <app-loader v-else />
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import AdminTable from "@/components/Admin/AdminTable.vue";
-import ModalForm from "@/components/UI/ModalForm";
-import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm";
-import adminFormMixin from "@/mixins/adminFormMixin.js";
-import dataStore from "@/mixins/dataStore.js";
-import toggle from "@/mixins/toggle.js";
-export default {
+
+import AdminAuthorForm from "@/components/Admin/Forms/AdminAuthorForm.vue";
+import AppLoader from "@/components/AppLoader.vue";
+
+import { reactive, ref, Ref, onMounted, defineComponent } from "vue";
+
+import useAuthor from "@/hooks/Author/useAuthor.ts";
+import Author from "@/models/Author";
+import useSearchedAuthors from "@/hooks/Author/useSearchedAuthors.ts";
+import useForm from "@/hooks/useForm";
+
+import useDialog from "@/hooks/useDialog";
+import useMessage from "@/hooks/useMessage";
+
+export default defineComponent({
   name: "admin-authors",
-  mixins: [toggle, adminFormMixin, dataStore],
+
   components: {
     AdminTable,
-    ModalForm,
     AdminAuthorForm,
+    AppLoader,
   },
-  data() {
+
+  setup() {
+    const {
+      response: authors,
+      loading,
+      errorMessage: error,
+      responseMessage,
+      getAuthors,
+      updateAuthor,
+      createAuthor,
+      deleteAuthor,
+    } = useAuthor();
+
+    const { searchQuery, searchedAuthors } = useSearchedAuthors(authors);
+    const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
+    const { showErrorMessage, showSuccessfulMessage } = useMessage();
+
+    let initialForm = ref({
+      _id: "",
+      first_name: "",
+      last_name: "",
+    });
+
+    onMounted(() => {
+      getAuthors();
+    });
+
+    const showCreateItemDialog = () => {
+      initialForm.value = { _id: "", first_name: "", last_name: "" };
+      showDialog();
+    };
+
+    const showEditItemDialog = (value: Author) => {
+      initialForm.value = { ...value };
+      showDialog();
+    };
+
+    const onSubmit = async (data: Author) => {
+      if (initialForm.value._id) {
+        await updateAuthor(initialForm.value._id, {
+          ...initialForm.value,
+          ...data,
+        });
+      } else {
+        await createAuthor(data);
+      }
+
+      displayDialog.value = false;
+      getAuthors();
+
+      if (error.value) {
+        showErrorMessage(error.value);
+      } else {
+        showSuccessfulMessage(responseMessage);
+      }
+    };
+
+    const onDelete = async (data: Author) => {
+      await deleteAuthor(data._id);
+      getAuthors();
+      if (error.value) {
+        showErrorMessage(error.value);
+      } else {
+        showSuccessfulMessage(responseMessage);
+      }
+    };
+
     return {
-      initialEditForm: { first_name: "", last_name: "" },
-      data: {
-        first_name: "",
-        last_name: "",
-      },
-      editForm: {
-        _id: "",
-        first_name: "",
-        last_name: "",
-      },
+      searchQuery,
+      searchedAuthors,
+      loading,
+      initialForm,
+      submitted,
+      displayDialog,
+      hideDialog,
+      showCreateItemDialog,
+      showEditItemDialog,
+      onSubmit,
+      onDelete,
     };
   },
-  methods: {
-    onDeleteData(value) {
-      this.removeData(
-        `/books/deleteauthor/${value._id}`,
-        this.getAuthors,
-        `${value.first_name} ${value.last_name} deleted`
-      );
-    },
-    resetForm() {
-      this.data.first_name = "";
-      this.data.last_name = "";
-    },
-    resetEditForm() {
-      this.editForm.first_name = this.initialEditForm.first_name;
-      this.editForm.last_name = this.initialEditForm.last_name;
-    },
-  },
-  computed: {
-    searchedItems() {
-      return this.authors.filter((item) => {
-        return (
-          item.first_name
-            ?.toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          item.last_name?.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
-      });
-    },
-  },
-  mounted() {
-    this.getAuthors();
-  },
-};
+});
 </script>
