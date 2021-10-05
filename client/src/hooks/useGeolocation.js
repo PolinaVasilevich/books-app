@@ -1,50 +1,43 @@
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
-export default function useGeolocation() {
-  const currentPoint = ref({ lat: null, lng: null });
+export default function useGeolocation(coords) {
+  const centerPosition = ref({ lat: 53.893009, lng: 27.567444 });
+  const currentPosition = ref(null);
 
-  const setLocationLatLng = (coords) => {
-    navigator.geolocation.watchPosition(getPosition, handleError);
-
-    function getPosition(position) {
-      const { latitude: lat, longitude: lng } = position.coords;
-
-      // const R = 6371;
-      // const distances = [];
-      // const closest = -1;
-
-      // coords.value.reduce((prev, curr) => {
-      //   let { lat: mlat, lng: mlng } = curr.options.position;
-      // });
-
-      // coords.value.reduce(function (prev, curr) {
-      //   var cpos = new google.maps.geometry.spherical.computeDistanceBetween(
-      //     { latitude: lat, longitude: lng },
-      //     curr.position
-      //   );
-      //   var ppos = new google.maps.geometry.spherical.computeDistanceBetween(
-      //     { latitude: lat, longitude: lng },
-      //     prev.position
-      //   );
-
-      //   return cpos < ppos ? curr : prev;
-      // }).position;
-
-      setCurrentPoint({
-        lat,
-        lng,
+  const trackPosition = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(successPosition, handleError, {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
       });
+    } else {
+      console.log(`Browser doesn't support Geolocation`);
     }
 
-    function handleError(error) {
-      console.error(error.message);
-      setCurrentPoint(coords.value[0].options.position);
+    function successPosition(position) {
+      centerPosition.value = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+
+      currentPosition.value = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+    }
+
+    function handleError(err) {
+      console.error(
+        "Error Code: " + err.code + " Error Message: " + err.message
+      );
+      // setCenterPosition(coords.value[0].options.position);
     }
   };
 
-  const setCurrentPoint = (loc) => {
-    currentPoint.value = loc;
+  const setCenterPosition = (loc) => {
+    centerPosition.value = loc;
   };
 
-  return { currentPoint, setCurrentPoint, setLocationLatLng };
+  return { centerPosition, currentPosition, setCenterPosition, trackPosition };
 }

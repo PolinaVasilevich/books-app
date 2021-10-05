@@ -1,7 +1,6 @@
 <template>
   <div class="book-page">
     <Toast />
-
     <div v-if="!user.isAdmin" class="mkdf-has-bg-image" data-height="300">
       <div class="mkdf-title-wrapper" style="height: 300px">
         <div class="mkdf-title-inner" style="height: inherit">
@@ -204,10 +203,12 @@
           />
 
           <Map
+            v-if="libraries.length"
             style="margin-left: -12.5%"
             class="select-library"
             :markers="searchedLibraries"
-            :currentPoint="currentPoint"
+            :centerPosition="centerPosition"
+            :currentPosition="currentPosition"
             @changeCurrentPoint="setSelectedLibrary"
             :currentLibraryID="selectedLibrary?._id"
           />
@@ -281,7 +282,9 @@
         </div>
       </div>
     </div>
+
     <h2
+      v-if="libraries.length"
       class="select-library-title"
       ref="map"
       style="
@@ -293,10 +296,11 @@
     >
       Select a library
     </h2>
-    <div class="book__map-wrapper">
+    <div class="book__map-wrapper" v-if="libraries.length">
       <Map
         :markers="searchedLibraries"
-        :currentPoint="currentPoint"
+        :centerPosition="centerPosition"
+        :currentPosition="currentPosition"
         @changeCurrentPoint="setSelectedLibrary"
         :currentLibraryID="selectedLibrary?._id"
       />
@@ -401,7 +405,7 @@ import useDialog from "@/hooks/useDialog";
 
 import API from "../utils/api";
 import Map from "@/components/Map.vue";
-import adminFormMixin from "@/mixins/adminFormMixin.js";
+// import adminFormMixin from "@/mixins/adminFormMixin.js";
 import toggle from "@/mixins/toggle.js";
 
 import ReviewList from "@/components/Reviews/ReviewList.vue";
@@ -412,7 +416,7 @@ import Library from "@/models/Library";
 
 export default defineComponent({
   components: { ReviewList, ConfirmDialog, Map },
-  mixins: [toggle, adminFormMixin],
+  mixins: [toggle],
 
   setup() {
     const map = ref<any>({});
@@ -464,8 +468,12 @@ export default defineComponent({
     const { submitted, displayDialog, hideDialog, showDialog } = useDialog();
     const { showErrorMessage, showSuccessfulMessage } = useMessage();
 
-    const { currentPoint, setCurrentPoint, setLocationLatLng } =
-      useGeolocation();
+    const {
+      centerPosition,
+      currentPosition,
+      setCenterPosition,
+      trackPosition,
+    } = useGeolocation();
 
     const user = computed(() => store.getters["login/user"]);
     const isLoggedIn = computed(() => store.getters["login/isLoggedIn"]);
@@ -611,7 +619,7 @@ export default defineComponent({
     };
 
     const setSelectedLibrary = (library: Library) => {
-      setCurrentPoint(library?.options?.position);
+      setCenterPosition(library?.options?.position);
       selectedLibrary.value = { ...library };
 
       /////
@@ -636,19 +644,19 @@ export default defineComponent({
     };
 
     // watchEffect(() => {
-    //   setCurrentPoint(selectedLibrary.value?.options.position);
+    //   setLocationLatLng(libraries);
     // });
 
     onMounted(async () => {
       getBooks();
       getReviews();
       getUserReservedBooks();
-      await getLibrariesByBook(route.params.id);
+      getLibrariesByBook(route.params.id);
+      trackPosition();
       getCurrentBook();
       checkReserveBook(currentBook.value._id, user.value._id);
       getUserReviewBook();
       getReviewsBook();
-      setLocationLatLng(libraries);
     });
 
     return {
@@ -675,7 +683,8 @@ export default defineComponent({
       saveReview,
       onSave,
       displayModal,
-      currentPoint,
+      centerPosition,
+      currentPosition,
       setSelectedLibrary,
       listRefs,
       map,
