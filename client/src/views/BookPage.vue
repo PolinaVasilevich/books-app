@@ -187,7 +187,12 @@
             "
             :label="'Reserve book'.toUpperCase()"
             class="p-button-warning select-library"
-            :disabled="!libraries.length || isReserved || isDisabled"
+            :disabled="
+              !libraries.length ||
+              isReserved ||
+              isDisabled ||
+              !selectedLibrary.name
+            "
             style="margin: 20px 0"
             icon="pi pi-book"
             @click="confirmReserveBook(library)"
@@ -204,7 +209,7 @@
 
           <Map
             v-if="libraries.length"
-            style="margin-left: -12.5%"
+            style="margin-left: -12.5%; margin-right: -12.5%"
             class="select-library"
             :markers="searchedLibraries"
             :centerPosition="centerPosition"
