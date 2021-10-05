@@ -33,8 +33,6 @@ LibrarySchema.pre("save", async function (next) {
     street: number + " " + street,
   });
 
-  console.log(loc);
-
   this.location = {
     type: "Point",
     coordinates: [loc[0].longitude, loc[0].latitude],

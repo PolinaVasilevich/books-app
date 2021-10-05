@@ -1,9 +1,5 @@
 <template>
-  <GMapMap
-    style="width: 100vw; height: 700px"
-    :zoom="zoomMap"
-    :center="currentPoint"
-  >
+  <GMapMap style="height: 700px" :zoom="zoomMap" :center="centerPosition">
     <GMapMarker
       :key="m.name"
       v-for="m in markers"
@@ -13,6 +9,11 @@
       :draggable="true"
       :icon="m._id === currentLibraryID ? activeIcon : defaultIcon"
     />
+    <GMapMarker :position="currentPosition" :icon="currentPositionIcon">
+      <GMapInfoWindow>
+        <div>You are here</div>
+      </GMapInfoWindow>
+    </GMapMarker>
   </GMapMap>
 </template>
 
@@ -22,8 +23,9 @@ import { defineComponent, ref, onMounted } from "vue";
 export default defineComponent({
   props: {
     markers: { type: Array, required: true },
-    currentPoint: { type: Object },
+    centerPosition: { type: Object },
     currentLibraryID: { type: [String, Number] },
+    currentPosition: { type: Object },
   },
 
   emits: ["changeCurrentPoint"],
@@ -42,12 +44,23 @@ export default defineComponent({
       scaledSize: { width: 45, height: 45 },
     };
 
+    const currentPositionIcon = {
+      url: "https://icon-library.com/images/marker-icon/marker-icon-12.jpg",
+      scaledSize: { width: 60, height: 60 },
+    };
+
     const changeCurrentPoint = (point) => {
       emit("changeCurrentPoint", point);
       zoomMap.value = 13;
     };
 
-    return { zoomMap, defaultIcon, activeIcon, changeCurrentPoint };
+    return {
+      zoomMap,
+      defaultIcon,
+      activeIcon,
+      currentPositionIcon,
+      changeCurrentPoint,
+    };
   },
 });
 </script>
