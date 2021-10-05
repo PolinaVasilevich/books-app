@@ -8,6 +8,9 @@
 @import "@/assets/styles/admin-book-page.scss";
 @import "@/assets/styles/reviews.scss";
 @import "@/assets/styles/app.scss";
+@import "@/assets/styles/form.scss";
+@import "@/assets/styles/admin-reserved-books.scss";
+
 // @import "@/assets/styles/top-of-page.scss";
 
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,300&display=swap");
@@ -217,4 +220,9 @@ body {
   align-items: center;
   width: 100%;
   position: relative !important;
+}
+
+.active-search-button {
+  background-color: #f3f3f3 !important;
+  border-color: #f3f3f3 !important;
 }

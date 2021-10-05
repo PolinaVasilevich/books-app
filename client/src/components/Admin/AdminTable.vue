@@ -20,14 +20,6 @@
         </template>
 
         <template #right>
-          <FileUpload
-            mode="basic"
-            accept="image/*"
-            :maxFileSize="1000000"
-            label="Import"
-            chooseLabel="Import"
-            class="p-mr-2 p-d-inline-block"
-          />
           <Button
             label="Export"
             icon="pi pi-upload"

@@ -75,7 +75,6 @@
             <div
               v-if="isLoggedIn"
               class="nav-list__item"
-              :key="componentKey"
               style="margin-left: 0"
             >
               <router-link

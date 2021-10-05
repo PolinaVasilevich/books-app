@@ -165,6 +165,17 @@ class reservedBooksController {
 
         {
           $lookup: {
+            from: "users",
+            localField: "userAction",
+            foreignField: "_id",
+            as: "userAction",
+          },
+        },
+
+        { $unwind: "$userAction" },
+
+        {
+          $lookup: {
             from: "books",
             localField: "book",
             foreignField: "_id",
@@ -196,6 +207,7 @@ class reservedBooksController {
           $addFields: {
             data: { $arrayElemAt: ["$items", 0] },
             children: { $slice: ["$items", -1] },
+            size_items: { $size: "$items" },
           },
         },
 
@@ -203,6 +215,7 @@ class reservedBooksController {
           $set: {
             "data.key": "$data._id",
             key: "$data._id",
+            "children.key": "$data._id",
           },
         },
 
@@ -211,10 +224,53 @@ class reservedBooksController {
             _id: 0,
             data: 1,
             key: 1,
-            "children.key": "$data._id",
-            "children.data": 1,
+            size_items: 1,
+
+            children: {
+              $cond: {
+                if: { $gt: ["$size_items", 1] },
+                then: "$children",
+                else: [],
+              },
+            },
           },
         },
+      ]);
+
+      res.json(reservedBooks);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getNewReservedBooks(req, res) {
+    try {
+      const reservedBooks = await BookActions.aggregate([
+        {
+          $match: {
+            isActual: true,
+          },
+        },
+        { $sort: { action_date: -1 } },
+
+        {
+          $group: {
+            _id: { user: "$user", book: "$book" },
+            last_action: { $first: "$action_date" },
+            items: { $push: "$$ROOT" },
+          },
+        },
+
+        { $sort: { last_action: -1 } },
+
+        {
+          $addFields: {
+            size_items: { $size: "$items" },
+          },
+        },
+
+        { $match: { $expr: { $eq: ["$size_items", 1] } } },
+        // { $group: { _id: null, count: { $sum: 1 } } },
       ]);
 
       res.json(reservedBooks);
@@ -287,6 +343,19 @@ class reservedBooksController {
         .json({ message: `Cannot delete reserved book with id ${id}` });
     }
   }
+
+  // async getNewReservedBooks(req, res) {
+  //   try {
+  //     const reservedBooks = await BookActions.find({
+  //       isActual: true,
+  //       status: "Reserved",
+  //     });
+
+  //     res.json(reservedBooks);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 }
 
 module.exports = new reservedBooksController();

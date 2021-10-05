@@ -19,7 +19,7 @@ class authorController {
       const author = new Author({ first_name, last_name });
       await author.save();
       return res.json({
-        message: `Author ${first_name} ${last_name} has created`,
+        message: `Author ${first_name} ${last_name} was created successfully`,
       });
     } catch (e) {
       console.log(e);
@@ -59,7 +59,7 @@ class authorController {
       if (!book) {
         const author = await Author.findByIdAndDelete({ _id: id });
         return res.json({
-          message: `${author.first_name} ${author.last_name} were deleted successfully!`,
+          message: `${author.first_name} ${author.last_name} was deleted successfully!`,
         });
       } else {
         return res.status(400).json({
