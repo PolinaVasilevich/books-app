@@ -65,7 +65,7 @@ export default {
       } catch (error) {
         console.log(error);
         this.callback();
-        this.showMessage(error.response.data.message);
+        this.showErrorMessage(error.response.data.message);
       }
     },
 
@@ -78,7 +78,7 @@ export default {
       } catch (error) {
         console.log(error);
         this.callback();
-        this.showMessage(error.response.data.message);
+        this.showErrorMessage(error.response.data.message);
       }
     },
 

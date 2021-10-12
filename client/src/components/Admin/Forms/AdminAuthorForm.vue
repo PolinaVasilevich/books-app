@@ -40,11 +40,18 @@
         class="p-button-text btn-form"
         type="submit"
       />
-      <Button
+      <!-- <Button
         label="Reset"
         icon="pi pi-times"
         class="p-button-text btn-form"
         type="reset"
+      /> -->
+
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text btn-form"
+        @click="$emit('cancel')"
       />
     </div>
   </form>
@@ -61,7 +68,7 @@ export default defineComponent({
   props: {
     initialForm: { required: true, type: Object as PropType<Author> },
   },
-  emits: ["submitForm"],
+  emits: ["submitForm", "cancel"],
 
   setup(props, { emit }) {
     const { form, submitForm, resetForm, submitted, validForm } = useForm({

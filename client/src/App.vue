@@ -95,7 +95,11 @@
                     header__text header__text-button
                   "
                   style="padding-right: 0"
-                  :badge="notReturnedBooks?.length"
+                  :badge="
+                    notReturnedBooks?.length
+                      ? `${notReturnedBooks?.length}`
+                      : ''
+                  "
                   badgeClass="p-badge-danger"
                   :disabled="!notReturnedBooks?.length || user.isAdmin"
                 />

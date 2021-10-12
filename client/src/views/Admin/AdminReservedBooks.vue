@@ -65,7 +65,11 @@
                 searchQueryButton?.toLowerCase() === 'returntoday',
             },
           ]"
-          :badge="allMustReturnTodayBooks?.length"
+          :badge="
+            allMustReturnTodayBooks?.length
+              ? `${allMustReturnTodayBooks?.length}`
+              : ''
+          "
           badgeClass="p-badge-danger"
         />
 
@@ -81,13 +85,14 @@
                 searchQueryButton?.toLowerCase() === 'notreturted',
             },
           ]"
-          :badge="allNotReturnedBooks?.length"
+          :badge="
+            allNotReturnedBooks?.length ? `${allNotReturnedBooks?.length}` : ''
+          "
           badgeClass="p-badge-danger"
         />
       </div>
 
       <TreeTable
-        v-if="!loading"
         :value="searchedReservedBooks"
         :expandedKeys="expandedKeys"
         responsiveLayout="scroll"
@@ -248,9 +253,9 @@ import ConfirmDialog from "@/components/UI/ConfirmDialog";
 export default {
   name: "admin-users",
   components: { ConfirmDialog },
-  props: ["reservedBookTitle"],
+  props: ["reservedBookTitle", "reservedBookID"],
 
-  setup() {
+  setup(props) {
     const data = ref({});
     const displayConfirmDialog = ref(false);
     const displayMainDialog = ref(false);
@@ -299,12 +304,6 @@ export default {
 
     const { searchQuery, searchedReservedBooks, filteredData } =
       useSearchedReservedBooks(reservedBooks);
-
-    onMounted(() => {
-      getReservedBooks();
-      getAllNotReturnedBooks();
-      getAllMustReturnTodayBooks();
-    });
 
     const currentUser = computed(() => {
       return store.getters["login/user"];
@@ -382,6 +381,16 @@ export default {
         showSuccessfulMessage(responseMessage);
       }
     };
+
+    onMounted(() => {
+      getReservedBooks();
+      getAllNotReturnedBooks();
+      getAllMustReturnTodayBooks();
+
+      if (props.reservedBookTitle) {
+        searchQuery.value = props.reservedBookTitle;
+      }
+    });
 
     return {
       moment,

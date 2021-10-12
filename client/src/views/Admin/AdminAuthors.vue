@@ -35,6 +35,7 @@
           <admin-author-form
             @submitForm="onSubmit"
             :initialForm="initialForm"
+            @cancel="hideDialog"
           />
         </Dialog>
       </template>

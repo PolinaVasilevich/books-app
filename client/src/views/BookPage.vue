@@ -238,6 +238,7 @@
               typeForm="update"
               :bookTitle="currentBook?.title"
               @deleteReview="confirmDelete($event)"
+              :callback="getReviewsBook"
             />
             <confirm-dialog
               text="delete this review"
@@ -698,6 +699,7 @@ export default defineComponent({
       confirmReserveBook,
       searchQuery,
       searchedLibraries,
+      getReviewsBook,
     };
   },
 });

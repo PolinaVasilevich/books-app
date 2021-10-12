@@ -54,7 +54,9 @@
                   searchQueryButton?.toLowerCase() === 'returntoday',
               },
             ]"
-            :badge="returnTodayBooks?.length"
+            :badge="
+              returnTodayBooks?.length ? `${returnTodayBooks?.length}` : ''
+            "
             badgeClass="p-badge-danger"
           />
 
@@ -70,7 +72,9 @@
                   searchQueryButton?.toLowerCase() === 'notreturned',
               },
             ]"
-            :badge="notReturnedBooks?.length"
+            :badge="
+              notReturnedBooks?.length ? `${notReturnedBooks?.length}` : ''
+            "
             badgeClass="p-badge-danger"
           />
         </div>
@@ -160,9 +164,7 @@ export default {
     return {
       moment: moment,
       displayConfirmDialog: false,
-
       filteredData: null,
-      bookActions: [],
       item: null,
       searchQueryButton: "all",
       icons: [

@@ -4,8 +4,6 @@
     :dataForm="dataForm"
     :path="path"
     :callback="callback"
-    @showMessage="showMessage"
-    @showErrorMessage="showErrorMessage"
     @resetForm="$emit('resetForm')"
   >
     <template v-slot:input>
@@ -93,11 +91,11 @@ export default {
       required: true,
     },
     author: {
-      type: String,
+      type: [String, Object],
       required: true,
     },
     genre: {
-      type: String,
+      type: [String, Object],
       required: true,
     },
     img: {
