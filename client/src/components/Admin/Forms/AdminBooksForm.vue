@@ -18,7 +18,15 @@
         required
       />
 
-      <select class="form-control select" v-model="selectAuthor">
+      <select
+        class="form-control select"
+        v-model="selectAuthor"
+        required
+        v-selectColor
+      >
+        <option style="color: #cccccc" disabled value="">
+          Select from authors
+        </option>
         <option v-for="item in authors" :key="item._id" :value="item">
           {{ item.first_name + " " + item.last_name }}
         </option>
@@ -31,7 +39,15 @@
         placeholder="Enter description book"
       />
 
-      <select class="form-control select" v-model="selectGenre">
+      <select
+        class="form-control select"
+        v-model="selectGenre"
+        required
+        v-selectColor
+      >
+        <option disabled value="" style="color: #cccccc">
+          Select from genres
+        </option>
         <option
           v-for="item in genres"
           :key="item._id"

@@ -217,9 +217,9 @@ export default {
 
     resetForm() {
       this.data.title = "";
-      this.data.author = this.authors[0];
+      this.data.author = "";
       this.data.description = "";
-      this.data.genre = this.genres[0];
+      this.data.genre = "";
       this.data.img = "";
       this.data.count = 0;
     },
@@ -260,8 +260,8 @@ export default {
   },
 
   mounted() {
-    this.data.author = this.authors[0];
-    this.data.genre = this.genres[0];
+    // this.data.author = this.authors[0];
+    // this.data.genre = this.genres[0];
   },
 };
 </script>

@@ -37,7 +37,7 @@
       </template>
     </modal-form>
     <DataView
-      :value="searchedBooks"
+      :value="searchedAndSortedBooks"
       :layout="layout"
       :paginator="true"
       :rows="rows"
@@ -88,90 +88,92 @@
           </div>
 
           <div class="books-page__buttons-sort-container">
-            <!-- <Dropdown
+            <DataViewLayoutOptions v-model="layout" />
+            <Dropdown
               v-model="selectedSort"
               :options="sortOptions"
               optionLabel="label"
               optionValue="value"
               placeholder="Sort By..."
-              style="text-align: left"
-            /> -->
-
-            <DataViewLayoutOptions v-model="layout" />
+              style="margin-right: 7px"
+            />
           </div>
         </div>
       </template>
 
       <template #list="slotProps">
-        <div class="p-col-12">
-          <div class="product-list-item">
-            <router-link
-              :to="
-                !this.user.isAdmin
-                  ? { name: 'book', params: { id: slotProps.data._id } }
-                  : {
-                      name: 'adminBookPage',
-                      params: { id: slotProps.data._id },
-                    }
-              "
-              ><img
-                :src="slotProps.data.img"
-                :alt="slotProps.data.title"
-                width="800"
-                height="1104"
-                class="
-                  attachment-woocommerce_single
-                  size-woocommerce_single
-                  wp-post-image
+        <transition-group name="list">
+          <div class="p-col-12">
+            <div class="product-list-item">
+              <router-link
+                :to="
+                  !this.user.isAdmin
+                    ? { name: 'book', params: { id: slotProps.data._id } }
+                    : {
+                        name: 'adminBookPage',
+                        params: { id: slotProps.data._id },
+                      }
                 "
-                loading="lazy"
-                sizes="(max-width: 800px) 100vw, 800px"
-              />
-            </router-link>
-
-            <div class="product-list-detail">
-              <div class="product-description books-page__description-author">
-                {{
-                  slotProps.data.author.first_name +
-                  " " +
-                  slotProps.data.author.last_name
-                }}
-              </div>
-              <div class="books-page__description-title">
-                {{ slotProps.data.title }}
-              </div>
-
-              <Rating
-                :modelValue="slotProps.data.rating"
-                :readonly="true"
-                :cancel="false"
-                v-if="slotProps.data.rating"
-              ></Rating>
-            </div>
-            <div class="product-list-action">
-              <div>
-                <Button
-                  v-if="user.isAdmin"
-                  icon="pi pi-times"
-                  class="p-button-rounded p-button-danger p-button-text"
-                  @click="confirmDelete(slotProps.data)"
+                ><img
+                  :src="slotProps.data.img"
+                  :alt="slotProps.data.title"
+                  width="800"
+                  height="1104"
+                  class="
+                    attachment-woocommerce_single
+                    size-woocommerce_single
+                    wp-post-image
+                  "
+                  loading="lazy"
+                  sizes="(max-width: 800px) 100vw, 800px"
                 />
+              </router-link>
+
+              <div class="product-list-detail">
+                <div class="product-description books-page__description-author">
+                  {{
+                    slotProps.data.author.first_name +
+                    " " +
+                    slotProps.data.author.last_name
+                  }}
+                </div>
+                <div class="books-page__description-title">
+                  {{ slotProps.data.title }}
+                </div>
+
+                <Rating
+                  :modelValue="slotProps.data.rating"
+                  :readonly="true"
+                  :cancel="false"
+                  v-if="slotProps.data.rating"
+                ></Rating>
               </div>
-              <span
-                class="product-badge"
-                :class="[
-                  `status-${getCountStatus(
-                    slotProps.data.count
-                  ).toLowerCase()}`,
-                ]"
-                >{{ getCountStatus(slotProps.data.count) }}</span
-              >
+              <div class="product-list-action">
+                <div>
+                  <Button
+                    v-if="user.isAdmin"
+                    icon="pi pi-times"
+                    class="p-button-rounded p-button-danger p-button-text"
+                    @click="confirmDelete(slotProps.data)"
+                  />
+                </div>
+                <span
+                  class="product-badge"
+                  :class="[
+                    `status-${getCountStatus(
+                      slotProps.data.count
+                    ).toLowerCase()}`,
+                  ]"
+                  >{{ getCountStatus(slotProps.data.count) }}</span
+                >
+              </div>
             </div>
           </div>
-        </div>
+        </transition-group>
       </template>
 
       <template #grid="slotProps">
+        <!-- <transition-group name="list"> -->
         <div
           class="p-col-12 p-md-4"
           style="display: flex; padding: 0 !important"
@@ -227,6 +229,7 @@
             </div>
           </div>
         </div>
+        <!-- </transition-group> -->
       </template>
     </DataView>
 
@@ -269,7 +272,7 @@ export default {
       displayConfirmDialog: false,
       mostPopularBooks: [],
       book: "",
-      rows: 9,
+      rows: 8,
       data: {
         title: "",
         author: "",
@@ -340,8 +343,10 @@ export default {
         this.layout = "grid";
       } else if (window.innerWidth < 900 && window.innerWidth > 666) {
         this.rows = 8;
-      } else {
+      } else if (window.innerWidth < 1300 && window.innerWidth > 900) {
         this.rows = 9;
+      } else {
+        this.rows = 8;
       }
     },
   },
@@ -381,27 +386,20 @@ export default {
       );
     },
 
-    sortedBooks() {
-      const typeDataSort = this.searchedBooks
-        ? typeof this.searchedBooks[0][this.selectedSort]
-        : "";
-
-      switch (typeDataSort) {
-        case "string": {
-          return [...this.searchedBooks].sort((firstItem, secondItem) =>
-            firstItem[this.selectedSort]?.localeCompare(
-              secondItem[this.selectedSort]
-            )
-          );
-        }
-        case "number": {
-          return [...this.searchedBooks].sort(
-            (firstItem, secondItem) =>
-              secondItem[this.selectedSort] - firstItem[this.selectedSort]
-          );
-        }
-        default:
-          return [...this.searchedBooks];
+    searchedAndSortedBooks() {
+      if (this.selectedSort === "title") {
+        return [...this.searchedBooks].sort((firstItem, secondItem) =>
+          firstItem[this.selectedSort]?.localeCompare(
+            secondItem[this.selectedSort]
+          )
+        );
+      } else if (this.selectedSort === "rating") {
+        return [...this.searchedBooks].sort(
+          (firstItem, secondItem) =>
+            secondItem[this.selectedSort] - firstItem[this.selectedSort]
+        );
+      } else {
+        return [...this.searchedBooks];
       }
     },
   },
@@ -417,6 +415,7 @@ export default {
       this.searchGenreQuery = this.bookGenre;
     }
     window.addEventListener("resize", this.onResize);
+    this.onResize();
   },
 };
 </script>

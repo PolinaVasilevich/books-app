@@ -9,11 +9,17 @@
         class="p-button-text btn-form"
         type="submit"
       />
-      <Button
+      <!-- <Button
         label="Reset"
         icon="pi pi-times"
         class="p-button-text btn-form"
         type="reset"
+      /> -->
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text btn-form"
+        @click="onCancel"
       />
     </div>
   </form>
@@ -43,6 +49,12 @@ export default {
   methods: {
     onReset() {
       this.$emit("resetForm");
+    },
+
+    onCancel() {
+      this.$emit("resetForm");
+      this.$emit("closeModal");
+      this.$emit("closeEditForm");
     },
 
     async addNewRecord(path, payload, textMessage = "Item created") {
