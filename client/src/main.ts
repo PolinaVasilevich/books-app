@@ -11,6 +11,7 @@ import router from "./router";
 import store from "./store";
 
 import components from "@/components/UI/";
+import directives from "@/directives";
 import components_primevue from "@/components/components_primevue";
 
 import "./assets/styles/main.scss";
@@ -24,7 +25,12 @@ const app = createApp(App);
 [...components, ...components_primevue].forEach((component) => {
   app.component(component.name, component);
 });
+
 app.directive("badge", BadgeDirective);
+
+directives.forEach((directive) => {
+  app.directive(directive.name, directive);
+});
 
 app
   .use(store)
