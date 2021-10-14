@@ -55,6 +55,9 @@
                 ? moment(slotProps.item.return_date).format("YYYY-MM-DD")
                 : ""
             }}
+            <!-- in the library
+            <strong>{{ slotProps.item.library }}</strong> at the address
+            <strong>{{ slotProps.item.library }}</strong> -->
           </p>
         </div>
       </template>

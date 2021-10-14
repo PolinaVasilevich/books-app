@@ -320,6 +320,7 @@ export default {
     };
 
     const confirmGiveOutBook = (book, user, reservation_number, library) => {
+      console.log(library);
       data.value = {
         book,
         user,
