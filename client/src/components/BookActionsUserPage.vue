@@ -60,7 +60,7 @@
               }}
             </p>
             <p v-if="slotProps.item.return_date">
-              in the library "<strong>{{ slotProps.item.library.name }}</strong
+              in the library "<strong>{{ slotProps.item.library?.name }}</strong
               >"
               <!-- <strong>{{ slotProps.item.library }}</strong> -->
             </p>

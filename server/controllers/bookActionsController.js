@@ -226,6 +226,17 @@ class bookController {
         },
 
         {
+          $lookup: {
+            from: "libraries",
+            localField: "library",
+            foreignField: "_id",
+            as: "library",
+          },
+        },
+
+        { $unwind: "$library" },
+
+        {
           $group: {
             _id: "$book",
             book: { $first: "$book" },
@@ -239,6 +250,7 @@ class bookController {
                 action_date: "$action_date",
                 isActual: "$isActual",
                 return_date: "$return_date",
+                library: "$library",
               },
             },
           },
@@ -343,6 +355,16 @@ class bookController {
             isActual: true,
           },
         },
+        {
+          $lookup: {
+            from: "libraries",
+            localField: "library",
+            foreignField: "_id",
+            as: "library",
+          },
+        },
+
+        { $unwind: "$library" },
 
         {
           $group: {
@@ -358,6 +380,7 @@ class bookController {
                 action_date: "$action_date",
                 isActual: "$isActual",
                 return_date: "$return_date",
+                library: "$library",
               },
             },
           },
