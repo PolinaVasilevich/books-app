@@ -288,6 +288,7 @@ export default {
       typeDataSort: "",
       sortOptions: [
         { label: "Sort By Title", value: "title" },
+        { label: "Sort By Count", value: "count" },
         { label: "Sort By Rating", value: "rating" },
       ],
       searchQuery: "",
@@ -393,7 +394,10 @@ export default {
             secondItem[this.selectedSort]
           )
         );
-      } else if (this.selectedSort === "rating") {
+      } else if (
+        this.selectedSort === "rating" ||
+        this.selectedSort === "count"
+      ) {
         return [...this.searchedBooks].sort(
           (firstItem, secondItem) =>
             secondItem[this.selectedSort] - firstItem[this.selectedSort]
