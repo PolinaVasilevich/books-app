@@ -3,6 +3,7 @@ import API from "@/utils/api";
 export const loginModule = {
   state: () => ({
     status: "",
+    errors: "",
     token: localStorage.getItem("token") || "",
     users: JSON.parse(localStorage.getItem("users")) || [],
     user: JSON.parse(localStorage.getItem("user")) || {},
@@ -34,11 +35,23 @@ export const loginModule = {
     notReturnedBooks(state) {
       return state.notReturnedBooks;
     },
+
+    status(state) {
+      return state.status;
+    },
+
+    errors(state) {
+      return state.errors;
+    },
   },
 
   mutations: {
     setStatus(state, status) {
       state.status = status;
+    },
+
+    setErrors(state, errors) {
+      state.errors = errors;
     },
 
     setToken(state, token) {
@@ -98,6 +111,8 @@ export const loginModule = {
         commit("setStatus", "loaded");
       } catch (error) {
         console.log(error);
+        commit("setStatus", "error");
+        commit("setErrors", error.response.data.message);
       }
     },
 

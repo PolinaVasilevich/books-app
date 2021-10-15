@@ -8,7 +8,25 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="book-page__container">
+      <Message severity="warn" v-if="!isLoggedIn && libraries.length">
+        <p style="font-size: 1.2rem; margin-top: 10px">
+          <router-link
+            style="text-decoration: none; color: #d14031"
+            to="/login"
+          >
+            login</router-link
+          >
+          or
+          <router-link
+            style="text-decoration: none; color: #d14031"
+            to="/registration"
+          >
+            create
+          </router-link>
+          your account to reserve this book
+        </p>
+      </Message>
       <div class="book-page__content">
         <div class="book-page__content__img-container">
           <img
@@ -172,7 +190,7 @@
             v-if="
               isLoggedIn && !user.isAdmin && libraries.length && !isReserved
             "
-            :label="'Reserve book'.toUpperCase()"
+            :label="'Select library'.toUpperCase()"
             class="p-button-warning select-library-button"
             :disabled="!libraries.length || isReserved || isDisabled"
             style="margin: 20px 0"
@@ -206,6 +224,19 @@
             icon="pi pi-book"
             style="margin: 20px 0"
           />
+
+          <p
+            style="font-size: 1.2rem; margin-top: 3px"
+            v-if="isReserved || isDisabled"
+          >
+            You can see information about the reserved book in the section
+            <router-link
+              style="text-decoration: none; color: #d14031"
+              :to="{ name: 'userPage', params: { id: user._id } }"
+            >
+              "My books"</router-link
+            >
+          </p>
 
           <Map
             v-if="libraries.length"

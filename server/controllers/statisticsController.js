@@ -8,7 +8,6 @@ class statisticsController {
     try {
       const mostPopularBooks = await BookActions.aggregate([
         { $match: { status: "Returned" } },
-
         {
           $group: {
             _id: "$book",
@@ -16,7 +15,6 @@ class statisticsController {
             count: { $sum: 1 },
           },
         },
-
         {
           $lookup: {
             from: "books",
@@ -25,9 +23,7 @@ class statisticsController {
             as: "book",
           },
         },
-
         { $unwind: "$book" },
-
         {
           $lookup: {
             from: "authors",
@@ -36,9 +32,7 @@ class statisticsController {
             as: "book.author",
           },
         },
-
         { $unwind: "$book.author" },
-
         {
           $match: {
             count: { $gte: 2 },
@@ -50,6 +44,45 @@ class statisticsController {
             count: 0,
           },
         },
+
+        {
+          $lookup: {
+            from: "libraries",
+            let: { bookId: "$book._id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $in: ["$$bookId", "$books.book"],
+                  },
+                },
+              },
+              { $unwind: "$books" },
+              { $match: { $expr: { $eq: ["$books.book", "$$bookId"] } } },
+              {
+                $group: {
+                  _id: "$books.book",
+                  count: { $sum: "$books.count" },
+                },
+              },
+            ],
+            as: "result",
+          },
+        },
+
+        {
+          $set: {
+            "book.count": {
+              $cond: [
+                { $gt: [{ $size: "$result" }, 0] },
+                { $first: "$result.count" },
+                0,
+              ],
+            },
+          },
+        },
+
+        { $sort: { "book.title": 1 } },
       ]);
 
       res.json(mostPopularBooks);

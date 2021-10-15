@@ -77,6 +77,7 @@ export default {
           severity: "error",
           summary: "Error Message",
           detail: error.response.data.message,
+          life: 3000,
         });
       }
     },
