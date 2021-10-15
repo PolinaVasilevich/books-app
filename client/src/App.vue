@@ -25,7 +25,7 @@
           <menu-header
             class="nav-list__menu"
             :isLogin="isLoggedIn"
-            :currentUser="currentUser"
+            :currentUser="this.user"
             :isAdmin="user?.isAdmin"
             @logout="openModal"
             :notReturnedBooks="notReturnedBooks"
@@ -74,13 +74,17 @@
 
             <div v-if="isLoggedIn" class="nav-list__item" style="margin: 0">
               <router-link
-                :to="{
-                  name: 'userPage',
-                  params: {
-                    id: user?._id,
-                    notReturned: !!notReturnedBooks?.length,
-                  },
-                }"
+                :to="
+                  notReturnedBooks?.length
+                    ? {
+                        name: 'userPage',
+                        params: {
+                          id: user?._id,
+                          notReturned: !!notReturnedBooks?.length,
+                        },
+                      }
+                    : {}
+                "
               >
                 <Button
                   type="button"
@@ -91,9 +95,13 @@
                     header__text header__text-button
                   "
                   style="padding-right: 0"
-                  :badge="notReturnedBooks?.length"
+                  :badge="
+                    notReturnedBooks?.length
+                      ? `${notReturnedBooks?.length}`
+                      : ''
+                  "
                   badgeClass="p-badge-danger"
-                  :disabled="!notReturnedBooks?.length && !user.isAdmin"
+                  :disabled="!notReturnedBooks?.length || user.isAdmin"
                 />
               </router-link>
             </div>

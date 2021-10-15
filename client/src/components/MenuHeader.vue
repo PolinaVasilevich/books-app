@@ -50,9 +50,9 @@ export default {
     },
   },
 
-  data() {
-    return {
-      headersNotAuth: [
+  computed: {
+    headersNotAuth() {
+      return [
         {
           label: "Home",
           icon: "pi pi-home",
@@ -81,22 +81,28 @@ export default {
             this.$router.push("/registration");
           },
         },
-      ],
+      ];
+    },
 
-      headersAuth: [
+    headersAuth() {
+      return [
         {
-          label: `${this.currentUser?.username}  `,
+          label: `${this.currentUser.username}  `,
           icon: "pi pi-user",
           isBadge: true,
           command: () => {
             this.hide();
-            this.$router.push({
-              name: "userPage",
-              params: {
-                id: this.currentUser._id,
-                notReturned: !!this.notReturnedBooks?.length,
-              },
-            });
+            this.$router.push(
+              this.notReturnedBooks?.length
+                ? {
+                    name: "userPage",
+                    params: {
+                      id: this.currentUser._id,
+                      notReturned: !!this.notReturnedBooks?.length,
+                    },
+                  }
+                : {}
+            );
           },
         },
         {
@@ -128,8 +134,11 @@ export default {
             this.$emit("logout");
           },
         },
-      ],
-      headersAdmin: [
+      ];
+    },
+
+    headersAdmin() {
+      return [
         {
           label: this.currentUser?.username,
           icon: "pi pi-user",
@@ -167,8 +176,12 @@ export default {
             this.$emit("logout");
           },
         },
-      ],
+      ];
+    },
+  },
 
+  data() {
+    return {
       headers: [],
     };
   },
@@ -193,10 +206,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .p-menuitem:hover {
   background-color: #f3f3f3 !important;
   border-color: #f3f3f3 !important;
 }
 </style>
->

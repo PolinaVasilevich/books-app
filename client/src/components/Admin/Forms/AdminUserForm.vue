@@ -4,8 +4,6 @@
     :dataForm="dataForm"
     :path="path"
     :callback="callback"
-    @showMessage="showMessage"
-    @showErrorMessage="showErrorMessage"
   >
     <template v-slot:input>
       <input

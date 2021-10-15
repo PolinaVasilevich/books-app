@@ -42,6 +42,9 @@ export default {
     bookTitle: {
       type: String,
     },
+    callback: {
+      type: Function,
+    },
   },
 
   methods: {

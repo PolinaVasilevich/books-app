@@ -167,7 +167,10 @@
                 <router-link
                   :to="{
                     name: 'reservedBooks',
-                    params: { reservedBookTitle: currentBook.title },
+                    params: {
+                      reservedBookTitle: currentBook.title,
+                      reservedBookID: currentBook._id,
+                    },
                   }"
                   class="router-link"
                 >

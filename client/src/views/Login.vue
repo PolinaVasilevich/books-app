@@ -1,7 +1,7 @@
 <template>
   <div class="form">
     <Toast />
-    <div v-if="!isAdmin" class="mkdf-has-bg-image" data-height="300">
+    <div class="mkdf-has-bg-image" data-height="300">
       <div class="mkdf-title-wrapper" style="height: 300px">
         <div class="mkdf-title-inner" style="height: inherit">
           <div class="mkdf-grid">

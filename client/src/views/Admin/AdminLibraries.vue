@@ -128,6 +128,7 @@
         <admin-library-form
           @submitForm="addNewLibrary"
           :initialForm="initialLibraryForm"
+          @cancel="hideLibraryDialog"
         />
       </Dialog>
     </div>

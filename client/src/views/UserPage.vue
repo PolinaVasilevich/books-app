@@ -44,6 +44,34 @@
 
           <Button
             type="button"
+            icon="pi pi-book"
+            label="Reserved books"
+            @click="showReservedBooks"
+            :class="[
+              'p-button-text',
+              {
+                'user-page__active-search-button':
+                  searchQueryButton?.toLowerCase() === 'reserved',
+              },
+            ]"
+          />
+
+          <Button
+            type="button"
+            icon="pi pi-book"
+            label="Received books"
+            @click="showReceiredBooks"
+            :class="[
+              'p-button-text',
+              {
+                'user-page__active-search-button':
+                  searchQueryButton?.toLowerCase() === 'received',
+              },
+            ]"
+          />
+
+          <Button
+            type="button"
             icon="pi pi-calendar"
             label="Must return today"
             @click="showBooksWhichMustReturnToday"
@@ -54,13 +82,15 @@
                   searchQueryButton?.toLowerCase() === 'returntoday',
               },
             ]"
-            :badge="returnTodayBooks?.length"
+            :badge="
+              returnTodayBooks?.length ? `${returnTodayBooks?.length}` : ''
+            "
             badgeClass="p-badge-danger"
           />
 
           <Button
             type="button"
-            icon="pi pi-calendar"
+            icon="pi pi-ban"
             label="Not returned"
             @click="showBooksWhichNotReturned"
             :class="[
@@ -70,7 +100,9 @@
                   searchQueryButton?.toLowerCase() === 'notreturned',
               },
             ]"
-            :badge="notReturnedBooks?.length"
+            :badge="
+              notReturnedBooks?.length ? `${notReturnedBooks?.length}` : ''
+            "
             badgeClass="p-badge-danger"
           />
         </div>
@@ -99,12 +131,19 @@
           </template>
 
           <template #content>
+            <h5 v-if="item.details.length === 1">
+              You reserved this book in the library
+              <strong>{{ item.library }}</strong>
+            </h5>
             <h5>
-              Reservation number:
+              <strong class="user-page__content-subtitle"
+                >Reservation number:
+              </strong>
               <span style="font-weight: normal">{{
                 item.reservation_number
               }}</span>
             </h5>
+
             <book-actions-user-page
               :data="item.details"
               :icons="icons"
@@ -160,9 +199,7 @@ export default {
     return {
       moment: moment,
       displayConfirmDialog: false,
-
       filteredData: null,
-      bookActions: [],
       item: null,
       searchQueryButton: "all",
       icons: [
@@ -244,6 +281,22 @@ export default {
     showBooksWhichMustReturnToday() {
       this.filteredData = [...this.returnTodayBooks];
       this.searchQueryButton = "returntoday";
+    },
+
+    showReservedBooks() {
+      this.filteredData = this.userReservedBooks.filter(
+        (item) => item.details?.length === 1
+      );
+
+      this.searchQueryButton = "reserved";
+    },
+
+    showReceiredBooks() {
+      this.filteredData = this.userReservedBooks.filter(
+        (item) => item.details?.length > 1
+      );
+
+      this.searchQueryButton = "received";
     },
 
     showAllBooks() {

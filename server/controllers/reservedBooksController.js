@@ -19,6 +19,17 @@ class reservedBooksController {
         { $sort: { action_date: 1 } },
 
         {
+          $lookup: {
+            from: "libraries",
+            localField: "library",
+            foreignField: "_id",
+            as: "library",
+          },
+        },
+
+        { $unwind: "$library" },
+
+        {
           $group: {
             _id: "$book",
             book: { $first: "$book" },
@@ -32,6 +43,7 @@ class reservedBooksController {
                 action_date: "$action_date",
                 isActual: "$isActual",
                 return_date: "$return_date",
+                library: "$library",
               },
             },
           },
