@@ -40,25 +40,31 @@
 
       <template #content="slotProps">
         <div style="width: max-content">
-          <p>{{ slotProps.item.status }}</p>
-          <p
-            :class="{ 'not-returned-text': isNotReturned }"
-            v-if="
-              slotProps.item.status === 'Received' && slotProps.item.return_date
-            "
-          >
-            <b :class="{ 'not-returned-text': isNotReturned }"
-              >Book must be returned on:</b
+          <div>
+            <p>{{ slotProps.item.status }}</p>
+            <p
+              style="margin-bottom: 0"
+              :class="{ 'not-returned-text': isNotReturned }"
+              v-if="
+                slotProps.item.status === 'Received' &&
+                slotProps.item.return_date
+              "
             >
-            {{
-              slotProps.item.return_date
-                ? moment(slotProps.item.return_date).format("YYYY-MM-DD")
-                : ""
-            }}
-            <!-- in the library
-            <strong>{{ slotProps.item.library }}</strong> at the address
-            <strong>{{ slotProps.item.library }}</strong> -->
-          </p>
+              <b :class="{ 'not-returned-text': isNotReturned }"
+                >Book must be returned on:</b
+              >
+              {{
+                slotProps.item.return_date
+                  ? moment(slotProps.item.return_date).format("YYYY-MM-DD")
+                  : ""
+              }}
+            </p>
+            <p v-if="slotProps.item.return_date">
+              in the library "<strong>{{ slotProps.item.library.name }}</strong
+              >"
+              <!-- <strong>{{ slotProps.item.library }}</strong> -->
+            </p>
+          </div>
         </div>
       </template>
     </Timeline>

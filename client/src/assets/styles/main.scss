@@ -226,3 +226,10 @@ body {
   background-color: #f3f3f3 !important;
   border-color: #f3f3f3 !important;
 }
+
+.user-page__buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+}

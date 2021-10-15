@@ -90,7 +90,7 @@
 
           <Button
             type="button"
-            icon="pi pi-calendar"
+            icon="pi pi-ban"
             label="Not returned"
             @click="showBooksWhichNotReturned"
             :class="[
@@ -133,10 +133,12 @@
           <template #content>
             <h5 v-if="item.details.length === 1">
               You reserved this book in the library
-              <strong>{{ item.library.name }}</strong>
+              <strong>{{ item.library }}</strong>
             </h5>
             <h5>
-              <strong>Reservation number: </strong>
+              <strong class="user-page__content-subtitle"
+                >Reservation number:
+              </strong>
               <span style="font-weight: normal">{{
                 item.reservation_number
               }}</span>

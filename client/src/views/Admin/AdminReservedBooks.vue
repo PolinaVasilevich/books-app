@@ -75,7 +75,7 @@
 
         <Button
           type="button"
-          icon="pi pi-calendar"
+          icon="pi pi-ban"
           label="Not returned"
           @click="showAllNotReturtedBooks"
           :class="[
@@ -320,7 +320,6 @@ export default {
     };
 
     const confirmGiveOutBook = (book, user, reservation_number, library) => {
-      console.log(library);
       data.value = {
         book,
         user,
