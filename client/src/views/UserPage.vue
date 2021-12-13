@@ -133,7 +133,7 @@
           <template #content>
             <h5 v-if="item.details.length === 1">
               You reserved this book in the library
-              <strong>{{ item.library }}</strong>
+              <strong>{{ item.library.name }}</strong>
             </h5>
             <h5>
               <strong class="user-page__content-subtitle"
